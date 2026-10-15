@@ -89,6 +89,11 @@ output.calc{display:flex;align-items:center;min-height:36px;padding:7px 9px;bord
 fieldset{border:0;margin:0;padding:0;min-width:0}
 fieldset legend{padding:0;margin-bottom:5px}
 .chipset{display:flex;flex-wrap:wrap;gap:6px}
+.outro-in{margin-top:8px;max-width:420px}
+.dmy{display:grid;grid-template-columns:1fr 1.2fr 1.3fr;gap:6px}
+input.upper{text-transform:uppercase}
+input[readonly]{background:var(--surface);color:var(--muted);cursor:default}
+input.invalido{border-color:var(--crit)!important}
 .chip{position:relative;display:inline-flex}
 .chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
 .chip span{display:inline-block;padding:6px 11px;border:1px solid var(--line-strong);border-radius:7px;background:var(--surface);font-size:13px;line-height:1.3;cursor:pointer;user-select:none}
@@ -303,32 +308,35 @@ body.patient-mode .pm-only{display:flex}
 var SCHEMA = [
 { id: 'ident', title: 'Identificação', fields: [
   { t: 'text', id: 'nome', label: 'Nome completo', span: 6 },
-  { t: 'text', id: 'nome_social', label: 'Nome social', span: 3 },
+  { t: 'text', id: 'nome_social', label: 'Nome social', span: 3, upper: true },
   { t: 'text', id: 'prontuario', label: 'Prontuário / registro', span: 3 },
-  { t: 'date', id: 'dn', label: 'Data de nascimento', span: 3 },
+  { t: 'dmy', id: 'dn', label: 'Data de nascimento', span: 4 },
   { t: 'calc', id: 'idade', label: 'Idade', span: 2 },
-  { t: 'chips', id: 'sexo', label: 'Sexo', options: ['Feminino', 'Masculino'], span: 3 },
-  { t: 'text', id: 'cor', label: 'Cor / raça (autodeclarada)', span: 4 },
-  { t: 'select', id: 'estado_civil', label: 'Estado civil', options: ['Solteiro(a)', 'Casado(a) / união estável', 'Divorciado(a)', 'Viúvo(a)'], span: 3 },
-  { t: 'text', id: 'profissao', label: 'Profissão / ocupação', span: 3 },
-  { t: 'text', id: 'escolaridade', label: 'Escolaridade', span: 3 },
-  { t: 'text', id: 'religiao', label: 'Religião', span: 3, ph: 'relevante para hemocomponentes' },
-  { t: 'text', id: 'naturalidade', label: 'Naturalidade', span: 3 },
+  { t: 'chips', id: 'sexo', label: 'Sexo biológico', options: ['Feminino', 'Masculino'], outro: true, span: 3 },
+  { t: 'text', id: 'genero', label: 'Gênero autopercebido', span: 3 },
+  { t: 'chips', id: 'cor', label: 'Cor / raça (autodeclarada)', options: ['Preta', 'Branca', 'Parda', 'Amarela', 'Indígena', 'Não declarar'], span: 12 },
+  { t: 'chips', id: 'estado_civil', label: 'Estado civil', options: ['Solteiro(a)', 'Casado(a) / união estável', 'Divorciado(a)', 'Viúvo(a)'], span: 12 },
+  { t: 'text', id: 'profissao', label: 'Profissão / ocupação', span: 4 },
+  { t: 'select', id: 'escolaridade', label: 'Escolaridade', options: ['Não alfabetizado', 'Fundamental incompleto', 'Fundamental completo', 'Médio incompleto', 'Médio completo', 'Superior', 'Pós-graduação'], span: 4 },
+  { t: 'text', id: 'naturalidade', label: 'Naturalidade', span: 4, ph: 'cidade – UF' },
+  { t: 'chips', id: 'religiao', label: 'Religião', options: ['Católica', 'Evangélica', 'Candomblé / Umbanda', 'Testemunha de Jeová'], outro: true, span: 12 },
   { t: 'text', id: 'endereco', label: 'Endereço', span: 6 },
   { t: 'text', id: 'cidade', label: 'Cidade / UF', span: 3 },
-  { t: 'text', id: 'telefone', label: 'Telefone', span: 3 },
-  { t: 'text', id: 'documento', label: 'Documento (RG / CPF)', span: 3 },
-  { t: 'text', id: 'convenio', label: 'Convênio / matrícula', span: 3 },
+  { t: 'text', id: 'telefone', label: 'Telefone', span: 3, mask: 'tel', ph: '(73) 9 9999-9999' },
+  { t: 'text', id: 'documento', label: 'CPF', span: 3, mask: 'cpf', ph: '000.000.000-00' },
+  { t: 'text', id: 'doc_outro', label: 'Outro documento', span: 3, ph: 'tipo e número' },
+  { t: 'chips', id: 'convenio', label: 'Convênio', options: ['PARTICULAR', 'UNIMED', 'PLANSERV', 'BRADESCO', 'CASSI', 'SULAMÉRICA', 'PLANSUL', 'AMIL', 'SAÚDE CAIXA', 'POSTAL SAÚDE', 'FUSEX', 'CAMED'], span: 12 },
+  { t: 'text', id: 'convenio_mat', label: 'Nº da carteirinha / matrícula', span: 4 },
   { t: 'text', id: 'contato_emerg', label: 'Contato de emergência (nome, parentesco, telefone)', span: 8 },
   { t: 'text', id: 'responsavel', label: 'Responsável legal (menor ou incapaz)', span: 4 },
   { t: 'text', id: 'responsavel_parent', label: 'Parentesco / vínculo', span: 3 },
   { t: 'text', id: 'responsavel_doc', label: 'Documento do responsável', span: 3 },
-  { t: 'text', id: 'comunicacao', label: 'Necessidades de comunicação', span: 12, ph: 'surdez, idioma, deficiência visual ou cognitiva' },
-  { t: 'text', id: 'informante', label: 'Informante', span: 3, ph: 'paciente, familiar, prontuário' },
-  { t: 'date', id: 'data_aval', label: 'Data da avaliação', span: 3 },
-  { t: 'time', id: 'hora_aval', label: 'Hora', span: 2 },
-  { t: 'text', id: 'anestesiologista', label: 'Anestesiologista avaliador', span: 4 },
-  { t: 'text', id: 'crm_anest', label: 'CRM / UF · RQE', span: 3 },
+  { t: 'chips', id: 'comunicacao', label: 'Necessidades de comunicação', options: ['Surdez', 'Deficiência visual', 'Deficiência cognitiva', 'Outro idioma'], outro: true, span: 12 },
+  { t: 'text', id: 'informante', label: 'Responsável pelas informações', span: 4, ph: 'paciente, familiar, prontuário' },
+  { t: 'date', id: 'data_aval', label: 'Data da avaliação', span: 3, ro: true },
+  { t: 'time', id: 'hora_aval', label: 'Hora', span: 2, ro: true },
+  { t: 'text', id: 'anestesiologista', label: 'Anestesiologista avaliador', span: 4, ro: true },
+  { t: 'text', id: 'crm_anest', label: 'CRM / UF · RQE', span: 4, ro: true },
   { t: 'chips', id: 'local_aval', label: 'Local da avaliação', options: ['Consultório / ambulatório', 'Enfermaria', 'UTI', 'Pronto-socorro', 'Teleconsulta'], span: 9 }
 ]},
 
@@ -1067,7 +1075,10 @@ function wrap(f, inner, extra){
 function renderField(f){
   switch (f.t){
     case 'text': case 'date': case 'time':
-      return wrap(f, [labelEl(f), h('input', { id: f.id, type: f.t, placeholder: f.ph || null, autocomplete: 'off' })]);
+      return wrap(f, [labelEl(f), h('input', { id: f.id, type: f.t, placeholder: f.ph || null, autocomplete: 'off', readonly: f.ro ? true : null,
+        title: f.ro ? 'Preenchido automaticamente pelo sistema' : null, inputmode: f.mask ? 'numeric' : null, maxlength: f.mask === 'cpf' ? 14 : f.mask === 'tel' ? 16 : null,
+        'data-mask': f.mask || null, 'class': f.upper ? 'upper' : null })]);
+    case 'dmy': return renderDmy(f);
     case 'num':
       return wrap(f, [labelEl(f), h('input', { id: f.id, type: 'text', inputmode: 'decimal', 'class': 'numf', autocomplete: 'off' })]);
     case 'calc':
@@ -1080,9 +1091,10 @@ function renderField(f){
       var type = f.t === 'chips' ? 'radio' : 'checkbox';
       var fs = h('fieldset', { 'class': 'f ' + f.t + ((f.span || 3) <= 3 ? ' sm' : ''), style: '--s:' + (f.span || 12), id: f.id },
         h('legend', null, f.label),
-        h('div', { 'class': 'chipset' }, f.options.map(function(o){
+        h('div', { 'class': 'chipset' }, f.options.concat(f.outro ? ['Outro'] : []).map(function(o){
           return h('label', { 'class': 'chip' }, h('input', { type: type, name: f.id, value: o }), h('span', null, o));
-        })));
+        })),
+        f.outro ? h('input', { type: 'text', id: f.id + '_outro', 'class': 'outro-in', 'data-outro-for': f.id, placeholder: 'Qual? Descreva', 'aria-label': f.label + ': outro', autocomplete: 'off', hidden: true }) : null);
       if (f.only) fs.setAttribute('data-only', f.only);
       return fs;
     case 'sub': return h('h3', { 'class': 'sub' }, f.label);
@@ -1096,6 +1108,59 @@ function renderField(f){
   }
   return null;
 }
+var MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+function renderDmy(f){
+  var ano = new Date().getFullYear(), anos = [];
+  for (var y = ano; y >= 1900; y--) anos.push(y);
+  var hid = h('input', { type: 'hidden', id: f.id });
+  function sync(){
+    var d = $(f.id + '_d').value, m = $(f.id + '_m').value, a = $(f.id + '_a').value;
+    if (d && m && a){
+      var max = new Date(+a, +m, 0).getDate();
+      if (+d > max){ $(f.id + '_d').value = String(max); d = String(max); }
+      hid.value = a + '-' + pad(+m) + '-' + pad(+d);
+    } else hid.value = '';
+  }
+  var sel = function(sfx, rot, opts){
+    return h('select', { id: f.id + '_' + sfx, 'aria-label': f.label + ': ' + rot, onchange: sync },
+      h('option', { value: '' }, rot), opts.map(function(o){ return h('option', { value: String(o[0]) }, String(o[1])); }));
+  };
+  var dias = []; for (var i = 1; i <= 31; i++) dias.push([i, pad(i)]);
+  return wrap(f, [h('span', { 'class': 'lbl' }, f.label), h('div', { 'class': 'dmy' },
+    sel('d', 'Dia', dias), sel('m', 'Mês', MESES.map(function(n, i){ return [i + 1, n]; })), sel('a', 'Ano', anos.map(function(y){ return [y, y]; }))), hid]);
+}
+function syncDmy(){
+  document.querySelectorAll('.dmy').forEach(function(b){
+    var hid = b.parentNode.querySelector('input[type=hidden]'); if (!hid || !hid.value) return;
+    var id = hid.id, p = hid.value.split('-');
+    if ($(id + '_a').value) return;
+    $(id + '_a').value = String(+p[0]); $(id + '_m').value = String(+p[1]); $(id + '_d').value = String(+p[2]);
+  });
+}
+function cpfValido(c){
+  c = c.replace(/\D/g, ''); if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+  for (var t = 9; t < 11; t++){ var s = 0; for (var i = 0; i < t; i++) s += +c[i] * (t + 1 - i); if (((s * 10) % 11) % 10 !== +c[t]) return false; }
+  return true;
+}
+function aplicarMascara(e){
+  var m = e.getAttribute('data-mask'), d = e.value.replace(/\D/g, '');
+  if (m === 'cpf'){
+    d = d.slice(0, 11);
+    e.value = d.replace(/^(\d{3})(\d)/, '$1.$2').replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d{1,2})$/, '.$1-$2');
+    e.classList.toggle('invalido', d.length === 11 && !cpfValido(d));
+    e.title = d.length === 11 && !cpfValido(d) ? 'CPF inválido: confira os números' : '';
+  } else if (m === 'tel'){
+    d = d.slice(0, 11);
+    if (d.length <= 10) e.value = d.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+    else e.value = d.replace(/^(\d{2})(\d)(\d{4})(\d{4})$/, '($1) $2 $3-$4');
+  }
+}
+document.addEventListener('input', function(e){
+  var t = e.target; if (!t || !t.matches) return;
+  if (t.matches('[data-mask]')) aplicarMascara(t);
+  if (t.matches('input.upper')){ var p = t.selectionStart; t.value = t.value.toLocaleUpperCase('pt-BR'); try { t.setSelectionRange(p, p); } catch (x) {} }
+}, true);
+function comOutro(id, v){ if (v !== 'Outro') return v; var o = txt(id + '_outro'); return o || v; }
 function tableRow(f, vals){
   var tr = h('tr');
   f.cols.forEach(function(c, i){ tr.appendChild(h('td', null, h('input', { type: 'text', 'aria-label': c[0], value: vals && vals[i] ? vals[i] : null }))); });
@@ -1215,6 +1280,8 @@ function aplicarSecao(id, d){
     if (e.type === 'checkbox') e.checked = !!v; else e.value = v == null ? '' : v;
   });
   (d.__manual || []).forEach(function(k){ var e = $(k); if (e) e.dataset.manual = '1'; else s.querySelectorAll('input[name="' + k + '"]').forEach(function(i){ i.dataset.manual = '1'; }); });
+  syncDmy();
+  s.querySelectorAll('[data-mask]').forEach(aplicarMascara);
   if (id === 'tcle'){
     if (d.__manualFlags) MANUAL = d.__manualFlags;
     if (d.__sig) Object.keys(d.__sig).forEach(function(k){ var x = d.__sig[k]; SIG[k] = { data: x.data, at: new Date(x.at), ratio: x.ratio, fit: x.fit }; if (PADS[k]) PADS[k].redraw(); });
@@ -1613,6 +1680,10 @@ function update(){
   if (pending) return; pending = true;
   requestAnimationFrame(function(){
     pending = false;
+    document.querySelectorAll('[data-outro-for]').forEach(function(i){
+      var on = !!document.querySelector('input[name="' + i.getAttribute('data-outro-for') + '"][value="Outro"]:checked');
+      i.hidden = !on;
+    });
     computeBase(); applyAuto(); computeScores();
     var A = alerts(); renderAlerts(A); renderStrip(); renderPanelScores(); renderUI();
     LAST_ALERTS = A;
@@ -1639,8 +1710,9 @@ function summary(semAssinatura){
           v = txt(f.id); if (v) L.push(f.label + ': ' + v + (f.unit && f.t === 'num' ? ' ' + f.unit : '')); break;
         case 'date': v = txt(f.id); if (v) L.push(f.label + ': ' + dBR(v)); break;
         case 'calc': v = $(f.id).textContent; if (v && v !== '—') L.push(f.label + ': ' + v + (f.unit ? ' ' + f.unit : '')); break;
-        case 'chips': v = chip(f.id); if (v) L.push(f.label + ': ' + v); break;
-        case 'multi': v = multi(f.id); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
+        case 'chips': v = comOutro(f.id, chip(f.id)); if (v) L.push(f.label + ': ' + v); break;
+        case 'dmy': v = txt(f.id); if (v) L.push(f.label + ': ' + dBR(v)); break;
+        case 'multi': v = multi(f.id).map(function(x){ return comOutro(f.id, x); }); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
         case 'table':
           var rows = tableRows(f.id);
           if (rows.length){ L.push(f.label + ':'); rows.forEach(function(r){ L.push('  - ' + r.map(function(c, i){ return c ? f.cols[i][0] + ': ' + c : ''; }).filter(Boolean).join('; ')); }); }
@@ -2222,7 +2294,7 @@ function clearAll(){
     if (f.t !== 'table') return;
     var tb = $(f.id).tBodies[0]; tb.innerHTML = ''; for (var i = 0; i < Math.min(f.rows, 2); i++) tb.appendChild(tableRow(f));
   }); });
-  var d = new Date(); $('data_aval').value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  var d = new Date(); $('data_aval').value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); $('hora_aval').value = pad(d.getHours()) + ':' + pad(d.getMinutes());
   tcleReset();
   $('banner').hidden = true;
   if (window.ACESSO && window.ACESSO.aposLimpar) window.ACESSO.aposLimpar();
@@ -2243,7 +2315,7 @@ function setVal(id, v){
 }
 var TABLES = {};
 var EXAMPLE = {
-  nome: 'Maria Aparecida Souza (EXEMPLO)', prontuario: '000000', documento: 'CPF 000.000.000-00', cidade: 'Salvador / BA', dn: '1958-03-14', sexo: 'Feminino', estado_civil: 'Casado(a) / união estável', profissao: 'Professora aposentada', informante: 'Paciente', local_aval: 'Consultório / ambulatório', anestesiologista: 'Dr. Cassio Brito',
+  nome: 'Maria Aparecida Souza (EXEMPLO)', prontuario: '000000', documento: '000.000.000-00', cor: 'Parda', escolaridade: 'Superior', religiao: 'Católica', convenio: 'PLANSERV', telefone: '73999998888', cidade: 'Salvador / BA', dn: '1958-03-14', sexo: 'Feminino', estado_civil: 'Casado(a) / união estável', profissao: 'Professora aposentada', informante: 'Paciente', local_aval: 'Consultório / ambulatório', anestesiologista: 'Dr. Cassio Brito',
   cirurgia: 'Colecistectomia videolaparoscópica', lateralidade: 'Não se aplica', diagnostico: 'Colelitíase sintomática (K80.2)', cirurgiao: 'Cirurgia geral', carater: 'Eletiva', risco_cir: 'Intermediário (1–5%)', regime: 'Internação', duracao: '2', posicao: 'Supina, próclive', uti_prev: 'Não', perda_sang: 'Mínima', incisao: 'Abdominal superior', cir_especial: ['Videolaparoscopia (pneumoperitônio)'],
   anest_previa: 'Sim', cirurgias: [['2009', 'Histerectomia abdominal', 'Raquianestesia', 'Hosp. Municipal', 'Náuseas e vômitos intensos no pós-operatório'], ['1986', 'Cesárea', 'Peridural', 'Maternidade', 'Nenhuma']],
   c_nvpo: true, c_nvpo_det: 'após histerectomia (2009)', fam_anest_nega: true,
@@ -2275,6 +2347,7 @@ var EXAMPLE = {
 function loadExample(){
   clearAll();
   Object.keys(EXAMPLE).forEach(function(k){ setVal(k, EXAMPLE[k]); });
+  syncDmy(); document.querySelectorAll('[data-mask]').forEach(aplicarMascara);
   $('banner').hidden = false;
   update();
 }
@@ -2318,7 +2391,7 @@ SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){
 }); });
 render(); bind(); loadExample();
 window.PRONT = { clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
-  coletarSecao: coletarSecao, aplicarSecao: aplicarSecao, setAssinado: setAssinado };
+  coletarSecao: coletarSecao, aplicarSecao: aplicarSecao, setAssinado: setAssinado, syncDmy: syncDmy };
 })();
 </script>
 
@@ -3208,6 +3281,13 @@ async function abrirProntuario(id, novo){
     if ((PERM[e.closest('.sec').id.slice(4)] || 'oculto') === 'oculto') return;
     e.value = ATUAL[c[1]]; window.ACESSO.sujo(e.closest('.sec').id.slice(4));
   });
+  var ident = (s.data || []).find(function(x){ return x.aba_id === 'ident'; });
+  if (ATUAL.criado_em && !(ident && ident.dados && ident.dados.data_aval)){
+    var cr = new Date(ATUAL.criado_em), p2 = function(n){ return (n < 10 ? '0' : '') + n; };
+    if ($('data_aval')) $('data_aval').value = cr.getFullYear() + '-' + p2(cr.getMonth() + 1) + '-' + p2(cr.getDate());
+    if ($('hora_aval')) $('hora_aval').value = p2(cr.getHours()) + ':' + p2(cr.getMinutes());
+  }
+  window.PRONT.syncDmy();
   if (ATUAL.paciente_sexo && !document.querySelector('#sec-ident input[name="sexo"]:checked')) document.querySelectorAll('#sec-ident input[name="sexo"]').forEach(function(i){ i.checked = i.value === ATUAL.paciente_sexo; });
   aplicarPermissoes();
   if (ATUAL.status === 'assinada'){
