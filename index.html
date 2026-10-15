@@ -91,6 +91,12 @@ fieldset legend{padding:0;margin-bottom:5px}
 .chipset{display:flex;flex-wrap:wrap;gap:6px}
 .outro-in{margin-top:8px;max-width:420px}
 .hm{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cellmulti{display:flex;flex-wrap:wrap;gap:4px 12px;min-width:250px;padding:4px 2px;font-size:13px}
+.cellmulti label{display:inline-flex;gap:5px;align-items:center;cursor:pointer;white-space:nowrap}
+.cellmulti input{accent-color:var(--accent)}
+table.edit select{min-width:90px}
+table.edit input.numcell{min-width:56px}
+table.ref thead th{text-align:left;font-weight:600}
 .cid-box{position:relative}
 .cid-lista{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:280px;overflow:auto}
 .cid-lista li{padding:7px 9px;border-radius:6px;font-size:13.5px;cursor:pointer;line-height:1.35}
@@ -373,11 +379,10 @@ var SCHEMA = [
 
 { id: 'hist', title: 'Histórico cirúrgico e anestésico', fields: [
   { t: 'chips', id: 'anest_previa', label: 'Já foi anestesiado(a)?', options: ['Não', 'Sim'], span: 12 },
-  { t: 'table', id: 'cirurgias', label: 'Cirurgias e anestesias anteriores', cols: [['Data (mês/ano)', 2], ['Procedimento', 4], ['Tipo de anestesia', 3], ['Hospital', 2], ['Intercorrências', 4]], rows: 4 },
+  { t: 'table', id: 'cirurgias', label: 'Cirurgias e anestesias anteriores', cols: [['Data (mês/ano)', 2], ['Procedimento', 4], ['Tipo de anestesia', 5, 'multi', ['Raquianestesia', 'Peridural', 'Geral', 'Bloqueio', 'Local', 'Sedação']], ['Hospital', 2], ['Intercorrências', 3]], rows: 4 },
   { t: 'conds', id: 'compl_anest', title: 'Complicações anestésicas prévias do paciente', items: [
     ['c_vad', 'Intubação ou ventilação difícil', 'Cormack-Lehane, dispositivo usado, carta de VAD'],
     ['c_hm', 'Hipertermia maligna (suspeita ou confirmada)', 'ano, desfecho, investigação'],
-    ['c_pseudo', 'Apneia prolongada após succinilcolina', 'deficiência de pseudocolinesterase'],
     ['c_anafilaxia', 'Reação alérgica / anafilaxia perioperatória', 'agente suspeito, investigação alergológica'],
     ['c_nvpo', 'Náuseas e vômitos pós-operatórios', ''],
     ['c_desp', 'Despertar prolongado / recuperação lenta', ''],
@@ -392,16 +397,17 @@ var SCHEMA = [
     ['c_lesao_dent', 'Lesão dentária ou de via aérea', ''],
     ['c_dor', 'Dor pós-operatória de difícil controle', ''],
     ['c_retencao', 'Retenção urinária', '']
-  ]},
+  ], outro: true },
   { t: 'conds', id: 'fam_anest', title: 'Antecedentes familiares relevantes', items: [
+    ['f_dac', 'Doença coronariana precoce / morte súbita', 'parentesco'],
+    ['f_has', 'Hipertensão arterial (HAS)', 'parentesco'],
+    ['f_dm', 'Diabetes (DM)', 'parentesco'],
     ['f_hm', 'Hipertermia maligna ou morte inexplicada em anestesia', 'parentesco'],
-    ['f_pseudo', 'Deficiência de pseudocolinesterase', ''],
+    ['f_genetica', 'Doença genética', 'qual, parentesco'],
     ['f_miopatia', 'Doença neuromuscular / distrofia muscular', ''],
     ['f_coag', 'Coagulopatia hereditária', ''],
-    ['f_tev', 'Trombose venosa / trombofilia', ''],
-    ['f_porfiria', 'Porfiria', ''],
-    ['f_dac', 'Doença coronariana precoce / morte súbita', '']
-  ]}
+    ['f_tev', 'Trombose venosa / trombofilia', '']
+  ], outro: true }
 ]},
 
 { id: 'habitos', title: 'Hábitos e vícios', fields: [
@@ -410,14 +416,19 @@ var SCHEMA = [
   { t: 'num', id: 'tab_cig', label: 'Cigarros por dia', span: 2 },
   { t: 'num', id: 'tab_anos', label: 'Anos de uso', span: 2 },
   { t: 'calc', id: 'macos_ano', label: 'Maços-ano', span: 2 },
-  { t: 'text', id: 'tab_parou', label: 'Parou há', span: 3 },
-  { t: 'multi', id: 'tab_outros', label: 'Outros produtos de tabaco', options: ['Cigarro eletrônico / vape', 'Narguilé', 'Charuto / cachimbo', 'Tabaco mascado', 'Fumante passivo'], span: 9 },
+  { t: 'ym', id: 'tab_parou', label: 'Parou há', span: 4 },
+  { t: 'multi', id: 'tab_outros', label: 'Outros produtos de tabaco', options: ['Cigarro eletrônico / vape', 'Narguilé', 'Charuto / cachimbo', 'Tabaco mascado', 'Fumante passivo'], outro: true, span: 8 },
   { t: 'sub', label: 'Álcool' },
   { t: 'chips', id: 'alcool', label: 'Consumo de álcool', options: ['Não bebe', 'Social / ocasional', 'Regular', 'Abusivo / dependência', 'Ex-etilista'], span: 12 },
   { t: 'text', id: 'alcool_tipo', label: 'Tipo de bebida e quantidade', span: 5, ph: 'ex.: 6 latas de cerveja no fim de semana' },
   { t: 'num', id: 'alcool_doses', label: 'Doses por semana', span: 2 },
   { t: 'text', id: 'alcool_ultima', label: 'Última ingestão', span: 2 },
   { t: 'chips', id: 'alcool_abst', label: 'Já teve abstinência?', options: ['Não', 'Sim'], span: 3 },
+  { t: 'reftab', title: 'Lembrete: gramas de álcool por bebida', head: ['Bebida', 'Volume', 'Teor', 'Álcool'], rows: [
+    ['Cerveja, lata', '350 mL', '5%', '≈ 14 g'], ['Cerveja, garrafa', '600 mL', '5%', '≈ 24 g'], ['Chope', '300 mL', '5%', '≈ 12 g'],
+    ['Vinho, taça', '150 mL', '12%', '≈ 14 g'], ['Vinho, garrafa', '750 mL', '12%', '≈ 72 g'],
+    ['Destilado, dose (cachaça, vodca, uísque)', '50 mL', '40%', '≈ 16 g'], ['Destilado, garrafa', '1 L', '40%', '≈ 320 g']],
+    note: 'Cálculo: volume (mL) × teor alcoólico × 0,8 = gramas de álcool. Dose padrão: 10 g (OMS) ou 14 g (EUA). Consumo de risco: mais de 2 doses padrão por dia (homens) ou 1 (mulheres).' },
   { t: 'sub', label: 'Outras substâncias' },
   { t: 'conds', id: 'drogas', title: 'Substâncias psicoativas', items: [
     ['d_maconha', 'Maconha / cannabis', 'frequência, última vez'],
@@ -426,11 +437,10 @@ var SCHEMA = [
     ['d_opioides', 'Opioides sem prescrição', ''],
     ['d_bzd', 'Benzodiazepínicos sem prescrição', ''],
     ['d_inj', 'Drogas injetáveis', 'acesso venoso, infecções'],
-    ['d_anabol', 'Anabolizantes / hormônios sem prescrição', ''],
-    ['d_outras', 'Outras (solventes, alucinógenos, cetamina)', '']
-  ]},
+    ['d_anabol', 'Anabolizantes / hormônios sem prescrição', '']
+  ], outro: true },
   { t: 'text', id: 'cafeina', label: 'Cafeína (xícaras por dia)', span: 4 },
-  { t: 'text', id: 'atividade_fisica', label: 'Atividade física regular', span: 8, ph: 'tipo e frequência semanal' }
+  { t: 'table', id: 'atividades', label: 'Atividade física regular', cols: [['Atividade', 4], ['Vezes', 1, 'num'], ['Por', 2, 'select', ['semana', 'mês']], ['Duração (min)', 2, 'num']], rows: 3 }
 ]},
 
 { id: 'alergias', title: 'Alergias', fields: [
@@ -1089,6 +1099,10 @@ function renderField(f){
         'data-mask': f.mask || null, 'class': f.upper ? 'upper' : null })]);
     case 'dmy': return renderDmy(f);
     case 'hm': return renderHm(f);
+    case 'ym': return renderYm(f);
+    case 'reftab': return h('details', { 'class': 'ref' }, h('summary', null, f.title),
+      h('div', { 'class': 'tbl-wrap' }, h('table', { 'class': 'ref' }, h('thead', null, h('tr', null, f.head.map(function(x){ return h('th', null, x); }))),
+        h('tbody', null, f.rows.map(function(r){ return h('tr', null, r.map(function(x){ return h('td', null, x); })); })))), h('p', null, f.note));
     case 'cid': return renderCid(f);
     case 'num':
       return wrap(f, [labelEl(f), h('input', { id: f.id, type: 'text', inputmode: 'decimal', 'class': 'numf', autocomplete: 'off' })]);
@@ -1184,8 +1198,31 @@ function renderCid(f){
   inp.addEventListener('blur', function(){ setTimeout(fechar, 120); });
   return wrap(f, [labelEl(f), h('div', { 'class': 'cid-box' }, inp, lista), h('span', { 'class': 'cid-dica' }, 'Busca na tabela CID-10 (DATASUS). Também aceita texto livre.')]);
 }
+function renderYm(f){
+  var hid = h('input', { type: 'hidden', id: f.id });
+  function sync(){
+    var a = $(f.id + '_a').value, m = $(f.id + '_m').value;
+    var p = [];
+    if (a !== '' && +a) p.push(a + (+a === 1 ? ' ano' : ' anos'));
+    if (m !== '' && +m) p.push(m + (+m === 1 ? ' mês' : ' meses'));
+    hid.value = p.length ? p.join(' e ') : (a === '0' || m === '0' ? 'menos de 1 mês' : '');
+  }
+  var anos = []; for (var i = 0; i <= 60; i++) anos.push(i);
+  var meses = []; for (var j = 0; j <= 11; j++) meses.push(j);
+  return wrap(f, [h('span', { 'class': 'lbl' }, f.label), h('div', { 'class': 'hm ym' },
+    h('select', { id: f.id + '_a', 'aria-label': f.label + ': anos', onchange: sync }, h('option', { value: '' }, 'anos'), anos.map(function(x){ return h('option', { value: String(x) }, x + (x === 1 ? ' ano' : ' anos')); })),
+    h('select', { id: f.id + '_m', 'aria-label': f.label + ': meses', onchange: sync }, h('option', { value: '' }, 'meses'), meses.map(function(x){ return h('option', { value: String(x) }, x + (x === 1 ? ' mês' : ' meses')); }))), hid]);
+}
+function syncYm(){
+  document.querySelectorAll('.ym').forEach(function(b){
+    var hid = b.parentNode.querySelector('input[type=hidden]'); if (!hid || !hid.value || $(hid.id + '_a').value !== '' || $(hid.id + '_m').value !== '') return;
+    var a = /(\d+)\s*ano/.exec(hid.value), m = /(\d+)\s*m[eê]s/.exec(hid.value);
+    $(hid.id + '_a').value = a ? String(Math.min(+a[1], 60)) : '0'; $(hid.id + '_m').value = m ? String(Math.min(+m[1], 11)) : '0';
+  });
+}
 function syncHm(){
-  document.querySelectorAll('.hm').forEach(function(b){
+  syncYm();
+  document.querySelectorAll('.hm:not(.ym)').forEach(function(b){
     var hid = b.parentNode.querySelector('input[type=hidden]'); if (!hid || !hid.value || $(hid.id + '_h').value !== '') return;
     var n = parseFloat(hid.value.replace(',', '.')); if (isNaN(n)) return;
     var hh = Math.floor(n), mm = Math.round((n - hh) * 60 / 15) * 15; if (mm === 60){ hh++; mm = 0; }
@@ -1225,9 +1262,22 @@ document.addEventListener('input', function(e){
   if (t.matches('input.upper')){ var p = t.selectionStart; t.value = t.value.toLocaleUpperCase('pt-BR'); try { t.setSelectionRange(p, p); } catch (x) {} }
 }, true);
 function comOutro(id, v){ if (v !== 'Outro') return v; var o = txt(id + '_outro'); return o || v; }
+function cellEl(c, v){
+  if (c[2] === 'multi'){
+    var sel = String(v || '').split(/;\s*/);
+    return h('div', { 'class': 'cellmulti', role: 'group', 'aria-label': c[0] }, c[3].map(function(o){ return h('label', null, h('input', { type: 'checkbox', value: o, checked: sel.indexOf(o) > -1 ? true : null }), o); }));
+  }
+  if (c[2] === 'select') return h('select', { 'aria-label': c[0] }, h('option', { value: '' }, '—'), c[3].map(function(o){ return h('option', { value: o, selected: v === o ? true : null }, o); }));
+  return h('input', { type: 'text', 'aria-label': c[0], value: v || null, inputmode: c[2] === 'num' ? 'numeric' : null, 'class': c[2] === 'num' ? 'numcell' : null });
+}
+function cellVal(td){
+  var m = td.querySelector('.cellmulti');
+  if (m) return [].map.call(m.querySelectorAll('input:checked'), function(i){ return i.value; }).join('; ');
+  var e = td.querySelector('input, select'); return e ? String(e.value || '').trim() : '';
+}
 function tableRow(f, vals){
   var tr = h('tr');
-  f.cols.forEach(function(c, i){ tr.appendChild(h('td', null, h('input', { type: 'text', 'aria-label': c[0], value: vals && vals[i] ? vals[i] : null }))); });
+  f.cols.forEach(function(c, i){ tr.appendChild(h('td', null, cellEl(c, vals && vals[i] ? vals[i] : ''))); });
   tr.appendChild(h('td', { 'class': 'x' }, h('button', { type: 'button', 'class': 'xbtn', 'aria-label': 'Remover linha', title: 'Remover linha', onclick: function(){ var tb = tr.parentNode; tr.remove(); if (!tb.children.length) tb.appendChild(tableRow(f)); update(); } }, '×')));
   return tr;
 }
@@ -1245,7 +1295,8 @@ function renderConds(f){
   var head = h('div', { 'class': 'conds-h' }, h('h3', null, f.title), h('span', { 'class': 'count' }));
   if (f.nega) head.appendChild(h('label', { 'class': 'nega' }, h('input', { type: 'checkbox', id: f.id + '_nega' }), 'Nega'));
   box.appendChild(head);
-  box.appendChild(h('div', { 'class': 'conds-grid' }, f.items.map(function(it){
+  var its = f.outro ? f.items.concat([[f.id + '_outro', 'Outro', 'descreva']]) : f.items;
+  box.appendChild(h('div', { 'class': 'conds-grid' }, its.map(function(it){
     return h('div', { 'class': 'cond' },
       h('label', null, h('input', { type: 'checkbox', id: it[0] }), h('span', null, it[1])),
       h('input', { type: 'text', 'class': 'det', id: it[0] + '_det', placeholder: it[2] || 'detalhes', hidden: true, 'aria-label': 'Detalhes: ' + it[1] }));
@@ -1608,7 +1659,7 @@ function computeScores(){
 /* ---------- Alertas ---------- */
 function tableRows(id){
   var t = $(id); if (!t) return [];
-  return Array.prototype.map.call(t.tBodies[0].rows, function(tr){ return Array.prototype.map.call(tr.querySelectorAll('input'), function(i){ return i.value.trim(); }); })
+  return Array.prototype.map.call(t.tBodies[0].rows, function(tr){ return [].slice.call(tr.cells, 0, -1).map(cellVal); })
     .filter(function(r){ return r.some(function(c){ return c; }); });
 }
 function allergyList(){
@@ -1744,6 +1795,7 @@ function update(){
   if (pending) return; pending = true;
   requestAnimationFrame(function(){
     pending = false;
+    var tc = $('cirurgias'); if (tc){ var wf = tc.closest('.f'); if (wf) wf.hidden = chip('anest_previa') === 'Não'; }
     document.querySelectorAll('[data-outro-for]').forEach(function(i){
       var on = !!document.querySelector('input[name="' + i.getAttribute('data-outro-for') + '"][value="Outro"]:checked');
       i.hidden = !on;
@@ -1777,6 +1829,7 @@ function summary(semAssinatura){
         case 'chips': v = comOutro(f.id, chip(f.id)); if (v) L.push(f.label + ': ' + v); break;
         case 'dmy': v = txt(f.id); if (v) L.push(f.label + ': ' + dBR(v)); break;
         case 'hm': v = txt(f.id); if (v) L.push(f.label + ': ' + fmtHm(v)); break;
+        case 'ym': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
         case 'cid': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
         case 'multi': v = multi(f.id).map(function(x){ return comOutro(f.id, x); }); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
         case 'table':
@@ -1784,7 +1837,7 @@ function summary(semAssinatura){
           if (rows.length){ L.push(f.label + ':'); rows.forEach(function(r){ L.push('  - ' + r.map(function(c, i){ return c ? f.cols[i][0] + ': ' + c : ''; }).filter(Boolean).join('; ')); }); }
           break;
         case 'conds':
-          var items = f.items.filter(function(it){ return ck(it[0]); }).map(function(it){ var d = txt(it[0] + '_det'); return it[1] + (d ? ' (' + d + ')' : ''); });
+          var items = (f.outro ? f.items.concat([[f.id + '_outro', 'Outro']]) : f.items).filter(function(it){ return ck(it[0]); }).map(function(it){ var d = txt(it[0] + '_det'); return it[1] + (d ? ' (' + d + ')' : ''); });
           if (items.length) L.push(f.title + ': ' + items.join('; '));
           else if (ck(f.id + '_nega')) L.push(f.title + ': nega.');
           break;
@@ -2385,7 +2438,7 @@ var EXAMPLE = {
   cirurgia: 'Colecistectomia videolaparoscópica', lateralidade: 'Não se aplica', diagnostico: 'Colelitíase sintomática (K80.2)', cirurgiao: 'Cirurgia geral', carater: 'Eletiva', risco_cir: 'Intermediário (1–5%)', regime: 'Internação', duracao: '2', posicao: ['Decúbito dorsal', 'Cefaloaclive (proclive)'], hospital: 'Hospital de Ilhéus', uti_prev: 'Não', perda_sang: 'Mínima', incisao: 'Abdominal superior', cir_especial: ['Videolaparoscopia (pneumoperitônio)'],
   anest_previa: 'Sim', cirurgias: [['2009', 'Histerectomia abdominal', 'Raquianestesia', 'Hosp. Municipal', 'Náuseas e vômitos intensos no pós-operatório'], ['1986', 'Cesárea', 'Peridural', 'Maternidade', 'Nenhuma']],
   c_nvpo: true, c_nvpo_det: 'após histerectomia (2009)', fam_anest_nega: true,
-  tab: 'Ex-fumante', tab_cig: '20', tab_anos: '15', tab_parou: '12 anos', alcool: 'Social / ocasional', alcool_abst: 'Não', atividade_fisica: 'Caminhada leve 2x/semana',
+  tab: 'Ex-fumante', tab_cig: '20', tab_anos: '15', tab_parou: '12 anos', alcool: 'Social / ocasional', alcool_abst: 'Não', atividades: [['Caminhada leve', '2', 'semana', '40']],
   alergia_status: 'Sim', alergia_tab: [['Dipirona', 'Urticária generalizada', 'Moderada', '2015']],   dasi1: true, dasi2: true, dasi3: true, dasi4: true, dasi6: true, dasi7: true, dasi10: true, mets_subj: 'Não', limitacao_func: 'Dor nos joelhos (artrose); nega angina', cfs: '3 — Regular',
   transf_prev: 'Não', tipo_sang: 'O+', aceita_transf: 'Sim', reserva: 'Tipagem e triagem',
   dent: ['Prótese parcial removível', 'Dentes com mobilidade'], dent_det: 'PPR superior; dente 31 com mobilidade',
