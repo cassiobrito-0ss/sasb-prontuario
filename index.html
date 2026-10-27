@@ -144,6 +144,7 @@ table.edit td.x{width:34px;text-align:center}
 .cond label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-size:13.5px}
 .cond input[type=checkbox],.si input[type=checkbox],.nega input{width:16px;height:16px;margin:2px 0 0;accent-color:var(--accent);flex:0 0 auto}
 .cond .det{margin-left:24px;width:calc(100% - 24px);min-height:32px;padding:5px 8px;font-size:13px}
+.cond .det.quando{margin-top:4px}
 .cond.on label span{font-weight:600}
 
 /* Escores */
@@ -412,18 +413,17 @@ var SCHEMA = [
 
 { id: 'habitos', title: 'Hábitos e vícios', fields: [
   { t: 'sub', label: 'Tabagismo' },
-  { t: 'chips', id: 'tab', label: 'Tabagismo', options: ['Nunca fumou', 'Fumante atual', 'Ex-fumante'], span: 6 },
+  { t: 'chips', id: 'tab', label: 'Tabagismo', options: ['Nunca fumou', 'Fumante atual', 'Ex-fumante'], outro: true, span: 6 },
   { t: 'num', id: 'tab_cig', label: 'Cigarros por dia', span: 2 },
   { t: 'num', id: 'tab_anos', label: 'Anos de uso', span: 2 },
   { t: 'calc', id: 'macos_ano', label: 'Maços-ano', span: 2 },
   { t: 'ym', id: 'tab_parou', label: 'Parou há', span: 4 },
-  { t: 'multi', id: 'tab_outros', label: 'Outros produtos de tabaco', options: ['Cigarro eletrônico / vape', 'Narguilé', 'Charuto / cachimbo', 'Tabaco mascado', 'Fumante passivo'], outro: true, span: 8 },
+  { t: 'multi', id: 'tab_outros', label: 'Outros produtos inalados', options: ['Cigarro eletrônico / vape', 'Narguilé', 'Charuto / cachimbo', 'Tabaco mascado', 'Fumante passivo'], outro: true, span: 8 },
   { t: 'sub', label: 'Álcool' },
   { t: 'chips', id: 'alcool', label: 'Consumo de álcool', options: ['Não bebe', 'Social / ocasional', 'Regular', 'Abusivo / dependência', 'Ex-etilista'], span: 12 },
   { t: 'text', id: 'alcool_tipo', label: 'Tipo de bebida e quantidade', span: 5, ph: 'ex.: 6 latas de cerveja no fim de semana' },
   { t: 'num', id: 'alcool_doses', label: 'Doses por semana', span: 2 },
-  { t: 'text', id: 'alcool_ultima', label: 'Última ingestão', span: 2 },
-  { t: 'chips', id: 'alcool_abst', label: 'Já teve abstinência?', options: ['Não', 'Sim'], span: 3 },
+  { t: 'chips', id: 'alcool_ultima', label: 'Última ingestão', options: ['Até a véspera da cirurgia', 'Há 5 dias', 'Há 10 dias'], outro: true, span: 12 },
   { t: 'reftab', title: 'Lembrete: gramas de álcool por bebida', head: ['Bebida', 'Volume', 'Teor', 'Álcool'], rows: [
     ['Cerveja, lata', '350 mL', '5%', '≈ 14 g'], ['Cerveja, garrafa', '600 mL', '5%', '≈ 24 g'], ['Chope', '300 mL', '5%', '≈ 12 g'],
     ['Vinho, taça', '150 mL', '12%', '≈ 14 g'], ['Vinho, garrafa', '750 mL', '12%', '≈ 72 g'],
@@ -456,10 +456,9 @@ var SCHEMA = [
     ['a_clorex', 'Clorexidina', ''],
     ['a_iodo', 'Iodo / contraste iodado', ''],
     ['a_adesivo', 'Esparadrapo / adesivos', ''],
-    ['a_alim', 'Alimentos', 'banana, abacate, kiwi, castanha: reatividade cruzada com látex'],
-    ['a_outros', 'Outras', '']
-  ]},
-  { t: 'multi', id: 'latex_risco', label: 'Fatores de risco para alergia ao látex', options: ['Múltiplas cirurgias (espinha bífida, malformações urológicas)', 'Exposição ocupacional (profissional de saúde)', 'Alergia a frutas tropicais', 'Atopia'], span: 12 }
+    ['a_alim', 'Alimentos', 'banana, abacate, kiwi, castanha: reatividade cruzada com látex']
+  ], outro: true },
+  { t: 'multi', id: 'latex_risco', label: 'Fatores de risco para alergia ao látex', options: ['Múltiplas cirurgias (espinha bífida, malformações urológicas)', 'Exposição ocupacional (profissional de saúde)', 'Alergia a frutas tropicais', 'Atopia'], outro: true, span: 12 }
 ]},
 
 { id: 'capfunc', title: 'Capacidade funcional e fragilidade', fields: [
@@ -478,28 +477,37 @@ var SCHEMA = [
     ['dasi12', 'Esportes extenuantes (natação, tênis individual, futebol)', 7.50]
   ], legend: 'DASI ≤ 34 identifica capacidade funcional reduzida, associada a maior risco cardiovascular (estudo METS, 2018). METs estimados = (0,43 × DASI + 9,6) ÷ 3,5.' },
   { t: 'chips', id: 'mets_subj', label: 'Sobe 2 lances de escada sem parar (≥ 4 METs)?', options: ['Sim', 'Não', 'Não avaliável (limitação não cardíaca)'], span: 12 },
-  { t: 'text', id: 'limitacao_func', label: 'Fator limitante', span: 12, ph: 'dispneia, angina, claudicação, dor articular, sequela neurológica' },
+  { t: 'chips', id: 'limitacao_func', label: 'Fator limitante', options: ['Ortopédico', 'Cardiorrespiratório'], outro: true, span: 12 },
   { t: 'select', id: 'cfs', label: 'Escala Clínica de Fragilidade (CFS) — idosos ≥ 65 anos', options: ['1 — Muito ativo', '2 — Ativo', '3 — Regular', '4 — Fragilidade muito leve', '5 — Fragilidade leve', '6 — Fragilidade moderada', '7 — Fragilidade grave', '8 — Fragilidade muito grave', '9 — Doente terminal'], span: 7 },
-  { t: 'multi', id: 'geriatria', label: 'Rastreio geriátrico', options: ['Quedas no último ano', 'Perda de peso não intencional', 'Déficit cognitivo / demência', 'Dependência para atividades diárias', 'Déficit visual ou auditivo', 'Polifarmácia (≥ 5 medicamentos)', 'Delirium prévio'], span: 12 }
+  { t: 'multi', id: 'geriatria', outro: true, label: 'Rastreio geriátrico', options: ['Quedas no último ano', 'Perda de peso não intencional', 'Déficit cognitivo / demência', 'Dependência para atividades diárias', 'Déficit visual ou auditivo', 'Polifarmácia (≥ 5 medicamentos)', 'Delirium prévio'], span: 12 }
 ]},
 
 { id: 'transf', title: 'Transfusões sanguíneas', fields: [
   { t: 'chips', id: 'transf_prev', label: 'Já recebeu transfusão?', options: ['Não', 'Sim', 'Não sabe'], span: 5 },
-  { t: 'text', id: 'tipo_sang', label: 'Tipo sanguíneo / Rh', span: 3 },
+  { t: 'text', id: 'tipo_sang', label: 'Grupo sanguíneo / Fator Rh', span: 3 },
   { t: 'text', id: 'pai', label: 'Anticorpos irregulares (PAI)', span: 4 },
   { t: 'table', id: 'transf_tab', label: 'Transfusões anteriores', cols: [['Data', 2], ['Hemocomponente', 3], ['Nº de bolsas', 2], ['Motivo', 3], ['Reação transfusional', 3]], rows: 2 },
   { t: 'chips', id: 'aceita_transf', label: 'Aceita transfusão?', options: ['Sim', 'Não (recusa)', 'Aceita parcialmente'], span: 7 },
   { t: 'text', id: 'transf_religiao', label: 'Motivo da recusa / restrição', span: 5, ph: 'ex.: Testemunha de Jeová' },
   { t: 'text', id: 'transf_aceita_det', label: 'Se parcial, o que aceita', span: 12, ph: 'albumina, fatores, recuperação intraoperatória (cell saver), hemodiluição' },
   { t: 'text', id: 'sensibilizacao', label: 'Gestações / exposições prévias (aloimunização)', span: 6 },
-  { t: 'chips', id: 'reserva', label: 'Reserva de hemocomponentes', options: ['Não necessária', 'Tipagem e triagem', 'Reserva com prova cruzada'], span: 6 },
-  { t: 'text', id: 'reserva_qtd', label: 'Quantidade / tipo reservado', span: 6 }
+  { t: 'chips', id: 'reserva', label: 'Reserva de hemocomponentes', options: ['Necessária (confirmar reserva)', 'Não necessária', 'Tipagem e triagem', 'Reserva com prova cruzada'], outro: true, span: 12 },
+  { t: 'conds', id: 'reserva_qtd', title: 'Hemocomponentes solicitados', outro: true, outroPh: 'qual e quantidade', items: [
+    ['r_ch', 'CH padrão', 'quantidade (unidades)'],
+    ['r_chfilt', 'CH filtrado (desleucocitado)', 'quantidade (unidades)'],
+    ['r_chlav', 'CH lavado', 'quantidade (unidades)'],
+    ['r_chcong', 'CH congelado (fenótipos raros)', 'quantidade (unidades)'],
+    ['r_chfen', 'CH fenotipado', 'quantidade (unidades)'],
+    ['r_plaq', 'Plaquetas', 'quantidade (unidades / aférese)'],
+    ['r_pfc', 'Plasma fresco congelado', 'quantidade (unidades)'],
+    ['r_crio', 'Crioprecipitado', 'quantidade (unidades)']
+  ]}
 ]},
 
 { id: 'proteses', title: 'Próteses dentárias, dispositivos e implantes', fields: [
   { t: 'sub', label: 'Dentição' },
-  { t: 'multi', id: 'dent', label: 'Condição dentária', options: ['Dentição íntegra', 'Prótese total superior', 'Prótese total inferior', 'Prótese parcial removível', 'Prótese fixa / ponte', 'Implantes dentários', 'Dentes com mobilidade', 'Dentes fraturados / cariados', 'Incisivos proeminentes', 'Edêntulo', 'Aparelho ortodôntico', 'Piercing oral ou facial'], span: 12 },
-  { t: 'text', id: 'dent_det', label: 'Localização (dentes, arcada)', span: 12, ph: 'ex.: 11 e 21 com mobilidade; prótese parcial removível superior' },
+  { t: 'multi', id: 'dent', outro: true, label: 'Condição dentária', options: ['Dentição íntegra', 'Prótese total superior', 'Prótese total inferior', 'Prótese parcial removível', 'Prótese fixa / ponte', 'Implantes dentários', 'Dentes com mobilidade', 'Dentes fraturados / cariados', 'Incisivos proeminentes', 'Edêntulo', 'Aparelho ortodôntico', 'Piercing oral ou facial'], span: 12 },
+  { t: 'multi', id: 'dent_det', label: 'Localização', options: ['Superior', 'Inferior', 'Lateral', 'Incisivos', 'Caninos', 'Pré-molares', 'Molares'], outro: true, span: 12 },
   { t: 'sub', label: 'Dispositivos e implantes' },
   { t: 'conds', id: 'disp', title: 'Dispositivos', items: [
     ['p_mp', 'Marcapasso', 'modelo, indicação, dependente?, última revisão'],
@@ -516,9 +524,8 @@ var SCHEMA = [
     ['p_ocular', 'Lentes de contato / prótese ocular', ''],
     ['p_auditivo', 'Aparelho auditivo / implante coclear', ''],
     ['p_mama', 'Implante mamário ou outros implantes', ''],
-    ['p_estomia', 'Traqueostomia / gastrostomia / estomia', ''],
-    ['p_outros', 'Outros', 'bomba de insulina, sensor de glicose, adornos']
-  ]}
+    ['p_estomia', 'Traqueostomia / gastrostomia / estomia', '']
+  ], outro: true, outroPh: 'bomba de insulina, sensor de glicose, adornos' }
 ]},
 
 { id: 'sistemas', title: 'Doenças por sistemas', fields: [
@@ -1295,11 +1302,12 @@ function renderConds(f){
   var head = h('div', { 'class': 'conds-h' }, h('h3', null, f.title), h('span', { 'class': 'count' }));
   if (f.nega) head.appendChild(h('label', { 'class': 'nega' }, h('input', { type: 'checkbox', id: f.id + '_nega' }), 'Nega'));
   box.appendChild(head);
-  var its = f.outro ? f.items.concat([[f.id + '_outro', 'Outro', 'descreva']]) : f.items;
+  var its = f.outro ? f.items.concat([[f.id + '_outro', 'Outro', f.outroPh || 'descreva']]) : f.items;
   box.appendChild(h('div', { 'class': 'conds-grid' }, its.map(function(it){
     return h('div', { 'class': 'cond' },
       h('label', null, h('input', { type: 'checkbox', id: it[0] }), h('span', null, it[1])),
-      h('input', { type: 'text', 'class': 'det', id: it[0] + '_det', placeholder: it[2] || 'detalhes', hidden: true, 'aria-label': 'Detalhes: ' + it[1] }));
+      h('input', { type: 'text', 'class': 'det', id: it[0] + '_det', placeholder: it[2] || 'detalhes', hidden: true, 'aria-label': 'Detalhes: ' + it[1] }),
+      f.quando ? h('input', { type: 'text', 'class': 'det quando', id: it[0] + '_quando', placeholder: 'desde quando / data (mês/ano)', hidden: true, 'aria-label': 'Período ou data: ' + it[1] }) : null);
   })));
   return box;
 }
@@ -1665,6 +1673,7 @@ function tableRows(id){
 function allergyList(){
   var list = tableRows('alergia_tab').map(function(r){ return r[0] + (r[1] ? ' (' + r[1] + ')' : ''); }).filter(Boolean);
   SCHEMA_ALERG.forEach(function(it){ if (ck(it[0])) list.push(it[1] + (txt(it[0] + '_det') ? ': ' + txt(it[0] + '_det') : '')); });
+  if (ck('alerg_esp_outro')) list.push(txt('alerg_esp_outro_det') || 'Outra alergia (não descrita)');
   return list;
 }
 var SCHEMA_ALERG = [];
@@ -1786,7 +1795,7 @@ function renderPanelScores(){
 }
 function renderUI(){
   document.querySelectorAll('[data-only="F"]').forEach(function(e){ e.hidden = C.sexo === 'Masculino'; });
-  document.querySelectorAll('.cond').forEach(function(c){ var cb = c.querySelector('input[type=checkbox]'), d = c.querySelector('.det'); c.classList.toggle('on', cb.checked); if (d) d.hidden = !cb.checked && !d.value; });
+  document.querySelectorAll('.cond').forEach(function(c){ var cb = c.querySelector('input[type=checkbox]'); c.classList.toggle('on', cb.checked); c.querySelectorAll('.det').forEach(function(d){ d.hidden = !cb.checked && !d.value; }); });
   document.querySelectorAll('.conds').forEach(function(b){
     var n = b.querySelectorAll('.cond input[type=checkbox]:checked').length;
     b.querySelector('.count').textContent = n ? n + ' marcado' + (n > 1 ? 's' : '') : '';
@@ -1849,7 +1858,7 @@ function summary(semAssinatura){
           if (rows.length){ L.push(f.label + ':'); rows.forEach(function(r){ L.push('  - ' + r.map(function(c, i){ return c ? f.cols[i][0] + ': ' + c : ''; }).filter(Boolean).join('; ')); }); }
           break;
         case 'conds':
-          var items = (f.outro ? f.items.concat([[f.id + '_outro', 'Outro']]) : f.items).filter(function(it){ return ck(it[0]); }).map(function(it){ var d = txt(it[0] + '_det'); return it[1] + (d ? ' (' + d + ')' : ''); });
+          var items = (f.outro ? f.items.concat([[f.id + '_outro', 'Outro']]) : f.items).filter(function(it){ return ck(it[0]); }).map(function(it){ var d = [txt(it[0] + '_det'), txt(it[0] + '_quando') ? 'desde ' + txt(it[0] + '_quando') : ''].filter(Boolean).join('; '); return it[1] + (d ? ' (' + d + ')' : ''); });
           if (items.length) L.push(f.title + ': ' + items.join('; '));
           else if (ck(f.id + '_nega')) L.push(f.title + ': nega.');
           break;
@@ -2450,10 +2459,10 @@ var EXAMPLE = {
   cirurgia: 'Colecistectomia videolaparoscópica', lateralidade: 'Não se aplica', diagnostico: 'Colelitíase sintomática (K80.2)', cirurgiao: 'Cirurgia geral', carater: 'Eletiva', risco_cir: 'Intermediário (1–5%)', regime: 'Internação', duracao: '2', posicao: ['Decúbito dorsal', 'Cefaloaclive (proclive)'], hospital: 'Hospital de Ilhéus', uti_prev: 'Não', perda_sang: 'Mínima', incisao: 'Abdominal superior', cir_especial: ['Videolaparoscopia (pneumoperitônio)'],
   anest_previa: 'Sim', cirurgias: [['2009', 'Histerectomia abdominal', 'Raquianestesia', 'Hosp. Municipal', 'Náuseas e vômitos intensos no pós-operatório'], ['1986', 'Cesárea', 'Peridural', 'Maternidade', 'Nenhuma']],
   c_nvpo: true, c_nvpo_det: 'após histerectomia (2009)', fam_anest_nega: true,
-  tab: 'Ex-fumante', tab_cig: '20', tab_anos: '15', tab_parou: '12 anos', alcool: 'Social / ocasional', alcool_abst: 'Não', atividades: [['Caminhada leve', '2', 'semana', '40']],
+  tab: 'Ex-fumante', tab_cig: '20', tab_anos: '15', tab_parou: '12 anos', alcool: 'Social / ocasional', atividades: [['Caminhada leve', '2', 'semana', '40']],
   alergia_status: 'Sim', alergia_tab: [['Dipirona', 'Urticária generalizada', 'Moderada', '2015']],   dasi1: true, dasi2: true, dasi3: true, dasi4: true, dasi6: true, dasi7: true, dasi10: true, mets_subj: 'Não', limitacao_func: 'Dor nos joelhos (artrose); nega angina', cfs: '3 — Regular',
   transf_prev: 'Não', tipo_sang: 'O+', aceita_transf: 'Sim', reserva: 'Tipagem e triagem',
-  dent: ['Prótese parcial removível', 'Dentes com mobilidade'], dent_det: 'PPR superior; dente 31 com mobilidade',
+  dent: ['Prótese parcial removível', 'Dentes com mobilidade'], dent_det: ['Superior', 'Incisivos'],
   has: true, has_det: 'há 15 anos, controlada com losartana', cv_nega: false,
   ronco: true, ronco_det: 'ronco alto relatado pelo marido; sem polissonografia',
   neuro_nega: true, psiq_nega: true, renal_nega: true, hemato_nega: true, onco_nega: true, infec_nega: true, imuno_nega: true,
@@ -2519,6 +2528,7 @@ function bind(){
 SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){
   if (f.t === 'table') TABLES[f.id] = f;
   if (f.id === 'alerg_esp') SCHEMA_ALERG = f.items;
+  if (sec.id === 'sistemas' && f.t === 'conds'){ f.quando = true; if (['cv', 'infec'].indexOf(f.id) < 0) f.outro = true; }
 }); });
 render(); bind(); loadExample();
 window.PRONT = { clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
