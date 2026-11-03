@@ -91,6 +91,22 @@ fieldset legend{padding:0;margin-bottom:5px}
 .chipset{display:flex;flex-wrap:wrap;gap:6px}
 .outro-in{margin-top:8px;max-width:420px}
 .hm{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.lbl-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;width:100%}
+.sa{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap}
+.sa input{accent-color:var(--accent);margin:0}
+.ratio-box{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.ratio-l{font-size:12.5px;font-weight:600;letter-spacing:.04em;color:var(--muted);flex-basis:100%}
+.ratio-v{font:600 30px/1.1 var(--mono, ui-monospace, monospace);color:var(--ink)}
+.ratio-i{font-size:13px;color:var(--muted);font-weight:600}
+.ratio-i.alto{color:var(--crit)}
+table.jejum{width:100%;border-collapse:collapse;font-size:13.5px}
+table.jejum th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.jejum td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.jejum tr.on td{background:var(--accent-soft)}
+.jj-l{display:flex;gap:8px;align-items:center;cursor:pointer}
+.jj-l input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.jj-t{font-family:var(--mono, ui-monospace, monospace);white-space:nowrap}
+table.jejum select{min-width:80px}
 .cellmulti{display:flex;flex-wrap:wrap;gap:4px 12px;min-width:250px;padding:4px 2px;font-size:13px}
 .cellmulti label{display:inline-flex;gap:5px;align-items:center;cursor:pointer;white-space:nowrap}
 .cellmulti input{accent-color:var(--accent)}
@@ -742,8 +758,8 @@ var SCHEMA = [
 
 { id: 'meds', title: 'Medicamentos em uso', fields: [
   { t: 'chips', id: 'meds_status', label: 'Uso de medicamentos', options: ['Não usa medicamentos', 'Sim'], span: 12 },
-  { t: 'table', id: 'meds_tab', label: 'Medicamentos', cols: [['Medicamento', 4], ['Dose', 2], ['Posologia', 2], ['Indicação', 3], ['Última dose', 2], ['Conduta pré-operatória', 4]], rows: 6 },
-  { t: 'multi', id: 'meds_classes', label: 'Classes que exigem conduta específica (marque as que o paciente usa)', options: [
+  { t: 'table', id: 'meds_tab', label: 'Medicamentos', showIf: ['meds_status', 'Sim'], cols: [['Nome do medicamento', 4], ['Dose', 2], ['Horário', 2], ['Última dose', 3], ['Tempo de uso', 2]], rows: 6 },
+  { t: 'multi', id: 'meds_classes', outro: true, label: 'Classes que exigem conduta específica (marque as que o paciente usa)', options: [
     'Varfarina', 'Anticoagulante oral direto (rivaroxabana, apixabana, dabigatrana, edoxabana)', 'Heparina / enoxaparina', 'AAS', 'Clopidogrel / prasugrel / ticagrelor',
     'iSGLT2 (dapagliflozina, empagliflozina…)', 'Agonista GLP-1 / tirzepatida (semaglutida, liraglutida…)', 'Insulina', 'Antidiabético oral', 'IECA / BRA', 'Betabloqueador', 'Diurético',
     'Corticoide sistêmico', 'Imunossupressor / biológico', 'IMAO', 'Lítio', 'Antidepressivo', 'Antipsicótico', 'Benzodiazepínico', 'Opioide crônico / buprenorfina / metadona',
@@ -754,14 +770,14 @@ var SCHEMA = [
 
 { id: 'suplementos', title: 'Suplementos e fitoterápicos', fields: [
   { t: 'chips', id: 'supl_status', label: 'Usa suplementos, fitoterápicos ou chás?', options: ['Não', 'Sim'], span: 12 },
-  { t: 'multi', id: 'supl', label: 'Produtos em uso', options: ['Ômega-3 / óleo de peixe', 'Vitamina E', 'Ginkgo biloba', 'Alho (cápsulas)', 'Ginseng', 'Gengibre', 'Erva-de-são-joão (hipérico)', 'Kava-kava', 'Valeriana', 'Equinácea', 'Efedra', 'Cúrcuma', 'Extrato de chá verde', 'Castanha-da-índia', 'Melatonina', 'Whey / creatina', 'Termogênicos / pré-treino', 'Fórmulas para emagrecer', 'Chás, garrafadas, homeopatia'], span: 12 },
-  { t: 'text', id: 'supl_det', label: 'Dose, frequência e última tomada', span: 12 },
+  { t: 'multi', id: 'supl', outro: true, label: 'Produtos em uso', options: ['Ômega-3 / óleo de peixe', 'Vitamina E', 'Ginkgo biloba', 'Alho (cápsulas)', 'Ginseng', 'Gengibre', 'Erva-de-são-joão (hipérico)', 'Kava-kava', 'Valeriana', 'Equinácea', 'Efedra', 'Cúrcuma', 'Extrato de chá verde', 'Castanha-da-índia', 'Melatonina', 'Whey / creatina', 'Termogênicos / pré-treino', 'Fórmulas para emagrecer', 'Chás, garrafadas, homeopatia'], span: 12 },
+  { t: 'table', id: 'supl_tab', label: 'Produtos, dose e uso', showIf: ['supl_status', 'Sim'], cols: [['Nome do produto', 4], ['Dose', 2], ['Horário', 2], ['Última dose', 3], ['Tempo de uso', 2]], rows: 3 },
   { t: 'note', text: 'Aumentam sangramento: ômega-3, vitamina E, ginkgo, alho, ginseng, gengibre, cúrcuma, castanha-da-índia. Indução enzimática: erva-de-são-joão. Potencializam sedação: kava, valeriana. Instabilidade cardiovascular: efedra, termogênicos. Em geral, suspender 1 a 2 semanas antes.' }
 ]},
 
 { id: 'exfis', title: 'Exame físico geral', fields: [
-  { t: 'num', id: 'peso', label: 'Peso', unit: 'kg', span: 2 },
-  { t: 'num', id: 'altura', label: 'Altura', unit: 'cm', span: 2 },
+  { t: 'num', id: 'peso', label: 'Peso (kg)', span: 2 },
+  { t: 'num', id: 'altura', label: 'Altura (cm)', span: 2 },
   { t: 'calc', id: 'imc', label: 'IMC', unit: 'kg/m²', span: 2 },
   { t: 'text', id: 'pa', label: 'PA', unit: 'mmHg', span: 2, ph: '120/80' },
   { t: 'num', id: 'fc', label: 'FC', unit: 'bpm', span: 2 },
@@ -770,27 +786,37 @@ var SCHEMA = [
   { t: 'num', id: 'temp', label: 'Temperatura', unit: '°C', span: 3 },
   { t: 'num', id: 'hgt', label: 'Glicemia capilar', unit: 'mg/dL', span: 3 },
   { t: 'num', id: 'glasgow', label: 'Glasgow', span: 3 },
-  { t: 'chips', id: 'eg', label: 'Estado geral', options: ['Bom', 'Regular', 'Ruim'], span: 4 },
-  { t: 'chips', id: 'consciencia', label: 'Consciência', options: ['Lúcido e orientado', 'Confuso', 'Sonolento', 'Não contactuante'], span: 8 },
-  { t: 'multi', id: 'mucosas', label: 'Pele e mucosas', options: ['Coradas', 'Hipocoradas', 'Ictéricas', 'Cianóticas', 'Desidratadas', 'Hidratadas'], span: 7 },
-  { t: 'chips', id: 'nutricional', label: 'Estado nutricional', options: ['Eutrófico', 'Desnutrido', 'Sobrepeso', 'Obeso'], span: 5 },
-  { t: 'text', id: 'acv', label: 'Aparelho cardiovascular', span: 12, ph: 'ritmo, bulhas, sopros (grau, foco), B3, turgência jugular, pulsos' },
-  { t: 'text', id: 'ap_resp', label: 'Aparelho respiratório', span: 12, ph: 'murmúrio vesicular, sibilos, estertores, uso de musculatura acessória' },
-  { t: 'text', id: 'abdome', label: 'Abdome', span: 6, ph: 'distensão, ascite, massas, hérnias' },
-  { t: 'text', id: 'mmii', label: 'Membros inferiores', span: 6, ph: 'edema, varizes, pulsos, sinais de TVP' },
-  { t: 'text', id: 'neuro_ex', label: 'Exame neurológico sumário', span: 12, ph: 'déficits motores ou sensitivos pré-existentes (registrar antes de bloqueios)' },
-  { t: 'chips', id: 'acesso_venoso', label: 'Acesso venoso periférico', options: ['Bom', 'Regular', 'Difícil (considerar USG)'], span: 7 },
-  { t: 'text', id: 'membro_restrito', label: 'Membro restrito', span: 5, ph: 'fístula, mastectomia, lesão' }
+  { t: 'chips', id: 'eg', outro: true, label: 'Estado geral', options: ['Bom', 'Regular', 'Ruim'], span: 4 },
+  { t: 'chips', id: 'consciencia', outro: true, label: 'Consciência', options: ['Lúcido e orientado', 'Confuso', 'Sonolento', 'Não contactuante'], span: 8 },
+  { t: 'multi', id: 'mucosas', label: 'Pele e mucosas', options: ['Coradas', 'Hipocoradas', 'Ictéricas', 'Acianóticas', 'Cianóticas', 'Hidratadas', 'Desidratadas'], outro: true, span: 12 },
+  { t: 'chips', id: 'nutricional', outro: true, label: 'Estado nutricional', options: ['Eutrófico', 'Desnutrido', 'Sobrepeso', 'Obeso'], span: 5 },
+  { t: 'text', id: 'acv', semAlt: true, label: 'Aparelho cardiovascular', span: 12, ph: 'ritmo, bulhas, sopros (grau, foco), B3, turgência jugular, pulsos' },
+  { t: 'text', id: 'ap_resp', semAlt: true, label: 'Aparelho respiratório', span: 12, ph: 'murmúrio vesicular, sibilos, estertores, uso de musculatura acessória' },
+  { t: 'text', id: 'abdome', semAlt: true, label: 'Abdome', span: 6, ph: 'distensão, ascite, massas, hérnias' },
+  { t: 'text', id: 'mmii', semAlt: true, label: 'Membros inferiores', span: 6, ph: 'edema, varizes, pulsos, sinais de TVP' },
+  { t: 'text', id: 'neuro_ex', semAlt: true, label: 'Exame neurológico sumário', span: 12, ph: 'déficits motores ou sensitivos pré-existentes (registrar antes de bloqueios)' },
+  { t: 'chips', id: 'acesso_venoso', outro: true, semAlt: true, label: 'Acesso venoso periférico', options: ['Bom', 'Regular', 'Difícil (considerar USG)'], span: 7 },
+  { t: 'text', id: 'membro_restrito', semAlt: true, label: 'Membro restrito', span: 5, ph: 'fístula, mastectomia, lesão' }
 ]},
 
 { id: 'va', title: 'Via aérea e exame dirigido à anestesia', fields: [
-  { t: 'chips', id: 'mallampati', label: 'Mallampati', options: ['I', 'II', 'III', 'IV'], span: 4 },
-  { t: 'num', id: 'abertura', label: 'Abertura bucal (interincisivos)', unit: 'cm', span: 4 },
-  { t: 'num', id: 'circ_cerv', label: 'Circunferência cervical', unit: 'cm', span: 4 },
-  { t: 'chips', id: 'dtm', label: 'Distância tireomentoniana', options: ['≥ 6,5 cm', '6–6,5 cm', '< 6 cm'], span: 6 },
+  { t: 'chips', id: 'mallampati', outro: true, label: 'Mallampati', options: ['I', 'II', 'III', 'IV'], span: 4 },
+  { t: 'select', id: 'abertura', label: 'Abertura bucal (interincisivos)', options: ['> 4 cm ou 3 dedos', '3 a 3,9 cm', '2 a 2,9 cm', '< 2 cm'], span: 4 },
+  { t: 'select', id: 'circ_cerv', label: 'Circunferência cervical', options: ['< 40 cm', '40 a 42 cm', '> 42 cm'], outro: true, span: 4 },
+  { t: 'num', id: 'circ_cerv_cm', label: 'Circunferência cervical medida (cm)', span: 4, ph: 'opcional' },
+  { t: 'chips', id: 'dtm', label: 'Distância tireomentoniana', options: ['≥ 6,5 cm ou 4 dedos', '6 a 6,4 cm', '5 a 5,9 cm', '< 5 cm'], span: 8 },
+  { t: 'num', id: 'dtm_cm', label: 'DTM medida (cm)', span: 4, ph: 'opcional' },
+  { t: 'ratio', id: 'rel_cc_dtm', label: 'RELAÇÃO CIRCUNFERÊNCIA CERVICAL / DISTÂNCIA TIREOMENTONIANA', span: 12 },
   { t: 'chips', id: 'dem', label: 'Distância esternomentoniana', options: ['≥ 12,5 cm', '< 12,5 cm'], span: 6 },
-  { t: 'chips', id: 'ulbt', label: 'Mordida do lábio superior / protrusão mandibular', options: ['Classe I', 'Classe II', 'Classe III'], span: 6 },
-  { t: 'chips', id: 'mob_cerv', label: 'Mobilidade cervical (flexão/extensão)', options: ['Normal', 'Reduzida', 'Muito limitada'], span: 6 },
+  { t: 'multi', id: 'oclusao', label: 'Relação maxilomandibular / protrusão', options: ['Relação normal', 'Retrognatismo mandibular', 'Prognatismo mandibular', 'Retrognatismo maxilar', 'Prognatismo maxilar', 'Limitação da protrusão mandibular'], span: 12 },
+  { t: 'chips', id: 'ulbt', label: 'Teste da mordida do lábio superior (ULBT)', options: ['Classe I — favorável', 'Classe II — intermediário', 'Classe III — maior risco'], span: 12 },
+  { t: 'reftab', title: 'Lembrete: classes do ULBT', head: ['Classe', 'O que se observa', 'Leitura'], rows: [
+    ['I', 'Os incisivos inferiores ultrapassam a borda do lábio superior e alcançam a mucosa acima do vermelhão', 'Favorável'],
+    ['II', 'Os incisivos inferiores alcançam o lábio superior, mas não ultrapassam a borda do vermelhão', 'Intermediário'],
+    ['III', 'Os incisivos inferiores não alcançam o lábio superior', 'Maior risco de intubação difícil']],
+    note: 'Upper Lip Bite Test (Khan, 2003). Classe III tem boa especificidade para laringoscopia difícil.' },
+  { t: 'chips', id: 'mob_cerv', label: 'Mobilidade cervical (flexão/extensão)', options: ['Grau 1: normal (> 35°)', 'Grau 2: reduzida (22 a 35°)', 'Grau 3: muito limitada (12 a 21°)', 'Grau 4: < 12°'], span: 12 },
+  { t: 'multi', id: 'mob_lat', label: 'Redução da lateralidade', options: ['Direita', 'Esquerda'], span: 12 },
   { t: 'multi', id: 'va_achados', label: 'Achados', options: ['Barba', 'Retrognatia / micrognatia', 'Macroglossia', 'Palato ogival', 'Pescoço curto e grosso', 'Cicatriz ou radioterapia cervical', 'Traqueostomia prévia', 'Desvio de traqueia / massa cervical', 'Estridor / rouquidão', 'Trauma facial ou cervical', 'Colar cervical'], span: 12 },
   { t: 'chips', id: 'cormack', label: 'Cormack-Lehane prévio conhecido', options: ['I', 'IIa', 'IIb', 'III', 'IV', 'Desconhecido'], span: 12 },
   { t: 'score', id: 'langeron', title: 'Preditores de ventilação difícil sob máscara (Langeron)', items: [
@@ -801,11 +827,11 @@ var SCHEMA = [
     ['lg_ronco', 'História de roncos', 1, 'ronco']
   ], interp: [[0, 'Sem preditores relevantes', 'ok'], [2, '≥ 2 preditores: ventilação sob máscara difícil provável', 'warn']] },
   { t: 'chips', id: 'va_dificil', label: 'Via aérea difícil prevista?', options: ['Não', 'Sim — plano e material específicos'], span: 12 },
-  { t: 'multi', id: 'aspiracao', label: 'Risco de broncoaspiração', options: ['Jejum inadequado / urgência', 'Refluxo sintomático / hérnia de hiato', 'Gastroparesia (DM, agonista GLP-1)', 'Obstrução intestinal', 'Gestação > 20 semanas', 'Obesidade grave', 'Rebaixamento de consciência', 'Acalasia / divertículo'], span: 12 },
+  { t: 'multi', id: 'aspiracao', outro: true, label: 'Risco de broncoaspiração', options: ['Jejum inadequado / urgência', 'Refluxo sintomático / hérnia de hiato', 'Gastroparesia (DM, agonista GLP-1)', 'Obstrução intestinal', 'Gestação > 20 semanas', 'Obesidade grave', 'Rebaixamento de consciência', 'Acalasia / divertículo'], span: 12 },
   { t: 'text', id: 'usg_gastrico', label: 'Ultrassom gástrico (se realizado)', span: 12, ph: 'antro vazio / líquido claro / sólido; área antral' },
   { t: 'sub', label: 'Neuroeixo e posicionamento' },
-  { t: 'chips', id: 'nx_coluna', label: 'Coluna para bloqueio de neuroeixo', options: ['Processos palpáveis', 'Difícil palpação', 'Escoliose importante', 'Material de síntese'], span: 12 },
-  { t: 'chips', id: 'nx_pele', label: 'Pele no local de punção', options: ['Íntegra', 'Lesão / infecção'], span: 6 },
+  { t: 'multi', id: 'nx_coluna', label: 'Coluna para bloqueio de neuroeixo', options: ['Processos palpáveis', 'Difícil palpação', 'Tecido adiposo importante', 'Escoliose importante', 'Material de síntese'], outro: true, span: 12 },
+  { t: 'chips', id: 'nx_pele', label: 'Pele no local de punção', options: ['Íntegra', 'Tatuagem', 'Lesão / infecção'], outro: true, span: 6 },
   { t: 'text', id: 'posicionamento', label: 'Limitações para posicionamento', span: 6, ph: 'articulações, próteses, dor' }
 ]},
 
@@ -994,31 +1020,41 @@ var SCHEMA = [
     ['ar_inc', 'Incisão cirúrgica', [['Periférica', 0], ['Abdominal superior', 15], ['Intratorácica', 24]], 'incisao'],
     ['ar_dur', 'Duração da cirurgia', [['< 2 h', 0], ['2–3 h', 16], ['> 3 h', 23]], 'duracao'],
     ['ar_emerg', 'Procedimento de emergência', [['Não', 0], ['Sim', 8]], 'emergencia']
-  ], interp: [[0, 'Baixo risco (1,6%)', 'ok'], [26, 'Risco intermediário (13,3%)', 'warn'], [45, 'Alto risco (42,1%)', 'crit']] }
+  ], interp: [[0, 'Baixo risco (1,6%)', 'ok'], [26, 'Risco intermediário (13,3%)', 'warn'], [45, 'Alto risco (42,1%)', 'crit']] },
+  { t: 'score', id: 'egri', kind: 'select', title: 'Via aérea difícil: índice de El-Ganzouri (EGRI)', selects: [
+    ['eg_ab', 'Abertura bucal', [['≥ 4 cm', 0], ['< 4 cm', 1]], 'eg_ab'],
+    ['eg_dtm', 'Distância tireomentoniana', [['> 6,5 cm', 0], ['6 a 6,5 cm', 1], ['< 6 cm', 2]], 'eg_dtm'],
+    ['eg_mall', 'Mallampati', [['I', 0], ['II', 1], ['III ou IV', 2]], 'eg_mall'],
+    ['eg_cerv', 'Mobilidade cervical', [['> 90°', 0], ['80 a 90°', 1], ['< 80°', 2]], 'eg_cerv'],
+    ['eg_prot', 'Protrusão da mandíbula', [['Consegue', 0], ['Não consegue', 1]], 'eg_prot'],
+    ['eg_peso', 'Peso', [['< 90 kg', 0], ['90 a 110 kg', 1], ['> 110 kg', 2]], 'eg_peso'],
+    ['eg_hist', 'História de intubação difícil', [['Nenhuma', 0], ['Duvidosa', 1], ['Confirmada', 2]], 'eg_hist']
+  ], interp: [[0, 'Baixo risco de laringoscopia difícil', 'ok'], [4, 'EGRI ≥ 4: laringoscopia / intubação difícil provável', 'crit']],
+    legend: 'Escala de 0 a 12 (El-Ganzouri, 1996). Preenchido a partir da aba 13 e do peso; corrija manualmente se necessário.' },
+  { t: 'ckd', id: 'tfg', title: 'Função renal: TFG estimada pela CKD-EPI 2021' }
 ]},
 
 { id: 'plano', title: 'Conclusão e plano anestésico', fields: [
   { t: 'chips', id: 'apto', label: 'Conclusão', options: ['Apto', 'Apto com ressalvas', 'Aguardando exames / parecer', 'Não apto no momento — adiar'], span: 12 },
   { t: 'text', id: 'apto_motivo', label: 'Ressalvas / motivo', span: 12 },
-  { t: 'multi', id: 'tecnica', label: 'Técnica anestésica proposta', options: ['Geral balanceada', 'Venosa total (TIVA)', 'Raquianestesia', 'Peridural', 'Combinada raqui-peridural', 'Bloqueio de nervo periférico', 'Sedação', 'Local + sedação', 'Geral + bloqueio'], span: 12 },
-  { t: 'multi', id: 'va_plano', label: 'Manejo da via aérea', options: ['Intubação orotraqueal', 'Máscara laríngea', 'Videolaringoscopia', 'Intubação acordado (fibroscopia)', 'Sequência rápida', 'Carrinho de via aérea difícil em sala'], span: 12 },
-  { t: 'multi', id: 'monit', label: 'Monitorização', options: ['Padrão (ECG, PNI, SpO₂, EtCO₂)', 'Temperatura', 'TOF (bloqueio neuromuscular)', 'BIS / entropia', 'Pressão arterial invasiva', 'Acesso venoso central', 'Sonda vesical (débito urinário)', 'Débito cardíaco / VPP', 'Ecocardiograma transesofágico', 'Glicemia seriada', 'NIRS'], span: 12 },
+  { t: 'select', id: 'tecnica', label: 'Técnica anestésica proposta', options: ['Geral balanceada', 'Venosa total (TIVA/TCI)', 'Raquianestesia', 'Peridural', 'Combinada raqui-peridural', 'Bloqueio de nervo periférico', 'Sedação', 'Local + sedação', 'Geral + bloqueio', 'Bloqueio endovenoso de Bier'], outro: true, span: 12 },
+  { t: 'multi', id: 'va_plano', label: 'Manejo da via aérea', options: ['Intubação orotraqueal', 'Máscara laríngea', 'Videolaringoscopia', 'Broncofibroscópio', 'Ventilação monopulmonar', 'Intubação acordado (fibroscopia)', 'Sequência rápida', 'Material de via aérea difícil em sala'], outro: true, span: 12 },
+  { t: 'multi', id: 'monit', label: 'Monitorização', options: ['Padrão (ECG, PNI, SpO₂, EtCO₂)', 'Temperatura', 'TOF (bloqueio neuromuscular)', 'BIS / entropia', 'Pressão arterial invasiva', 'Acesso venoso central', 'Sonda vesical (débito urinário)', 'Débito cardíaco / VPP', 'Ecocardiograma transesofágico', 'Ecocardiograma transtorácico', 'Ultrassonografia (POCUS)', 'Glicemia seriada', 'NIRS'], outro: true, span: 12 },
   { t: 'text', id: 'acessos', label: 'Acessos venosos planejados', span: 12 },
-  { t: 'multi', id: 'profilaxias', label: 'Profilaxias', options: ['NVPO (conforme Apfel)', 'Tromboprofilaxia mecânica', 'Tromboprofilaxia farmacológica', 'Antibioticoprofilaxia (até 60 min antes da incisão)', 'Corticoide de estresse', 'Broncoaspiração', 'Broncodilatador antes da indução'], span: 12 },
-  { t: 'multi', id: 'precaucoes', label: 'Precauções especiais', options: ['Sala livre de látex', 'Técnica livre de gatilhos (HM), dantrolene disponível', 'Isolamento de contato', 'Reprogramar marcapasso / desativar CDI (ímã disponível)', 'Membro restrito para acesso e PA', 'Sem transfusão (recusa)', 'Aquecimento ativo', 'Proteção especial no posicionamento', 'Acompanhante na indução (TEA, demência, criança)'], span: 12 },
+  { t: 'multi', id: 'profilaxias', outro: true, label: 'Profilaxias', options: ['NVPO (conforme Apfel)', 'Tromboprofilaxia mecânica', 'Tromboprofilaxia farmacológica', 'Antibioticoprofilaxia (até 60 min antes da incisão)', 'Corticoide de estresse', 'Broncoaspiração', 'Broncodilatador antes da indução'], span: 12 },
+  { t: 'multi', id: 'precaucoes', outro: true, label: 'Precauções especiais', options: ['Sala livre de látex', 'Técnica livre de gatilhos (HM), dantrolene disponível', 'Isolamento de contato', 'Reprogramar marcapasso / desativar CDI (ímã disponível)', 'Membro restrito para acesso e PA', 'Sem transfusão (recusa)', 'Aquecimento ativo', 'Proteção especial no posicionamento', 'Acompanhante na indução (TEA, demência, criança)'], span: 12 },
   { t: 'text', id: 'analgesia', label: 'Analgesia pós-operatória', span: 12, ph: 'multimodal, bloqueio contínuo, PCA, opioide espinhal' },
   { t: 'text', id: 'premed', label: 'Medicação pré-anestésica', span: 12 },
-  { t: 'chips', id: 'destino', label: 'Destino pós-operatório', options: ['SRPA → quarto', 'SRPA → alta no mesmo dia', 'Semi-intensiva', 'UTI'], span: 12 },
+  { t: 'chips', id: 'destino', label: 'Destino pós-operatório', options: ['SRPA → leito', 'SRPA → alta no mesmo dia', 'Semi-intensiva', 'UTI'], outro: true, span: 12 },
   { t: 'textarea', id: 'plano_obs', label: 'Observações', span: 12 }
 ]},
 
 { id: 'orient', title: 'Orientações pré-operatórias', fields: [
   { t: 'note', text: 'Jejum (ASA 2023, adultos e crianças saudáveis): líquidos claros sem resíduo 2 h · leite materno 4 h · fórmula infantil e leite não humano 6 h · refeição leve 6 h · refeição gordurosa ou carne 8 h. Ajustar para gastroparesia, obesidade grave, agonistas GLP-1 e protocolos institucionais.' },
-  { t: 'text', id: 'jejum_sol', label: 'Jejum para sólidos a partir de', span: 6, ph: 'data e hora' },
-  { t: 'text', id: 'jejum_liq', label: 'Líquidos claros permitidos até', span: 6, ph: 'data e hora' },
-  { t: 'textarea', id: 'meds_manter', label: 'Medicamentos a tomar no dia (com pouca água)', span: 6 },
-  { t: 'textarea', id: 'meds_suspender', label: 'Medicamentos a suspender (e quando)', span: 6 },
-  { t: 'multi', id: 'orient_gerais', label: 'Orientações entregues', options: ['Remover próteses dentárias móveis, lentes de contato e aparelhos auditivos', 'Retirar joias, piercings, esmalte e unhas em gel', 'Banho no dia; não usar cremes no local', 'Trazer exames, relatórios e lista de medicamentos', 'Trazer CPAP', 'Vir com acompanhante adulto', 'Não dirigir nem tomar decisões importantes por 24 h', 'Avisar febre, gripe ou mudança no estado de saúde', 'Parar de fumar (idealmente ≥ 4 semanas antes)', 'Não ingerir álcool nas 24 h anteriores'], span: 12 }
+  { t: 'jejum', id: 'jejum', label: 'Jejum: horas por tipo de alimento e último horário permitido' },
+  { t: 'table', id: 'meds_manter_tab', label: 'Medicamentos a tomar no dia (com pouca água)', cols: [['Medicamento', 6], ['Horário da última dose', 4]], rows: 3 },
+  { t: 'table', id: 'meds_susp_tab', label: 'Medicamentos a suspender', cols: [['Medicamento', 6], ['Dia e horário da última dose', 4]], rows: 3 },
+  { t: 'multi', id: 'orient_gerais', outro: true, label: 'Orientações entregues', options: ['Remover próteses dentárias móveis, lentes de contato e aparelhos auditivos', 'Retirar joias, piercings, esmalte e unhas em gel', 'Banho no dia; não usar cremes no local', 'Trazer exames, relatórios e lista de medicamentos', 'Trazer CPAP', 'Vir com acompanhante adulto', 'Não dirigir nem tomar decisões importantes por 24 h', 'Avisar febre, gripe ou mudança no estado de saúde', 'Parar de fumar (idealmente ≥ 4 semanas antes)', 'Não ingerir álcool nas 24 h anteriores'], span: 12 }
 ]},
 
 { id: 'tcle', title: 'Termo de consentimento (TCLE)', fields: [
@@ -1032,8 +1068,8 @@ var SCHEMA = [
   { t: 'text', id: 'reav_sv', label: 'PA / FC / SpO₂ / HGT', span: 3 },
   { t: 'chips', id: 'reav_mudanca', label: 'Mudanças desde a consulta', options: ['Sem mudanças', 'Houve mudanças'], span: 5 },
   { t: 'text', id: 'reav_mudanca_det', label: 'Quais', span: 7 },
-  { t: 'text', id: 'reav_meds', label: 'Medicamentos tomados hoje', span: 12 },
-  { t: 'multi', id: 'reav_check', label: 'Conferência', options: ['Identidade e procedimento confirmados', 'Sítio e lateralidade demarcados', 'Consentimento assinado', 'Alergias conferidas (pulseira)', 'Próteses e adornos removidos', 'Exames e reserva de sangue conferidos', 'Via aérea e risco de aspiração reavaliados', 'Equipamento e fármacos checados (checklist OMS)'], span: 12 },
+  { t: 'table', id: 'reav_meds_tab', label: 'Medicamentos tomados hoje', cols: [['Medicamento', 6], ['Horário da última dose', 4]], rows: 2 },
+  { t: 'multi', id: 'reav_check', outro: true, label: 'Conferência', options: ['Identidade e procedimento confirmados', 'Sítio e lateralidade demarcados', 'Consentimento assinado', 'Alergias conferidas (pulseira)', 'Próteses e adornos removidos', 'Exames e reserva de sangue conferidos', 'Via aérea e risco de aspiração reavaliados', 'Equipamento e fármacos checados (checklist OMS)'], span: 12 },
   { t: 'text', id: 'reav_medico', label: 'Anestesiologista responsável', span: 12 }
 ]}
 ];
@@ -1101,7 +1137,7 @@ function wrap(f, inner, extra){
 function renderField(f){
   switch (f.t){
     case 'text': case 'date': case 'time':
-      return wrap(f, [labelEl(f), h('input', { id: f.id, type: f.t, placeholder: f.ph || null, autocomplete: 'off', readonly: f.ro ? true : null,
+      return wrap(f, [f.semAlt ? h('div', { 'class': 'lbl-row' }, labelEl(f), saBox(f)) : labelEl(f), h('input', { id: f.id, type: f.t, placeholder: f.ph || null, autocomplete: 'off', readonly: f.ro ? true : null,
         title: f.ro ? 'Preenchido automaticamente pelo sistema' : null, inputmode: f.mask ? 'numeric' : null, maxlength: f.mask === 'cpf' ? 14 : f.mask === 'tel' ? 16 : null,
         'data-mask': f.mask || null, 'class': f.upper ? 'upper' : null })]);
     case 'dmy': return renderDmy(f);
@@ -1116,13 +1152,20 @@ function renderField(f){
     case 'calc':
       return wrap(f, [h('span', { 'class': 'lbl' }, f.label, f.unit ? h('span', { 'class': 'unit' }, ' ' + f.unit) : null), h('output', { id: f.id, 'class': 'calc' }, '—')]);
     case 'select':
-      return wrap(f, [labelEl(f), h('select', { id: f.id }, h('option', { value: '' }, '—'), f.options.map(function(o){ return h('option', { value: o }, o); }))]);
+      return wrap(f, [labelEl(f), h('select', { id: f.id }, h('option', { value: '' }, '—'), f.options.concat(f.outro ? ['Outro'] : []).map(function(o){ return h('option', { value: o }, o); })),
+        f.outro ? h('input', { type: 'text', id: f.id + '_outro', 'class': 'outro-in', 'data-outro-for': f.id, placeholder: 'Qual? Descreva', 'aria-label': f.label + ': outro', autocomplete: 'off', hidden: true }) : null]);
+    case 'ratio': return wrap(f, [h('div', { 'class': 'ratio-box' }, h('span', { 'class': 'ratio-l' }, f.label), h('output', { id: f.id, 'class': 'ratio-v' }, '—'), h('span', { 'class': 'ratio-i', id: f.id + '_i' }, 'Preencha as duas medidas em cm (circunferência cervical e DTM).'))]);
+    case 'jejum': return renderJejum(f);
+    case 'ckd': return h('div', { 'class': 'score', id: f.id + '_box' }, h('div', { 'class': 'score-h' }, h('h3', null, f.title), h('div', { 'class': 'score-val', id: f.id + '_val' }, '—')),
+      h('div', { 'class': 'score-items' }, h('p', { 'class': 'legend', id: f.id + '_dados', style: 'margin:4px 12px' }, '')),
+      h('div', { 'class': 'score-foot' }, h('span', { 'class': 'interp lv-none', id: f.id + '_interp' }, 'Sem dados'),
+        h('p', { 'class': 'legend' }, 'CKD-EPI 2021, sem ajuste por raça. Usa a creatinina da aba 14, a idade e o sexo biológico. Estágios KDIGO: G1 ≥ 90 · G2 60–89 · G3a 45–59 · G3b 30–44 · G4 15–29 · G5 < 15 mL/min/1,73 m².')));
     case 'textarea':
       return wrap(f, [labelEl(f), h('textarea', { id: f.id, placeholder: f.ph || null })]);
     case 'chips': case 'multi':
       var type = f.t === 'chips' ? 'radio' : 'checkbox';
       var fs = h('fieldset', { 'class': 'f ' + f.t + ((f.span || 3) <= 3 ? ' sm' : ''), style: '--s:' + (f.span || 12), id: f.id },
-        h('legend', null, f.label),
+        f.semAlt ? h('legend', { 'class': 'lbl-row' }, f.label, saBox(f)) : h('legend', null, f.label),
         h('div', { 'class': 'chipset' }, f.options.concat(f.outro ? ['Outro'] : []).map(function(o){
           return h('label', { 'class': 'chip' }, h('input', { type: type, name: f.id, value: o }), h('span', null, o));
         })),
@@ -1268,6 +1311,39 @@ document.addEventListener('input', function(e){
   if (t.matches('[data-mask]')) aplicarMascara(t);
   if (t.matches('input.upper')){ var p = t.selectionStart; t.value = t.value.toLocaleUpperCase('pt-BR'); try { t.setSelectionRange(p, p); } catch (x) {} }
 }, true);
+function saBox(f){ return h('label', { 'class': 'sa' }, h('input', { type: 'checkbox', id: f.id + '_sa' }), 'Sem alterações'); }
+function semAlt(id, v){ return v || (ck(id + '_sa') ? 'sem alterações' : ''); }
+var JEJUM = [['ger', 'Refeições gerais (gordurosas, carne)', 8], ['leve', 'Refeições leves', 6], ['liq', 'Líquidos claros (água, chá, suco sem polpa)', 2], ['form', 'Fórmulas infantis / leite não humano', 6], ['mat', 'Leite materno', 4]];
+function renderJejum(f){
+  var hs = []; for (var i = 1; i <= 12; i++) hs.push(i);
+  function linha(k, rot, def, outro){
+    return h('tr', null,
+      h('td', null, h('label', { 'class': 'jj-l' }, h('input', { type: 'checkbox', id: 'jj_' + k }), outro ? h('input', { type: 'text', id: 'jj_' + k + '_nome', placeholder: 'Outro: qual?', 'aria-label': 'Outro tipo de alimento' }) : h('span', null, rot))),
+      h('td', null, h('select', { id: 'jj_' + k + '_h', 'aria-label': 'Horas de jejum' }, hs.map(function(x){ return h('option', { value: String(x), selected: x === def ? true : null }, x + ' h'); }))),
+      h('td', { 'class': 'jj-t', id: 'jj_' + k + '_t' }, '—'));
+  }
+  return h('div', { 'class': 'f full' }, h('span', { 'class': 'lbl' }, f.label),
+    h('div', { 'class': 'tbl-wrap' }, h('table', { 'class': 'jejum' }, h('thead', null, h('tr', null, h('th', null, 'Tipo de alimento'), h('th', null, 'Horas de jejum'), h('th', null, 'Último horário permitido'))),
+      h('tbody', null, JEJUM.map(function(j){ return linha(j[0], j[1], j[2]); }).concat([linha('out', '', 6, true)])))),
+    h('p', { 'class': 'note', id: 'jj_aviso' }, 'Marque os tipos que se aplicam. O último horário é calculado a partir da data e da hora da cirurgia (aba 02).'));
+}
+function jejumCirurgia(){
+  var d = txt('data_cir'), hr = txt('hora_cir'); if (!d || !hr) return null;
+  var t = new Date(d + 'T' + hr); return isNaN(t) ? null : t;
+}
+function jejumLinhas(){
+  var base = jejumCirurgia(), out = [];
+  JEJUM.concat([['out', '', 6]]).forEach(function(j){
+    if (!ck('jj_' + j[0])) return;
+    var nome = j[0] === 'out' ? (txt('jj_out_nome') || 'Outro') : j[1].replace(/ \(.*\)$/, '');
+    var hrs = +txt('jj_' + j[0] + '_h') || j[2];
+    var lim = base ? new Date(base.getTime() - hrs * 3600000) : null;
+    out.push({ k: j[0], nome: nome, hrs: hrs, lim: lim });
+  });
+  return out;
+}
+var DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+function fmtLim(d){ return DIAS[d.getDay()] + ' ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' às ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
 function comOutro(id, v){ if (v !== 'Outro') return v; var o = txt(id + '_outro'); return o || v; }
 function cellEl(c, v){
   if (c[2] === 'multi'){
@@ -1566,12 +1642,25 @@ function bmi(){ var p = num('peso'), a = num('altura'); if (!p || !a) return nul
 function fmt(n, d){ return n === null || n === undefined ? '—' : n.toFixed(d === undefined ? 1 : d).replace('.', ','); }
 
 var C = {};
+function ckdEstagio(v){ return v >= 90 ? 'G1: normal ou alta' : v >= 60 ? 'G2: levemente reduzida' : v >= 45 ? 'G3a: leve a moderadamente reduzida' : v >= 30 ? 'G3b: moderada a gravemente reduzida' : v >= 15 ? 'G4: gravemente reduzida' : 'G5: falência renal'; }
 function computeBase(){
   C.age = ageYears(); C.bmi = bmi(); C.sexo = chip('sexo');
   var cig = num('tab_cig'), anos = num('tab_anos');
   C.macos = cig !== null && anos !== null ? cig / 20 * anos : null;
   var cr = num('cr'), peso = num('peso');
   C.clcr = cr && peso && C.age !== null ? (140 - C.age) * peso / (72 * cr) * (C.sexo === 'Feminino' ? 0.85 : 1) : null;
+  C.tfg = null;
+  if (cr && C.age !== null && C.age >= 18 && (C.sexo === 'Feminino' || C.sexo === 'Masculino')){
+    var fem = C.sexo === 'Feminino', k = fem ? 0.7 : 0.9, a = fem ? -0.241 : -0.302;
+    C.tfg = 142 * Math.pow(Math.min(cr / k, 1), a) * Math.pow(Math.max(cr / k, 1), -1.200) * Math.pow(0.9938, C.age) * (fem ? 1.012 : 1);
+  }
+  if ($('tfg_val')){
+    $('tfg_val').textContent = C.tfg === null ? '—' : fmt(C.tfg, 0) + ' mL/min';
+    $('tfg_dados').textContent = 'Creatinina: ' + (cr ? fmt(cr, 2) + ' mg/dL' : 'não informada (aba 14)') + ' · Idade: ' + (C.age === null ? '—' : C.age + ' anos') + ' · Sexo biológico: ' + (C.sexo || '—');
+    var ti = $('tfg_interp');
+    if (C.tfg === null){ ti.textContent = cr ? 'Cálculo exige idade ≥ 18 anos e sexo biológico feminino ou masculino' : 'Sem dados'; ti.className = 'interp lv-none'; }
+    else { ti.textContent = ckdEstagio(C.tfg); ti.className = 'interp lv-' + (C.tfg >= 60 ? 'ok' : C.tfg >= 30 ? 'warn' : 'crit'); }
+  }
   $('idade').textContent = C.age === null ? '—' : C.age + ' anos';
   $('imc').textContent = C.bmi === null ? '—' : fmt(C.bmi);
   $('macos_ano').textContent = C.macos === null ? '—' : fmt(C.macos);
@@ -1595,7 +1684,21 @@ var AUTO = {
   masc: function(){ return C.sexo ? C.sexo === 'Masculino' : null; },
   fem: function(){ return C.sexo ? C.sexo === 'Feminino' : null; },
   naofumante: function(){ var t = chip('tab'); return t ? t !== 'Fumante atual' : null; },
-  pescoco: function(){ var c = num('circ_cerv'); if (c === null || !C.sexo) return null; return C.sexo === 'Masculino' ? c >= 43 : c >= 41; },
+  pescoco: function(){
+    var c = num('circ_cerv_cm'), cat = txt('circ_cerv');
+    if (c !== null && C.sexo) return C.sexo === 'Masculino' ? c >= 43 : c >= 41;
+    if (cat === '> 42 cm') return C.sexo === 'Masculino' ? null : true;
+    if (cat === '< 40 cm') return false;
+    if (cat === '40 a 42 cm' && C.sexo === 'Masculino') return false;
+    return null;
+  },
+  eg_ab: function(){ var a = txt('abertura'); return !a ? null : a.indexOf('> 4') === 0 ? 0 : 1; },
+  eg_dtm: function(){ var d = num('dtm_cm'); if (d !== null) return d > 6.5 ? 0 : d >= 6 ? 1 : 2; var c = chip('dtm'); return !c ? null : c.indexOf('≥ 6,5') === 0 ? 0 : c.indexOf('6 a') === 0 ? 1 : 2; },
+  eg_mall: function(){ var m = chip('mallampati'); return m === 'I' ? 0 : m === 'II' ? 1 : (m === 'III' || m === 'IV') ? 2 : null; },
+  eg_cerv: function(){ var m = chip('mob_cerv'); return !m ? null : m.indexOf('Grau 1') === 0 ? 0 : m.indexOf('Grau 2') === 0 ? 1 : 2; },
+  eg_prot: function(){ var u = chip('ulbt'); if (u) return u.indexOf('Classe III') === 0 ? 1 : 0; return multi('oclusao').indexOf('Limitação da protrusão mandibular') > -1 ? 1 : null; },
+  eg_peso: function(){ var p = num('peso'); return p === null ? null : p < 90 ? 0 : p <= 110 ? 1 : 2; },
+  eg_hist: function(){ return ck('c_vad') ? 2 : (chip('cormack') === 'III' || chip('cormack') === 'IV') ? 2 : null; },
   cr2: function(){ var c = num('cr'); return c === null ? null : c > 2; },
   isquemica: function(){ return ck('dac') || ck('iam') || ck('revasc'); },
   insulina: function(){ return ck('dm_insulina') || multi('meds_classes').indexOf('Insulina') > -1; },
@@ -1697,8 +1800,10 @@ function alerts(){
   if (ck('d_opioides')) add('warn', 'Uso de opioides sem prescrição', 'Tolerância provável: analgesia multimodal e cuidado com abstinência.');
   if (ck('d_inj')) add('warn', 'Uso de drogas injetáveis', 'Acesso venoso possivelmente difícil; risco infeccioso.');
   if (ck('d_bzd')) add('info', 'Uso de benzodiazepínicos sem prescrição', 'Tolerância a sedativos; risco de abstinência.');
-  var vad = ck('c_vad') || chip('va_dificil').indexOf('Sim') === 0 || chip('mallampati') === 'IV' || (num('abertura') !== null && num('abertura') < 3) || chip('dtm') === '< 6 cm' || chip('ulbt') === 'Classe III' || chip('mob_cerv') === 'Muito limitada';
-  if (vad) add('crit', 'Via aérea difícil prevista', 'Plano A/B/C, videolaringoscópio e carrinho de via aérea difícil em sala.');
+  var vad = ck('c_vad') || chip('va_dificil').indexOf('Sim') === 0 || chip('mallampati') === 'IV' || ['2 a 2,9 cm', '< 2 cm'].indexOf(txt('abertura')) > -1 || ['5 a 5,9 cm', '< 5 cm'].indexOf(chip('dtm')) > -1 || chip('ulbt').indexOf('Classe III') === 0 || /^Grau [34]/.test(chip('mob_cerv')) || (SC.egri && SC.egri.any && SC.egri.v >= 4);
+  if (vad) add('crit', 'Via aérea difícil prevista', (SC.egri && SC.egri.any ? 'EGRI ' + SC.egri.v + '. ' : '') + 'Plano A/B/C, videolaringoscópio e carrinho de via aérea difícil em sala.');
+  if (C.rcc !== null && C.rcc >= 5) add('warn', 'Relação circunferência cervical / DTM ' + fmt(C.rcc, 1), 'Valor ≥ 5 associa-se a intubação difícil, sobretudo em obesos.');
+  if (C.tfg !== null && C.tfg < 30) add('warn', 'TFG ' + fmt(C.tfg, 0) + ' mL/min/1,73 m² (CKD-EPI)', 'Ajustar doses de fármacos de eliminação renal; cuidado com nefrotóxicos e potássio.');
   if (SC.langeron && SC.langeron.v >= 2) add('warn', 'Ventilação sob máscara difícil provável', SC.langeron.v + ' preditores de Langeron.');
   if (chip('aceita_transf') === 'Não (recusa)') add('crit', 'Recusa de transfusão', 'Documentar; planejar estratégias poupadoras de sangue.');
   else if (chip('aceita_transf') === 'Aceita parcialmente') add('warn', 'Aceitação parcial de hemocomponentes', txt('transf_aceita_det'));
@@ -1790,6 +1895,8 @@ function renderPanelScores(){
   row('Caprini', SC.caprini ? SC.caprini.v + ' pts' : '—');
   row('ARISCAT', SC.ariscat && SC.ariscat.any ? SC.ariscat.v + ' pts' : '—');
   row('Langeron (VMD)', SC.langeron ? SC.langeron.v + ' / 5' : '—');
+  row('EGRI (via aérea)', SC.egri && SC.egri.any ? SC.egri.v + ' / 12' : '—');
+  row('TFG (CKD-EPI)', C.tfg === null || C.tfg === undefined ? '—' : fmt(C.tfg, 0) + ' mL/min');
   row('ClCr', C.clcr === null ? '—' : fmt(C.clcr, 0) + ' mL/min');
   row('Maços-ano', C.macos === null ? '—' : fmt(C.macos));
 }
@@ -1817,8 +1924,28 @@ function update(){
   requestAnimationFrame(function(){
     pending = false;
     var tc = $('cirurgias'); if (tc){ var wf = tc.closest('.f'); if (wf) wf.hidden = chip('anest_previa') === 'Não'; }
+    SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){ if (f.showIf && $(f.id)){ var w = $(f.id).closest('.f'); if (w) w.hidden = chip(f.showIf[0]) !== f.showIf[1]; } }); });
+    var cc = num('circ_cerv_cm'), dd = num('dtm_cm');
+    if (cc !== null && $('circ_cerv')) $('circ_cerv').value = cc < 40 ? '< 40 cm' : cc <= 42 ? '40 a 42 cm' : '> 42 cm';
+    if (dd !== null && $('dtm_cm')) setRadio('dtm', dd >= 6.5 ? '≥ 6,5 cm ou 4 dedos' : dd >= 6 ? '6 a 6,4 cm' : dd >= 5 ? '5 a 5,9 cm' : '< 5 cm');
+    C.rcc = cc !== null && dd ? cc / dd : null;
+    if ($('rel_cc_dtm')){
+      $('rel_cc_dtm').textContent = C.rcc === null ? '—' : fmt(C.rcc, 1);
+      var ri = $('rel_cc_dtm_i'); ri.dataset.alerta = C.rcc !== null && C.rcc >= 5 ? '1' : '';
+      ri.textContent = C.rcc === null ? 'Preencha as duas medidas em cm (circunferência cervical e DTM).' : C.rcc >= 5 ? 'VALOR ≥ 5: PREDITOR DE INTUBAÇÃO DIFÍCIL' : 'Abaixo de 5: sem aumento de risco por este critério';
+      ri.className = 'ratio-i' + (C.rcc !== null && C.rcc >= 5 ? ' alto' : '');
+    }
+    if ($('jj_ger')){
+      var base = jejumCirurgia();
+      JEJUM.concat([['out', '', 6]]).forEach(function(j){
+        var on = ck('jj_' + j[0]), t = $('jj_' + j[0] + '_t'), hrs = +txt('jj_' + j[0] + '_h') || j[2];
+        t.textContent = !on ? '—' : base ? fmtLim(new Date(base.getTime() - hrs * 3600000)) : 'informe data e hora da cirurgia';
+        t.parentNode.classList.toggle('on', on);
+      });
+    }
     document.querySelectorAll('[data-outro-for]').forEach(function(i){
-      var on = !!document.querySelector('input[name="' + i.getAttribute('data-outro-for') + '"][value="Outro"]:checked');
+      var fid = i.getAttribute('data-outro-for'), el = $(fid);
+      var on = el && el.tagName === 'SELECT' ? el.value === 'Outro' : !!document.querySelector('input[name="' + fid + '"][value="Outro"]:checked');
       i.hidden = !on;
     });
     computeBase(); applyAuto(); computeScores();
@@ -1843,11 +1970,16 @@ function summary(semAssinatura){
       if (f.only === 'F' && C.sexo === 'Masculino') return;
       var v;
       switch (f.t){
-        case 'text': case 'num': case 'time': case 'textarea': case 'select':
-          v = txt(f.id); if (v) L.push(f.label + ': ' + v + (f.unit && f.t === 'num' ? ' ' + f.unit : '')); break;
+        case 'text': case 'num': case 'time': case 'textarea':
+          v = f.semAlt ? semAlt(f.id, txt(f.id)) : txt(f.id); if (v) L.push(f.label + ': ' + v + (f.unit && f.t === 'num' ? ' ' + f.unit : '')); break;
+        case 'select': v = comOutro(f.id, txt(f.id)); if (v) L.push(f.label + ': ' + v); break;
+        case 'ratio': v = $(f.id).textContent; if (v && v !== '—') L.push('Relação circunferência cervical / DTM: ' + v + ($(f.id + '_i').dataset.alerta ? ' (≥ 5: preditor de intubação difícil)' : '')); break;
+        case 'jejum':
+          var jl = jejumLinhas(); if (jl.length) L.push('Jejum: ' + jl.map(function(x){ return x.nome + ' ' + x.hrs + ' h' + (x.lim ? ' (até ' + fmtLim(x.lim) + ')' : ''); }).join('; ')); break;
+        case 'ckd': if (C.tfg !== null && C.tfg !== undefined) L.push('TFG estimada (CKD-EPI 2021): ' + fmt(C.tfg, 0) + ' mL/min/1,73 m² — ' + ckdEstagio(C.tfg)); break;
         case 'date': v = txt(f.id); if (v) L.push(f.label + ': ' + dBR(v)); break;
         case 'calc': v = $(f.id).textContent; if (v && v !== '—') L.push(f.label + ': ' + v + (f.unit ? ' ' + f.unit : '')); break;
-        case 'chips': v = comOutro(f.id, chip(f.id)); if (v) L.push(f.label + ': ' + v); break;
+        case 'chips': v = comOutro(f.id, chip(f.id)); if (f.semAlt) v = semAlt(f.id, v); if (v) L.push(f.label + ': ' + v); break;
         case 'dmy': v = txt(f.id); if (v) L.push(f.label + ': ' + dBR(v)); break;
         case 'hm': v = txt(f.id); if (v) L.push(f.label + ': ' + fmtHm(v)); break;
         case 'ym': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
@@ -1954,7 +2086,8 @@ var TX = {
 };
 var TECH_MAP = {
   'Geral balanceada': 'Anestesia geral (venosa e inalatória)',
-  'Venosa total (TIVA)': 'Anestesia geral venosa total',
+  'Venosa total (TIVA/TCI)': 'Anestesia geral venosa total',
+  'Bloqueio endovenoso de Bier': 'Anestesia regional intravenosa (bloqueio de Bier)',
   'Raquianestesia': 'Raquianestesia',
   'Peridural': 'Anestesia peridural',
   'Combinada raqui-peridural': 'Bloqueio combinado raqui-peridural',
@@ -2158,7 +2291,8 @@ function suggestRisks(){
 }
 
 function tAge(){ return C.age; }
-function tTech(){ return multi('tecnica').map(function(t){ return TECH_MAP[t] || t; }); }
+function tecRaw(){ var v = comOutro('tecnica', txt('tecnica')); return v ? [v] : []; }
+function tTech(){ return tecRaw().map(function(t){ return TECH_MAP[t] || t; }); }
 function tAutoRows(){
   var nome = txt('nome'), social = txt('nome_social');
   var proc = [txt('cirurgia'), chip('lateralidade') && chip('lateralidade') !== 'Não se aplica' ? 'lado ' + chip('lateralidade').toLowerCase() : '', txt('regiao')].filter(Boolean).join(' · ');
@@ -2194,9 +2328,9 @@ function tcleRefresh(){
   var tech = tTech(), ul = $('tcle-tech'); ul.innerHTML = '';
   if (tech.length) tech.forEach(function(t){ ul.appendChild(h('li', null, t)); });
   else ul.appendChild(h('li', { 'class': 'miss', style: 'color:var(--warn)' }, 'Técnica ainda não definida. ', h('a', { href: '#sec-plano', 'class': 'doc-only' }, 'Marcar em Conclusão e plano anestésico')));
-  var tsel = multi('tecnica');
-  $('tcle-sed-w').hidden = !tsel.some(function(t){ return /Sedação|Local \+ sedação/.test(t); });
-  $('tcle-bloq-w').hidden = !tsel.some(function(t){ return /Bloqueio|Geral \+ bloqueio/.test(t); });
+  var tsel = tecRaw();
+  $('tcle-sed-w').hidden = !tsel.some(function(t){ return /sedação/i.test(t); });
+  $('tcle-bloq-w').hidden = !tsel.some(function(t){ return /bloqueio/i.test(t); });
   if (!MANUAL.tcle_assoc){
     var m = multi('monit').map(function(x){ return ASSOC_FROM_MONIT[x]; }).filter(Boolean);
     if (/cateter|cont[ií]nu/i.test(txt('analgesia'))) m.push('Cateter para analgesia pós-operatória');
@@ -2436,6 +2570,7 @@ function clearAll(){
   }); });
   var d = new Date(); $('data_aval').value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); $('hora_aval').value = pad(d.getHours()) + ':' + pad(d.getMinutes());
   tcleReset();
+  JEJUM.concat([['out', '', 6]]).forEach(function(j){ var e = $('jj_' + j[0] + '_h'); if (e) e.value = String(j[2]); });
   $('banner').hidden = true;
   if (window.ACESSO && window.ACESSO.aposLimpar) window.ACESSO.aposLimpar();
   update();
@@ -2470,12 +2605,12 @@ var EXAMPLE = {
   drge: true, drge_det: 'pirose pós-prandial, sintomática', vesicula: true, vesicula_det: 'cólicas biliares recorrentes',
   artrose: true, artrose_det: 'joelhos',
   menopausa: true, menopausa_det: 'aos 51 anos', cesarea: true, cesarea_det: '1', gpa: 'G2 P2 (1 cesárea) A0',
-  meds_status: 'Sim', meds_tab: [['Losartana', '50 mg', '12/12 h', 'HAS', '', 'Omitir 24 h antes'], ['Metformina', '850 mg', '12/12 h', 'DM2', '', 'Não tomar no dia'], ['Semaglutida SC', '0,5 mg', 'Semanal', 'DM2 / peso', '', 'Individualizar (ver referência)'], ['Omeprazol', '20 mg', '1x/dia', 'DRGE', '', 'Manter, inclusive no dia']],
+  meds_status: 'Sim', meds_tab: [['Losartana', '50 mg', '08h e 20h', 'ontem 20h', '15 anos'], ['Metformina', '850 mg', '08h e 20h', 'ontem 20h', '8 anos'], ['Semaglutida SC', '0,5 mg', 'semanal (domingo)', 'há 5 dias', '1 ano'], ['Omeprazol', '20 mg', '07h', 'hoje 07h', '3 anos']],
   meds_classes: ['IECA / BRA', 'Antidiabético oral', 'Agonista GLP-1 / tirzepatida (semaglutida, liraglutida…)'],
-  supl_status: 'Sim', supl: ['Ômega-3 / óleo de peixe'], supl_det: '1 g/dia; suspender 7 dias antes',
+  supl_status: 'Sim', supl: ['Ômega-3 / óleo de peixe'], supl_tab: [['Ômega-3', '1 g', '12h', 'ontem', '2 anos']],
   peso: '82', altura: '158', pa: '146/88', fc: '78', freq_resp: '16', spo2: '95', temp: '36,4', hgt: '142', glasgow: '15', eg: 'Bom', consciencia: 'Lúcido e orientado', mucosas: ['Coradas', 'Hidratadas'], nutricional: 'Obeso',
   acv: 'RCR em 2T, BNF, sem sopros', ap_resp: 'MV presente bilateralmente, sem ruídos adventícios', abdome: 'Globoso, flácido, doloroso em hipocôndrio direito', mmii: 'Sem edema; varizes de pequeno calibre', acesso_venoso: 'Bom',
-  mallampati: 'III', abertura: '4', circ_cerv: '40', dtm: '≥ 6,5 cm', dem: '≥ 12,5 cm', ulbt: 'Classe II', mob_cerv: 'Normal', cormack: 'Desconhecido', va_dificil: 'Não',
+  mallampati: 'III', abertura: '> 4 cm ou 3 dedos', circ_cerv: '40 a 42 cm', circ_cerv_cm: '41', dtm_cm: '7', dtm: '≥ 6,5 cm ou 4 dedos', dem: '≥ 12,5 cm', ulbt: 'Classe II — intermediário', oclusao: ['Relação normal'], mob_cerv: 'Grau 1: normal (> 35°)', cormack: 'Desconhecido', va_dificil: 'Não',
   aspiracao: ['Refluxo sintomático / hérnia de hiato', 'Gastroparesia (DM, agonista GLP-1)'], nx_coluna: 'Processos palpáveis', nx_pele: 'Íntegra',
   hb: '12,8', ht: '38', leuco: '7200', bastoes: '2', plaq: '245000', tp: '12,4', atv_prot: '95', inr: '1,02', ttpa: '29 s (R 1,05)', tipagem: 'O+', bhcg: 'Não se aplica', sor_hiv: 'Não reagente', sor_hcv: 'Não reagente', sor_hbsag: 'Não reagente', na: '139', k: '4,3', ureia: '32', cr: '0,9', glic: '138', hba1c: '7,4', ecg: '08/2026 — ritmo sinusal, FC 76, sem alterações isquêmicas',
   asa: 'II', r_cir: true, ap_o: true, cap_maior: true,
