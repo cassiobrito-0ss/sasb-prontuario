@@ -91,6 +91,12 @@ fieldset legend{padding:0;margin-bottom:5px}
 .chipset{display:flex;flex-wrap:wrap;gap:6px}
 .outro-in{margin-top:8px;max-width:420px}
 .hm{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dt-box{position:relative;display:flex;gap:6px;align-items:stretch}
+.dt-box input[type=text]{flex:1;min-width:0;font-variant-numeric:tabular-nums}
+.dt-cal{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:38px;border:1px solid var(--line);border-radius:7px;background:var(--surface-2);color:var(--muted);cursor:pointer}
+.dt-cal:hover{color:var(--ink);border-color:var(--accent)}
+.dt-cal:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.dt-cal-in{position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0}
 .lbl-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;width:100%}
 .sa{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap}
 .sa input{accent-color:var(--accent);margin:0}
@@ -341,7 +347,7 @@ var SCHEMA = [
   { t: 'text', id: 'nome', label: 'Nome completo', span: 6 },
   { t: 'text', id: 'nome_social', label: 'Nome social', span: 3, upper: true },
   { t: 'text', id: 'prontuario', label: 'Prontuário / registro', span: 3 },
-  { t: 'dmy', id: 'dn', label: 'Data de nascimento', span: 4 },
+  { t: 'date', id: 'dn', label: 'Data de nascimento', span: 4, passado: true },
   { t: 'calc', id: 'idade', label: 'Idade', span: 2 },
   { t: 'chips', id: 'sexo', label: 'Sexo biológico', options: ['Feminino', 'Masculino'], outro: true, span: 3 },
   { t: 'text', id: 'genero', label: 'Gênero autopercebido', span: 3 },
@@ -396,7 +402,7 @@ var SCHEMA = [
 
 { id: 'hist', title: 'Histórico cirúrgico e anestésico', fields: [
   { t: 'chips', id: 'anest_previa', label: 'Já foi anestesiado(a)?', options: ['Não', 'Sim'], span: 12 },
-  { t: 'table', id: 'cirurgias', label: 'Cirurgias e anestesias anteriores', cols: [['Data (mês/ano)', 2], ['Procedimento', 4], ['Tipo de anestesia', 5, 'multi', ['Raquianestesia', 'Peridural', 'Geral', 'Bloqueio', 'Local', 'Sedação']], ['Hospital', 2], ['Intercorrências', 3]], rows: 4 },
+  { t: 'table', id: 'cirurgias', label: 'Cirurgias e anestesias anteriores', cols: [['Data (mês/ano)', 2, 'mesano'], ['Procedimento', 4], ['Tipo de anestesia', 5, 'multi', ['Raquianestesia', 'Peridural', 'Geral', 'Bloqueio', 'Local', 'Sedação']], ['Hospital', 2], ['Intercorrências', 3]], rows: 4 },
   { t: 'conds', id: 'compl_anest', title: 'Complicações anestésicas prévias do paciente', items: [
     ['c_vad', 'Intubação ou ventilação difícil', 'Cormack-Lehane, dispositivo usado, carta de VAD'],
     ['c_hm', 'Hipertermia maligna (suspeita ou confirmada)', 'ano, desfecho, investigação'],
@@ -502,7 +508,7 @@ var SCHEMA = [
   { t: 'chips', id: 'transf_prev', label: 'Já recebeu transfusão?', options: ['Não', 'Sim', 'Não sabe'], span: 5 },
   { t: 'text', id: 'tipo_sang', label: 'Grupo sanguíneo / Fator Rh', span: 3 },
   { t: 'text', id: 'pai', label: 'Anticorpos irregulares (PAI)', span: 4 },
-  { t: 'table', id: 'transf_tab', label: 'Transfusões anteriores', cols: [['Data', 2], ['Hemocomponente', 3], ['Nº de bolsas', 2], ['Motivo', 3], ['Reação transfusional', 3]], rows: 2 },
+  { t: 'table', id: 'transf_tab', label: 'Transfusões anteriores', cols: [['Data', 2, 'data'], ['Hemocomponente', 3], ['Nº de bolsas', 2], ['Motivo', 3], ['Reação transfusional', 3]], rows: 2 },
   { t: 'chips', id: 'aceita_transf', label: 'Aceita transfusão?', options: ['Sim', 'Não (recusa)', 'Aceita parcialmente'], span: 7 },
   { t: 'text', id: 'transf_religiao', label: 'Motivo da recusa / restrição', span: 5, ph: 'ex.: Testemunha de Jeová' },
   { t: 'text', id: 'transf_aceita_det', label: 'Se parcial, o que aceita', span: 12, ph: 'albumina, fatores, recuperação intraoperatória (cell saver), hemodiluição' },
@@ -739,7 +745,7 @@ var SCHEMA = [
     ['abortos', 'Abortos de repetição / natimorto', ''],
     ['endom', 'Endometriose / miomatose', '']
   ]},
-  { t: 'text', id: 'dum', label: 'DUM', span: 3, only: 'F' },
+  { t: 'date', id: 'dum', label: 'DUM', span: 3, only: 'F', passado: true },
   { t: 'text', id: 'gpa', label: 'Gestações / partos / abortos (G P A)', span: 5, only: 'F' },
   { t: 'text', id: 'ig', label: 'Idade gestacional (se gestante)', span: 4, only: 'F' },
   { t: 'conds', id: 'ped', title: 'Pediátrico (se aplicável)', items: [
@@ -1062,7 +1068,8 @@ var SCHEMA = [
 ]},
 
 { id: 'reaval', title: 'Reavaliação no dia da cirurgia', fields: [
-  { t: 'text', id: 'reav_data', label: 'Data e hora', span: 3 },
+  { t: 'date', id: 'reav_data', label: 'Data', span: 3 },
+  { t: 'time', id: 'reav_hora', label: 'Hora', span: 2 },
   { t: 'text', id: 'reav_solidos', label: 'Última refeição sólida', span: 3 },
   { t: 'text', id: 'reav_liquidos', label: 'Últimos líquidos', span: 3 },
   { t: 'text', id: 'reav_sv', label: 'PA / FC / SpO₂ / HGT', span: 3 },
@@ -1136,7 +1143,10 @@ function wrap(f, inner, extra){
 }
 function renderField(f){
   switch (f.t){
-    case 'text': case 'date': case 'time':
+    case 'date': return renderData(f);
+    case 'time':
+      return wrap(f, [labelEl(f), h('input', { id: f.id, type: 'text', inputmode: 'numeric', placeholder: 'hh:mm', maxlength: 5, autocomplete: 'off', 'data-dmask': 'hora', readonly: f.ro ? true : null, title: f.ro ? 'Preenchido automaticamente pelo sistema' : 'Digite só os números: 2152 = 21:52' })]);
+    case 'text':
       return wrap(f, [f.semAlt ? h('div', { 'class': 'lbl-row' }, labelEl(f), saBox(f)) : labelEl(f), h('input', { id: f.id, type: f.t, placeholder: f.ph || null, autocomplete: 'off', readonly: f.ro ? true : null,
         title: f.ro ? 'Preenchido automaticamente pelo sistema' : null, inputmode: f.mask ? 'numeric' : null, maxlength: f.mask === 'cpf' ? 14 : f.mask === 'tel' ? 16 : null,
         'data-mask': f.mask || null, 'class': f.upper ? 'upper' : null })]);
@@ -1279,7 +1289,73 @@ function syncHm(){
     $(hid.id + '_h').value = String(Math.min(hh, 16)); $(hid.id + '_min').value = String(mm);
   });
 }
+function renderData(f){
+  var hid = h('input', { type: 'hidden', id: f.id });
+  var txtIn = h('input', { type: 'text', id: f.id + '_txt', inputmode: 'numeric', placeholder: 'dd/mm/aaaa', maxlength: 10, autocomplete: 'off', 'data-dmask': 'data', 'data-for': f.id, 'data-ano': f.passado ? 'passado' : '',
+    readonly: f.ro ? true : null, 'aria-label': f.label, title: f.ro ? 'Preenchido automaticamente pelo sistema' : 'Digite só os números: 03112026 ou 031126 = 03/11/2026' });
+  var kids = [txtIn];
+  if (!f.ro){
+    var cal = h('input', { type: 'date', id: f.id + '_cal', 'class': 'dt-cal-in', tabindex: '-1', 'aria-hidden': 'true' });
+    cal.addEventListener('change', function(){ if (!cal.value) return; hid.value = cal.value; txtIn.value = isoBR(cal.value); txtIn.classList.remove('invalido'); txtIn.dispatchEvent(new Event('input', { bubbles: true })); });
+    kids.push(h('button', { type: 'button', 'class': 'dt-cal', 'aria-label': 'Abrir calendário: ' + f.label, title: 'Abrir calendário', onclick: function(){ cal.value = hid.value || ''; try { cal.showPicker(); } catch (e){ cal.focus(); cal.click(); } } },
+      h('span', { 'aria-hidden': 'true', html: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>' })), cal);
+  }
+  return wrap(f, [h('label', { 'class': 'lbl', 'for': f.id + '_txt' }, f.label), h('div', { 'class': 'dt-box' }, kids), hid]);
+}
+function isoBR(v){ var p = String(v || '').split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : ''; }
+/* datas e horas digitadas só com números */
+function anoDe2(yy, modo){
+  var atual = new Date().getFullYear(), y = 2000 + yy;
+  if (modo === 'passado') return y > atual ? y - 100 : y;
+  return y > atual + 10 ? y - 100 : y;
+}
+function lerData(digs, modo){
+  var d, m, y;
+  if (digs.length === 8){ d = +digs.slice(0, 2); m = +digs.slice(2, 4); y = +digs.slice(4); }
+  else if (digs.length === 6){ d = +digs.slice(0, 2); m = +digs.slice(2, 4); y = anoDe2(+digs.slice(4), modo); }
+  else return null;
+  var dt = new Date(y, m - 1, d);
+  if (m < 1 || m > 12 || d < 1 || dt.getDate() !== d || dt.getMonth() !== m - 1 || y < 1900) return null;
+  return y + '-' + pad(m) + '-' + pad(d);
+}
+function fmtDigitosData(digs){ return digs.length <= 2 ? digs : digs.length <= 4 ? digs.slice(0, 2) + '/' + digs.slice(2) : digs.slice(0, 2) + '/' + digs.slice(2, 4) + '/' + digs.slice(4); }
+function mascaraTempo(e, final){
+  var tipo = e.getAttribute('data-dmask'), digs = e.value.replace(/\D/g, '');
+  if (tipo === 'data' || tipo === 'data-txt'){
+    digs = digs.slice(0, 8);
+    var iso = (digs.length === 8 || (final && digs.length === 6)) ? lerData(digs, e.getAttribute('data-ano')) : null;
+    e.value = iso ? isoBR(iso) : fmtDigitosData(digs);
+    e.classList.toggle('invalido', !!digs && (digs.length === 8 || final) && !iso);
+    var hid = e.getAttribute('data-for') ? $(e.getAttribute('data-for')) : null;
+    if (hid) hid.value = iso || '';
+  } else if (tipo === 'hora'){
+    digs = digs.slice(0, 4);
+    if (final && digs.length === 3) digs = '0' + digs;
+    if (final && digs.length <= 2 && digs) digs = pad(+digs) + '00';
+    var ok = digs.length === 4 && +digs.slice(0, 2) < 24 && +digs.slice(2) < 60;
+    e.value = digs.length > 2 ? digs.slice(0, 2) + ':' + digs.slice(2) : digs;
+    e.classList.toggle('invalido', !!digs && (digs.length === 4 || final) && !ok);
+  } else if (tipo === 'mesano'){
+    digs = digs.slice(0, 6);
+    if (final && digs.length === 4) digs = digs.slice(0, 2) + String(anoDe2(+digs.slice(2), 'passado'));
+    e.value = digs.length > 2 ? digs.slice(0, 2) + '/' + digs.slice(2) : digs;
+    e.classList.toggle('invalido', digs.length === 6 && (+digs.slice(0, 2) < 1 || +digs.slice(0, 2) > 12));
+  }
+}
+document.addEventListener('input', function(e){ var t = e.target; if (t && t.matches && t.matches('[data-dmask]') && e.isTrusted) mascaraTempo(t, false); }, true);
+document.addEventListener('blur', function(e){
+  var t = e.target; if (!t || !t.matches || !t.matches('[data-dmask]') || t.readOnly) return;
+  var antes = t.value; mascaraTempo(t, true);
+  if (t.value !== antes || t.getAttribute('data-for')) t.dispatchEvent(new Event('input', { bubbles: true }));
+}, true);
+function syncDatas(){
+  document.querySelectorAll('input[data-dmask="data"][data-for]').forEach(function(t){
+    var hid = $(t.getAttribute('data-for')); if (!hid) return;
+    t.value = hid.value ? isoBR(hid.value) : ''; t.classList.remove('invalido');
+  });
+}
 function syncDmy(){
+  syncDatas();
   syncHm();
   document.querySelectorAll('.dmy').forEach(function(b){
     var hid = b.parentNode.querySelector('input[type=hidden]'); if (!hid || !hid.value) return;
@@ -1350,6 +1426,7 @@ function cellEl(c, v){
     var sel = String(v || '').split(/;\s*/);
     return h('div', { 'class': 'cellmulti', role: 'group', 'aria-label': c[0] }, c[3].map(function(o){ return h('label', null, h('input', { type: 'checkbox', value: o, checked: sel.indexOf(o) > -1 ? true : null }), o); }));
   }
+  if (c[2] === 'data' || c[2] === 'mesano') return h('input', { type: 'text', 'aria-label': c[0], value: v || null, inputmode: 'numeric', placeholder: c[2] === 'data' ? 'dd/mm/aaaa' : 'mm/aaaa', maxlength: c[2] === 'data' ? 10 : 7, 'data-dmask': c[2] === 'data' ? 'data-txt' : 'mesano', 'data-ano': 'passado' });
   if (c[2] === 'select') return h('select', { 'aria-label': c[0] }, h('option', { value: '' }, '—'), c[3].map(function(o){ return h('option', { value: o, selected: v === o ? true : null }, o); }));
   return h('input', { type: 'text', 'aria-label': c[0], value: v || null, inputmode: c[2] === 'num' ? 'numeric' : null, 'class': c[2] === 'num' ? 'numcell' : null });
 }
@@ -2570,6 +2647,7 @@ function clearAll(){
   }); });
   var d = new Date(); $('data_aval').value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); $('hora_aval').value = pad(d.getHours()) + ':' + pad(d.getMinutes());
   tcleReset();
+  syncDatas();
   JEJUM.concat([['out', '', 6]]).forEach(function(j){ var e = $('jj_' + j[0] + '_h'); if (e) e.value = String(j[2]); });
   $('banner').hidden = true;
   if (window.ACESSO && window.ACESSO.aposLimpar) window.ACESSO.aposLimpar();
