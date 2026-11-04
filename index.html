@@ -1052,7 +1052,8 @@ var SCHEMA = [
 { id: 'plano', title: 'Conclusão e plano anestésico', fields: [
   { t: 'chips', id: 'apto', label: 'Conclusão', options: ['Apto', 'Apto com ressalvas', 'Aguardando exames / parecer', 'Não apto no momento — adiar'], span: 12 },
   { t: 'text', id: 'apto_motivo', label: 'Ressalvas / motivo', span: 12 },
-  { t: 'select', id: 'tecnica', label: 'Técnica anestésica proposta', options: ['Geral balanceada', 'Venosa total (TIVA/TCI)', 'Raquianestesia', 'Peridural', 'Combinada raqui-peridural', 'Bloqueio de nervo periférico', 'Sedação', 'Local + sedação', 'Geral + bloqueio', 'Bloqueio endovenoso de Bier'], outro: true, span: 12 },
+  { t: 'multi', id: 'tecnica', label: 'Técnica anestésica proposta', options: ['Geral balanceada', 'Venosa total (TIVA/TCI)', 'Geral + bloqueio', 'Raquianestesia', 'Peridural', 'Combinada raqui-peridural', 'Bloqueio de nervo periférico', 'Sedação', 'Local + sedação', 'Bloqueio endovenoso de Bier'], outro: true, span: 12 },
+  { t: 'text', id: 'tec_bloqueio', label: 'Especificar bloqueio', ph: 'ex.: interescalênico, plexo braquial infraclavicular, femoral, TAP, ESP, bloqueio do quadrado lombar…', span: 12 },
   { t: 'multi', id: 'va_plano', label: 'Manejo da via aérea', options: ['Intubação orotraqueal', 'Máscara laríngea', 'Videolaringoscopia', 'Broncofibroscópio', 'Ventilação monopulmonar', 'Intubação acordado (fibroscopia)', 'Sequência rápida', 'Material de via aérea difícil em sala'], outro: true, span: 12 },
   { t: 'multi', id: 'monit', label: 'Monitorização', options: ['Padrão (ECG, PNI, SpO₂, EtCO₂)', 'Temperatura', 'TOF (bloqueio neuromuscular)', 'BIS / entropia', 'Pressão arterial invasiva', 'Acesso venoso central', 'Sonda vesical (débito urinário)', 'Débito cardíaco / VPP', 'Ecocardiograma transesofágico', 'Ecocardiograma transtorácico', 'Ultrassonografia (POCUS)', 'Glicemia seriada', 'NIRS'], outro: true, span: 12 },
   { t: 'text', id: 'acessos', label: 'Acessos venosos planejados', span: 12 },
@@ -2012,6 +2013,7 @@ function update(){
     pending = false;
     var tc = $('cirurgias'); if (tc){ var wf = tc.closest('.f'); if (wf) wf.hidden = chip('anest_previa') === 'Não'; }
     SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){ if (f.showIf && $(f.id)){ var w = $(f.id).closest('.f'); if (w) w.hidden = chip(f.showIf[0]) !== f.showIf[1]; } }); });
+    if ($('tec_bloqueio')) $('tec_bloqueio').closest('.f').hidden = !temBloqueio();
     if ($('orient_cir')){
       var dc = txt('data_cir'), hc = txt('hora_cir'), dcd = dc ? new Date(dc + 'T12:00') : null;
       $('orient_cir_v').textContent = dc ? (DIAS_LONGO[dcd.getDay()] + ', ' + dBR(dc) + (hc ? ' às ' + hc : '')) : '—';
@@ -2054,6 +2056,7 @@ function summary(semAssinatura){
       var v;
       switch (f.t){
         case 'text': case 'num': case 'time': case 'textarea':
+          if (f.id === 'tec_bloqueio' && !temBloqueio()) break;
           v = f.semAlt ? semAlt(f.id, txt(f.id)) : txt(f.id); if (v) L.push(f.label + ': ' + v + (f.unit && f.t === 'num' ? ' ' + f.unit : '')); break;
         case 'select': v = comOutro(f.id, txt(f.id)); if (v) L.push(f.label + ': ' + v); break;
         case 'ratio': v = $(f.id).textContent; if (v && v !== '—') L.push('Relação circunferência cervical / DTM: ' + v + ($(f.id + '_i').dataset.alerta ? ' (≥ 5: preditor de intubação difícil)' : '')); break;
@@ -2259,7 +2262,7 @@ function tcleRender(){
   root.appendChild(block('Técnica anestésica proposta', 'automático', [
     h('ul', { id: 'tcle-tech' }),
     h('div', { id: 'tcle-sed-w' }, h('span', { 'class': 'lbl' }, 'Grau previsto de sedação'), tRadios('tcle_sed', ['Mínima', 'Moderada', 'Profunda'])),
-    h('div', { 'class': 'fields', id: 'tcle-bloq-w' }, tIn('tcle_bloq_reg', 'Região do bloqueio', 'ex.: plexo braquial, femoral')),
+    h('div', { 'class': 'fields', id: 'tcle-bloq-w' }, tIn('tcle_bloq_reg', 'Região do bloqueio', 'ex.: plexo braquial, femoral', true)),
     h('div', null, h('span', { 'class': 'lbl' }, 'Procedimentos associados'), h('div', { 'class': 'opts', id: 'tcle-assoc' }, ASSOC.map(function(o){ return h('label', null, h('input', { type: 'checkbox', name: 'tcle_assoc', value: o, id: 'tcle_assoc_' + ASSOC.indexOf(o) }), o); }))),
     h('p', { 'class': 'legend' }, TX.techNote)
   ]));
@@ -2375,7 +2378,8 @@ function suggestRisks(){
 }
 
 function tAge(){ return C.age; }
-function tecRaw(){ var v = comOutro('tecnica', txt('tecnica')); return v ? [v] : []; }
+function tecRaw(){ return multi('tecnica').map(function(v){ return comOutro('tecnica', v); }); }
+function temBloqueio(){ return multi('tecnica').some(function(v){ return v === 'Geral + bloqueio' || v === 'Bloqueio de nervo periférico'; }); }
 function tTech(){ return tecRaw().map(function(t){ return TECH_MAP[t] || t; }); }
 function tAutoRows(){
   var nome = txt('nome'), social = txt('nome_social');
@@ -2432,6 +2436,7 @@ function tcleRefresh(){
   /* quem assina */
   if (!MANUAL.tcle_signer) setRadio('tcle_signer', tNeedsResp() ? 'Responsável legal' : 'Paciente');
   var resp = radioVal('tcle_signer') === 'Responsável legal';
+  autoSet('tcle_bloq_reg', temBloqueio() ? txt('tec_bloqueio') : '');
   autoSet('tcle_sig_nome', resp ? txt('responsavel') : txt('nome'));
   autoSet('tcle_sig_doc', resp ? txt('responsavel_doc') : txt('documento'));
   autoSet('tcle_sig_parent', resp ? txt('responsavel_parent') : '');
