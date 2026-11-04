@@ -105,6 +105,11 @@ fieldset legend{padding:0;margin-bottom:5px}
 .ratio-v{font:600 30px/1.1 var(--mono, ui-monospace, monospace);color:var(--ink)}
 .ratio-i{font-size:13px;color:var(--muted);font-weight:600}
 .ratio-i.alto{color:var(--crit)}
+.cir-banner{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:14px 16px;border:1px solid var(--accent);border-left-width:4px;border-radius:10px;background:var(--accent-soft)}
+.cir-banner .cb-l{flex-basis:100%;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.cir-banner strong{font-size:20px;color:var(--ink)}
+.cir-banner .cb-n{font-size:12.5px;color:var(--muted)}
+.cir-banner.vazio{border-color:var(--line-strong);background:var(--surface-2)}
 table.jejum{width:100%;border-collapse:collapse;font-size:13.5px}
 table.jejum th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
 table.jejum td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -1060,6 +1065,7 @@ var SCHEMA = [
 ]},
 
 { id: 'orient', title: 'Orientações pré-operatórias', fields: [
+  { t: 'cirinfo', id: 'orient_cir' },
   { t: 'note', text: 'Jejum (ASA 2023, adultos e crianças saudáveis): líquidos claros sem resíduo 2 h · leite materno 4 h · fórmula infantil e leite não humano 6 h · refeição leve 6 h · refeição gordurosa ou carne 8 h. Ajustar para gastroparesia, obesidade grave, agonistas GLP-1 e protocolos institucionais.' },
   { t: 'jejum', id: 'jejum', label: 'Jejum: horas por tipo de alimento e último horário permitido' },
   { t: 'table', id: 'meds_manter_tab', label: 'Medicamentos a tomar no dia (com pouca água)', cols: [['Medicamento', 6], ['Horário da última dose', 4]], rows: 3 },
@@ -1188,6 +1194,7 @@ function renderField(f){
       return fs;
     case 'sub': return h('h3', { 'class': 'sub' }, f.label);
     case 'note': return h('p', { 'class': 'note' }, f.text);
+    case 'cirinfo': return h('div', { 'class': 'f full' }, h('div', { 'class': 'cir-banner', id: f.id }, h('span', { 'class': 'cb-l' }, 'Data e horário da cirurgia'), h('strong', { id: f.id + '_v' }, '—'), h('span', { 'class': 'cb-n', id: f.id + '_n' }, 'Informe na aba 02 (Procedimento proposto).')));
     case 'table': return renderTable(f);
     case 'conds': return renderConds(f);
     case 'score': return renderScore(f);
@@ -1423,6 +1430,7 @@ function jejumLinhas(){
   return out;
 }
 var DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+var DIAS_LONGO = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 function fmtLim(d){ return DIAS[d.getDay()] + ' ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' às ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
 function comOutro(id, v){ if (v !== 'Outro') return v; var o = txt(id + '_outro'); return o || v; }
 function cellEl(c, v){
@@ -2004,6 +2012,12 @@ function update(){
     pending = false;
     var tc = $('cirurgias'); if (tc){ var wf = tc.closest('.f'); if (wf) wf.hidden = chip('anest_previa') === 'Não'; }
     SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){ if (f.showIf && $(f.id)){ var w = $(f.id).closest('.f'); if (w) w.hidden = chip(f.showIf[0]) !== f.showIf[1]; } }); });
+    if ($('orient_cir')){
+      var dc = txt('data_cir'), hc = txt('hora_cir'), dcd = dc ? new Date(dc + 'T12:00') : null;
+      $('orient_cir_v').textContent = dc ? (DIAS_LONGO[dcd.getDay()] + ', ' + dBR(dc) + (hc ? ' às ' + hc : '')) : '—';
+      $('orient_cir_n').textContent = !dc ? 'Informe a data e o horário na aba 02 (Procedimento proposto).' : !hc ? 'Falta o horário da cirurgia (aba 02).' : 'Conforme a aba 02 (Procedimento proposto).';
+      $('orient_cir').classList.toggle('vazio', !dc || !hc);
+    }
     if ($('jj_ger')){
       var base = jejumCirurgia();
       JEJUM.concat([['out', '', 6]]).forEach(function(j){
@@ -2043,6 +2057,7 @@ function summary(semAssinatura){
           v = f.semAlt ? semAlt(f.id, txt(f.id)) : txt(f.id); if (v) L.push(f.label + ': ' + v + (f.unit && f.t === 'num' ? ' ' + f.unit : '')); break;
         case 'select': v = comOutro(f.id, txt(f.id)); if (v) L.push(f.label + ': ' + v); break;
         case 'ratio': v = $(f.id).textContent; if (v && v !== '—') L.push('Relação circunferência cervical / DTM: ' + v + ($(f.id + '_i').dataset.alerta ? ' (≥ 5: preditor de intubação difícil)' : '')); break;
+        case 'cirinfo': v = txt('data_cir'); if (v) L.push('Data e horário da cirurgia: ' + dBR(v) + (txt('hora_cir') ? ' às ' + txt('hora_cir') : '')); break;
         case 'jejum':
           var jl = jejumLinhas(); if (jl.length) L.push('Jejum: ' + jl.map(function(x){ return x.nome + ' ' + x.hrs + ' h' + (x.lim ? ' (até ' + fmtLim(x.lim) + ')' : ''); }).join('; ')); break;
         case 'ckd': if (C.tfg !== null && C.tfg !== undefined) L.push('TFG estimada (CKD-EPI 2021): ' + fmt(C.tfg, 0) + ' mL/min/1,73 m² — ' + ckdEstagio(C.tfg)); break;
