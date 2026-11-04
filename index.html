@@ -105,6 +105,14 @@ fieldset legend{padding:0;margin-bottom:5px}
 .ratio-v{font:600 30px/1.1 var(--mono, ui-monospace, monospace);color:var(--ink)}
 .ratio-i{font-size:13px;color:var(--muted);font-weight:600}
 .ratio-i.alto{color:var(--crit)}
+.vadp{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 14px}
+.vadp.on{border-color:var(--crit);background:var(--crit-soft)}
+.vadp-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.vadp-h h3{margin:0;font-size:14px}
+.vadp-n{font-size:13px;font-weight:600;color:var(--muted)}
+.vadp.on .vadp-n{color:var(--crit)}
+.vadp ul{margin:8px 0 4px;padding-left:20px;font-size:13.5px}
+.vadp li.vazio{list-style:none;margin-left:-20px;color:var(--muted)}
 .cir-banner{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:14px 16px;border:1px solid var(--accent);border-left-width:4px;border-radius:10px;background:var(--accent-soft)}
 .cir-banner .cb-l{flex-basis:100%;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .cir-banner strong{font-size:20px;color:var(--ink)}
@@ -843,6 +851,17 @@ var SCHEMA = [
   { t: 'multi', id: 'mob_dor', label: 'Dor aos movimentos cervicais', options: ['Flexão', 'Extensão', 'Rotação', 'Lateralidade'], span: 12 },
   { t: 'multi', id: 'va_achados', label: 'Achados', options: ['Barba', 'Retrognatia / micrognatia', 'Macroglossia', 'Palato ogival', 'Pescoço curto e grosso', 'Cicatriz ou radioterapia cervical', 'Traqueostomia prévia', 'Desvio de traqueia / massa cervical', 'Estridor / rouquidão', 'Trauma facial ou cervical', 'Colar cervical'], span: 12 },
   { t: 'chips', id: 'cormack', label: 'Cormack-Lehane prévio conhecido', options: ['I', 'IIa', 'IIb', 'III', 'IV', 'Desconhecido'], span: 12 },
+  { t: 'score', id: 'egri', kind: 'select', title: 'Via aérea difícil: índice de El-Ganzouri (EGRI)', selects: [
+    ['eg_ab', 'Abertura bucal', [['≥ 4 cm', 0], ['< 4 cm', 1]], 'eg_ab'],
+    ['eg_dtm', 'Distância tireomentoniana', [['> 6,5 cm', 0], ['6 a 6,5 cm', 1], ['< 6 cm', 2]], 'eg_dtm'],
+    ['eg_mall', 'Mallampati', [['I', 0], ['II', 1], ['III ou IV', 2]], 'eg_mall'],
+    ['eg_cerv', 'Mobilidade cervical', [['> 90°', 0], ['80 a 90°', 1], ['< 80°', 2]], 'eg_cerv'],
+    ['eg_prot', 'Protrusão da mandíbula', [['Consegue', 0], ['Não consegue', 1]], 'eg_prot'],
+    ['eg_peso', 'Peso', [['< 90 kg', 0], ['90 a 110 kg', 1], ['> 110 kg', 2]], 'eg_peso'],
+    ['eg_hist', 'História de intubação difícil', [['Nenhuma', 0], ['Duvidosa', 1], ['Confirmada', 2]], 'eg_hist']
+  ], interp: [[0, 'Baixo risco de laringoscopia difícil', 'ok'], [4, 'EGRI ≥ 4: laringoscopia / intubação difícil provável', 'crit']],
+    legend: 'Escala de 0 a 12 (El-Ganzouri, 1996). Preenchido a partir dos campos acima e do peso; corrija manualmente se necessário.' },
+  { t: 'vadpred', id: 'vad_pred' },
   { t: 'score', id: 'langeron', title: 'Preditores de ventilação difícil sob máscara (Langeron)', items: [
     ['lg_barba', 'Barba', 1, 'barba'],
     ['lg_imc', 'IMC > 26 kg/m²', 1, 'imc26'],
@@ -1045,16 +1064,6 @@ var SCHEMA = [
     ['ar_dur', 'Duração da cirurgia', [['< 2 h', 0], ['2–3 h', 16], ['> 3 h', 23]], 'duracao'],
     ['ar_emerg', 'Procedimento de emergência', [['Não', 0], ['Sim', 8]], 'emergencia']
   ], interp: [[0, 'Baixo risco (1,6%)', 'ok'], [26, 'Risco intermediário (13,3%)', 'warn'], [45, 'Alto risco (42,1%)', 'crit']] },
-  { t: 'score', id: 'egri', kind: 'select', title: 'Via aérea difícil: índice de El-Ganzouri (EGRI)', selects: [
-    ['eg_ab', 'Abertura bucal', [['≥ 4 cm', 0], ['< 4 cm', 1]], 'eg_ab'],
-    ['eg_dtm', 'Distância tireomentoniana', [['> 6,5 cm', 0], ['6 a 6,5 cm', 1], ['< 6 cm', 2]], 'eg_dtm'],
-    ['eg_mall', 'Mallampati', [['I', 0], ['II', 1], ['III ou IV', 2]], 'eg_mall'],
-    ['eg_cerv', 'Mobilidade cervical', [['> 90°', 0], ['80 a 90°', 1], ['< 80°', 2]], 'eg_cerv'],
-    ['eg_prot', 'Protrusão da mandíbula', [['Consegue', 0], ['Não consegue', 1]], 'eg_prot'],
-    ['eg_peso', 'Peso', [['< 90 kg', 0], ['90 a 110 kg', 1], ['> 110 kg', 2]], 'eg_peso'],
-    ['eg_hist', 'História de intubação difícil', [['Nenhuma', 0], ['Duvidosa', 1], ['Confirmada', 2]], 'eg_hist']
-  ], interp: [[0, 'Baixo risco de laringoscopia difícil', 'ok'], [4, 'EGRI ≥ 4: laringoscopia / intubação difícil provável', 'crit']],
-    legend: 'Escala de 0 a 12 (El-Ganzouri, 1996). Preenchido a partir da aba 13 e do peso; corrija manualmente se necessário.' },
   { t: 'ckd', id: 'tfg', title: 'Função renal: TFG estimada pela CKD-EPI 2021' }
 ]},
 
@@ -1204,6 +1213,7 @@ function renderField(f){
       return fs;
     case 'sub': return h('h3', { 'class': 'sub' }, f.label);
     case 'note': return h('p', { 'class': 'note' }, f.text);
+    case 'vadpred': return h('div', { 'class': 'f full' }, h('div', { 'class': 'vadp', id: f.id }, h('div', { 'class': 'vadp-h' }, h('h3', null, 'Preditores de via aérea difícil'), h('span', { 'class': 'vadp-n', id: f.id + '_n' }, '0')), h('ul', { id: f.id + '_l' }), h('p', { 'class': 'legend' }, 'Considerados automaticamente: abertura bucal < 4 cm, circunferência cervical ≥ 40 cm, DTM < 6,5 cm, DEM < 12,5 cm, qualquer alteração maxilomandibular, ULBT classe II ou III, Mallampati III ou IV, mobilidade cervical muito reduzida e via aérea difícil prévia.')));
     case 'cirinfo': return h('div', { 'class': 'f full' }, h('div', { 'class': 'cir-banner', id: f.id }, h('span', { 'class': 'cb-l' }, 'Data e horário da cirurgia'), h('strong', { id: f.id + '_v' }, '—'), h('span', { 'class': 'cb-n', id: f.id + '_n' }, 'Informe na aba 02 (Procedimento proposto).')));
     case 'table': return renderTable(f);
     case 'conds': return renderConds(f);
@@ -1878,6 +1888,27 @@ function allergyList(){
   return list;
 }
 var SCHEMA_ALERG = [];
+function vadPreditores(){
+  var P = [], v;
+  v = txt('abertura'); if (v && v !== '> 4 cm ou 3 dedos') P.push('abertura bucal ' + v);
+  v = comOutro('circ_cerv', txt('circ_cerv')); if (v === '40 a 42 cm' || v === '> 42 cm') P.push('circunferência cervical ' + v);
+  v = chip('dtm'); if (v && v.indexOf('≥ 6,5') !== 0) P.push('DTM ' + v);
+  if (chip('dem') === '< 12,5 cm') P.push('DEM < 12,5 cm');
+  v = multi('oclusao').filter(function(x){ return x !== 'Relação normal'; }); if (v.length) P.push(v.join(', ').toLowerCase());
+  v = chip('ulbt'); if (/^Classe (II|III)/.test(v)) P.push('ULBT ' + v.split(' —')[0].replace('Classe', 'classe'));
+  v = chip('mallampati'); if (v === 'III' || v === 'IV') P.push('Mallampati ' + v);
+  ['mob_flex', 'mob_ext'].forEach(function(id, i){ if (chip(id) === 'Muito reduzida') P.push((i ? 'extensão' : 'flexão') + ' cervical muito reduzida'); });
+  if (ck('c_vad')) P.push('via aérea difícil em anestesia prévia');
+  return P;
+}
+function vadRefresh(){
+  if (!$('vad_pred')) return;
+  var P = vadPreditores(), ul = $('vad_pred_l'); ul.innerHTML = '';
+  $('vad_pred_n').textContent = P.length ? P.length + (P.length > 1 ? ' presentes' : ' presente') : 'nenhum';
+  $('vad_pred').classList.toggle('on', P.length > 0);
+  if (P.length) P.forEach(function(x){ ul.appendChild(h('li', null, x.charAt(0).toUpperCase() + x.slice(1))); });
+  else ul.appendChild(h('li', { 'class': 'vazio' }, 'Nenhum preditor identificado nos campos preenchidos.'));
+}
 function alerts(){
   var A = [], mc = multi('meds_classes');
   function add(l, t, d){ A.push({ l: l, t: t, d: d || '' }); }
@@ -1898,8 +1929,9 @@ function alerts(){
   if (ck('d_opioides')) add('warn', 'Uso de opioides sem prescrição', 'Tolerância provável: analgesia multimodal e cuidado com abstinência.');
   if (ck('d_inj')) add('warn', 'Uso de drogas injetáveis', 'Acesso venoso possivelmente difícil; risco infeccioso.');
   if (ck('d_bzd')) add('info', 'Uso de benzodiazepínicos sem prescrição', 'Tolerância a sedativos; risco de abstinência.');
-  var vad = ck('c_vad') || chip('va_dificil').indexOf('Sim') === 0 || chip('mallampati') === 'IV' || ['2 a 2,9 cm', '< 2 cm'].indexOf(txt('abertura')) > -1 || ['5 a 5,9 cm', '< 5 cm'].indexOf(chip('dtm')) > -1 || chip('ulbt').indexOf('Classe III') === 0 || chip('mob_flex') === 'Muito reduzida' || chip('mob_ext') === 'Muito reduzida' || (SC.egri && SC.egri.any && SC.egri.v >= 4);
-  if (vad) add('crit', 'Via aérea difícil prevista', (SC.egri && SC.egri.any ? 'EGRI ' + SC.egri.v + '. ' : '') + 'Plano A/B/C, videolaringoscópio e carrinho de via aérea difícil em sala.');
+  var vp = vadPreditores();
+  var vad = vp.length > 0 || ck('c_vad') || chip('va_dificil').indexOf('Sim') === 0 || chip('mallampati') === 'IV' || ['2 a 2,9 cm', '< 2 cm'].indexOf(txt('abertura')) > -1 || ['5 a 5,9 cm', '< 5 cm'].indexOf(chip('dtm')) > -1 || chip('ulbt').indexOf('Classe III') === 0 || chip('mob_flex') === 'Muito reduzida' || chip('mob_ext') === 'Muito reduzida' || (SC.egri && SC.egri.any && SC.egri.v >= 4);
+  if (vad) add('crit', 'Via aérea difícil prevista', (vp.length ? 'Preditores: ' + vp.join('; ') + '. ' : '') + (SC.egri && SC.egri.any ? 'EGRI ' + SC.egri.v + '. ' : '') + 'Plano A/B/C, videolaringoscópio e carrinho de via aérea difícil em sala.');
   if (C.tfg !== null && C.tfg < 30) add('warn', 'TFG ' + fmt(C.tfg, 0) + ' mL/min/1,73 m² (CKD-EPI)', 'Ajustar doses de fármacos de eliminação renal; cuidado com nefrotóxicos e potássio.');
   if (SC.langeron && SC.langeron.v >= 2) add('warn', 'Ventilação sob máscara difícil provável', SC.langeron.v + ' preditores de Langeron.');
   if (chip('aceita_transf') === 'Não (recusa)') add('crit', 'Recusa de transfusão', 'Documentar; planejar estratégias poupadoras de sangue.');
@@ -1917,7 +1949,11 @@ function alerts(){
   if (ck('p_fistula') || ck('p_mastect') || txt('membro_restrito')) add('warn', 'Membro restrito', [txt('p_fistula_det'), txt('p_mastect_det'), txt('membro_restrito')].filter(Boolean).join(' · ') || 'Não puncionar nem aferir PA no membro indicado.');
   if (SC.stopbang && SC.stopbang.lvl === 'crit') add('warn', 'Alto risco de apneia obstrutiva do sono', 'STOP-Bang ' + SC.stopbang.v + '. Poupar opioides; considerar CPAP e monitorização pós-operatória.');
   else if (ck('saos')) add('warn', 'Apneia obstrutiva do sono', 'Trazer CPAP; cautela com opioides e sedativos.');
-  if ((SC.dasi && SC.dasi.any && SC.dasi.v <= 34) || chip('mets_subj') === 'Não') add('warn', 'Capacidade funcional reduzida', 'Considerar BNP/NT-proBNP e avaliação cardiológica conforme risco cirúrgico.');
+  var met4 = [];
+  if (chip('mets_subj') === 'Não') met4.push('não sobe 2 lances de escada sem parar');
+  if (SC.dasi && SC.dasi.any && SC.dasi.mets < 4) met4.push('DASI ' + fmt(SC.dasi.v, 1) + ' (' + fmt(SC.dasi.mets) + ' METs estimados)');
+  if (met4.length) add('warn', 'Capacidade funcional < 4 METs', met4.join('; ') + (chip('limitacao_func') ? ' · fator limitante: ' + comOutro('limitacao_func', chip('limitacao_func')) : '') + '. Maior risco perioperatório: considerar BNP/NT-proBNP, ECG e avaliação cardiológica conforme o risco cirúrgico.');
+  else if (SC.dasi && SC.dasi.any && SC.dasi.v <= 34) add('warn', 'Capacidade funcional reduzida (DASI ' + fmt(SC.dasi.v, 1) + ')', 'Considerar BNP/NT-proBNP e avaliação cardiológica conforme risco cirúrgico.');
   if (SC.emapo && SC.emapo.v >= 6) add(SC.emapo.v >= 11 ? 'crit' : 'warn', 'Risco cardiovascular ' + (SC.emapo.v > 15 ? 'muito elevado' : SC.emapo.v >= 11 ? 'elevado' : 'moderado') + ' (EMAPO ' + SC.emapo.v + ')', SC.emapo.label);
   if (SC.rcri && SC.rcri.v >= 2) add(SC.rcri.v >= 3 ? 'crit' : 'warn', 'Risco cardíaco elevado (Lee ' + SC.rcri.v + ')', SC.rcri.label);
   if (ck('iam') || ck('dor_tor') || ck('sincope')) add('warn', 'Sintoma ou evento cardíaco relevante', 'Verificar datas (IAM < 60 dias, angina instável) antes de cirurgia eletiva.');
@@ -1945,7 +1981,9 @@ function alerts(){
   if (sor.length) add('info', 'Sorologia reagente: ' + sor.join(', '), 'Precauções padrão; avaliar função hepática e tratamento.');
   if (chip('rcv_risco') === 'Alto') add('warn', 'Risco cardiovascular alto (avaliação cardiológica)', txt('rcv_resumo') ? txt('rcv_resumo').slice(0, 160) : 'Conferir recomendações do cardiologista.');
   var a1 = num('hba1c'); if (a1 !== null && a1 >= 8.5) add('info', 'HbA1c ' + fmt(a1) + '%', 'Controle glicêmico inadequado; considerar otimização.');
-  var cfs = txt('cfs'); if (cfs && parseInt(cfs, 10) >= 5) add('info', 'Paciente frágil (CFS ' + parseInt(cfs, 10) + ')', 'Risco de delirium e perda funcional; envolver família no planejamento.');
+  var cfs = txt('cfs'), cfn = cfs ? parseInt(cfs, 10) : 0;
+  if (cfn >= 6) add('warn', 'Fragilidade ' + cfs.replace(/^\d+ — /, '').replace(/^Fragilidade /, '').toLowerCase() + ' (CFS ' + cfn + ')', 'Fragilidade moderada ou maior: alto risco de complicações, delirium, perda funcional e institucionalização. Discutir objetivos de cuidado com paciente e família, considerar avaliação geriátrica, prevenção de delirium e analgesia poupadora de opioides.');
+  else if (cfn === 5) add('info', 'Paciente frágil (CFS 5)', 'Risco de delirium e perda funcional; envolver família no planejamento.');
   if (chip('tab') === 'Fumante atual') add('info', 'Tabagista atual', 'Orientar cessação; risco pulmonar e de cicatrização.');
   if (ck('p_valv') || ck('p_stent')) add('info', 'Prótese valvar / stent', 'Conferir antitrombóticos e profilaxia de endocardite quando indicada.');
   var order = { crit: 0, warn: 1, info: 2 };
@@ -2042,7 +2080,7 @@ function update(){
       var on = el && el.tagName === 'SELECT' ? el.value === 'Outro' : !!document.querySelector('input[name="' + fid + '"][value="Outro"]:checked');
       i.hidden = !on;
     });
-    computeBase(); applyAuto(); computeScores();
+    computeBase(); applyAuto(); computeScores(); vadRefresh();
     var A = alerts(); renderAlerts(A); renderStrip(); renderPanelScores(); renderUI();
     LAST_ALERTS = A;
     tcleRefresh();
@@ -2069,6 +2107,7 @@ function summary(semAssinatura){
           v = f.semAlt ? semAlt(f.id, txt(f.id)) : txt(f.id); if (v) L.push(f.label + ': ' + v + (f.unit && f.t === 'num' ? ' ' + f.unit : '')); break;
         case 'select': v = comOutro(f.id, txt(f.id)); if (v) L.push(f.label + ': ' + v); break;
         case 'ratio': v = $(f.id).textContent; if (v && v !== '—') L.push('Relação circunferência cervical / DTM: ' + v + ($(f.id + '_i').dataset.alerta ? ' (≥ 5: preditor de intubação difícil)' : '')); break;
+        case 'vadpred': v = vadPreditores(); if (v.length) L.push('Preditores de via aérea difícil: ' + v.join('; ')); break;
         case 'cirinfo': v = txt('data_cir'); if (v) L.push('Data e horário da cirurgia: ' + dBR(v) + (txt('hora_cir') ? ' às ' + txt('hora_cir') : '')); break;
         case 'jejum':
           var jl = jejumLinhas(); if (jl.length) L.push('Jejum: ' + jl.map(function(x){ return x.nome + ' ' + x.hrs + ' h' + (x.lim ? ' (até ' + fmtLim(x.lim) + ')' : ''); }).join('; ')); break;
