@@ -123,7 +123,11 @@ table.jejum select{min-width:80px}
 .cellmulti input{accent-color:var(--accent)}
 table.edit select{min-width:90px}
 table.edit input.numcell{min-width:56px}
-table.ref thead th{text-align:left;font-weight:600}
+table.ref thead th{text-align:left;font-weight:600;padding:7px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+table.ref.lista td:first-child{width:20%;white-space:nowrap}
+table.ref ul{margin:0;padding-left:18px;columns:2;column-gap:28px}
+table.ref li{break-inside:avoid;margin:0 0 3px}
+@media (max-width:640px){table.ref ul{columns:1}}
 .cid-box{position:relative}
 .cid-lista{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:280px;overflow:auto}
 .cid-lista li{padding:7px 9px;border-radius:6px;font-size:13.5px;cursor:pointer;line-height:1.35}
@@ -396,6 +400,11 @@ var SCHEMA = [
   { t: 'time', id: 'hora_cir', label: 'Horário da cirurgia', span: 2 },
   { t: 'chips', id: 'carater', label: 'Caráter', options: ['Eletiva', 'Urgência', 'Emergência'], outro: true, span: 4 },
   { t: 'chips', id: 'risco_cir', label: 'Risco cirúrgico intrínseco (ESC/ESAIC)', options: ['Baixo (< 1%)', 'Intermediário (1–5%)', 'Alto (> 5%)'], outro: true, span: 8 },
+  { t: 'reftab', title: 'Consulta: risco cirúrgico intrínseco por tipo de cirurgia (ESC/ESAIC 2022)', head: ['Risco', 'Cirurgias'], lista: true, rows: [
+    ['Baixo (< 1%)', ['Mama', 'Odontológica', 'Endócrina: tireoide', 'Oftalmológica', 'Ginecológica menor', 'Ortopédica menor (meniscectomia)', 'Reconstrutora', 'Cirurgia superficial', 'Urológica menor (ressecção transuretral da próstata)', 'Ressecção pulmonar menor por videotoracoscopia (VATS)']],
+    ['Intermediário (1–5%)', ['Carótida assintomática (endarterectomia ou stent)', 'Carótida sintomática (endarterectomia)', 'Correção endovascular de aneurisma de aorta', 'Cabeça e pescoço', 'Intraperitoneal: esplenectomia, correção de hérnia de hiato, colecistectomia', 'Intratorácica não maior', 'Neurológica ou ortopédica maior (quadril e coluna)', 'Angioplastia arterial periférica', 'Transplante renal', 'Urológica ou ginecológica maior']],
+    ['Alto (> 5%)', ['Ressecção de adrenal', 'Cirurgia de aorta e vascular maior', 'Carótida sintomática (stent)', 'Cirurgia duodenopancreática', 'Ressecção hepática, cirurgia de vias biliares', 'Esofagectomia', 'Revascularização aberta de membro inferior por isquemia aguda ou amputação', 'Pneumonectomia (VATS ou aberta)', 'Transplante pulmonar ou hepático', 'Correção de perfuração intestinal', 'Cistectomia total']]],
+    note: 'Risco estimado de morte cardiovascular, infarto ou AVC em 30 dias, considerando apenas o tipo de cirurgia, sem as comorbidades do paciente. Fonte: Diretriz ESC 2022 de avaliação cardiovascular em cirurgia não cardíaca (Halvorsen et al., desenvolvida com a ESAIC), tabela 5.' },
   { t: 'chips', id: 'regime', label: 'Regime', options: ['Ambulatorial / day clinic', 'Internação', 'Já internado'], outro: true, span: 6 },
   { t: 'hm', id: 'duracao', label: 'Duração estimada', span: 3 },
   { t: 'chips', id: 'uti_prev', label: 'UTI pós-operatória', options: ['Não', 'Sim — reservar vaga'], span: 3 },
@@ -1165,8 +1174,8 @@ function renderField(f){
     case 'hm': return renderHm(f);
     case 'ym': return renderYm(f);
     case 'reftab': return h('details', { 'class': 'ref' }, h('summary', null, f.title),
-      h('div', { 'class': 'tbl-wrap' }, h('table', { 'class': 'ref' }, h('thead', null, h('tr', null, f.head.map(function(x){ return h('th', null, x); }))),
-        h('tbody', null, f.rows.map(function(r){ return h('tr', null, r.map(function(x){ return h('td', null, x); })); })))), h('p', null, f.note));
+      h('div', { 'class': 'tbl-wrap' }, h('table', { 'class': 'ref' + (f.lista ? ' lista' : '') }, h('thead', null, h('tr', null, f.head.map(function(x){ return h('th', null, x); }))),
+        h('tbody', null, f.rows.map(function(r){ return h('tr', null, r.map(function(x){ return h('td', null, Array.isArray(x) ? h('ul', null, x.map(function(y){ return h('li', null, y); })) : x); })); })))), h('p', null, f.note));
     case 'cid': return renderCid(f);
     case 'num':
       return wrap(f, [labelEl(f), h('input', { id: f.id, type: 'text', inputmode: 'decimal', 'class': 'numf', autocomplete: 'off' })]);
