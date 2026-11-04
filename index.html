@@ -821,8 +821,12 @@ var SCHEMA = [
     ['II', 'Os incisivos inferiores alcançam o lábio superior, mas não ultrapassam a borda do vermelhão', 'Intermediário'],
     ['III', 'Os incisivos inferiores não alcançam o lábio superior', 'Maior risco de intubação difícil']],
     note: 'Upper Lip Bite Test (Khan, 2003). Classe III tem boa especificidade para laringoscopia difícil.' },
-  { t: 'chips', id: 'mob_cerv', label: 'Mobilidade cervical (flexão/extensão)', options: ['Grau 1: normal (> 35°)', 'Grau 2: reduzida (22 a 35°)', 'Grau 3: muito limitada (12 a 21°)', 'Grau 4: < 12°'], span: 12 },
-  { t: 'multi', id: 'mob_lat', label: 'Redução da lateralidade', options: ['Direita', 'Esquerda'], span: 12 },
+  { t: 'sub', label: 'Mobilidade cervical' },
+  { t: 'chips', id: 'mob_flex', label: 'Flexão cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
+  { t: 'chips', id: 'mob_ext', label: 'Extensão cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
+  { t: 'chips', id: 'mob_rot', label: 'Rotação cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
+  { t: 'chips', id: 'mob_latr', label: 'Lateralidade cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
+  { t: 'multi', id: 'mob_dor', label: 'Dor aos movimentos cervicais', options: ['Flexão', 'Extensão', 'Rotação', 'Lateralidade'], span: 12 },
   { t: 'multi', id: 'va_achados', label: 'Achados', options: ['Barba', 'Retrognatia / micrognatia', 'Macroglossia', 'Palato ogival', 'Pescoço curto e grosso', 'Cicatriz ou radioterapia cervical', 'Traqueostomia prévia', 'Desvio de traqueia / massa cervical', 'Estridor / rouquidão', 'Trauma facial ou cervical', 'Colar cervical'], span: 12 },
   { t: 'chips', id: 'cormack', label: 'Cormack-Lehane prévio conhecido', options: ['I', 'IIa', 'IIb', 'III', 'IV', 'Desconhecido'], span: 12 },
   { t: 'score', id: 'langeron', title: 'Preditores de ventilação difícil sob máscara (Langeron)', items: [
@@ -1771,7 +1775,7 @@ var AUTO = {
   eg_ab: function(){ var a = txt('abertura'); return !a ? null : a.indexOf('> 4') === 0 ? 0 : 1; },
   eg_dtm: function(){ var c = chip('dtm'); return !c ? null : c.indexOf('≥ 6,5') === 0 ? 0 : c.indexOf('6 a') === 0 ? 1 : 2; },
   eg_mall: function(){ var m = chip('mallampati'); return m === 'I' ? 0 : m === 'II' ? 1 : (m === 'III' || m === 'IV') ? 2 : null; },
-  eg_cerv: function(){ var m = chip('mob_cerv'); return !m ? null : m.indexOf('Grau 1') === 0 ? 0 : m.indexOf('Grau 2') === 0 ? 1 : 2; },
+  eg_cerv: function(){ var g = { 'Normal': 0, 'Reduzida': 1, 'Muito reduzida': 2 }, a = g[chip('mob_flex')], b = g[chip('mob_ext')]; if (a === undefined && b === undefined) return null; return Math.max(a || 0, b || 0); },
   eg_prot: function(){ var u = chip('ulbt'); if (u) return u.indexOf('Classe III') === 0 ? 1 : 0; return multi('oclusao').indexOf('Limitação da protrusão mandibular') > -1 ? 1 : null; },
   eg_peso: function(){ var p = num('peso'); return p === null ? null : p < 90 ? 0 : p <= 110 ? 1 : 2; },
   eg_hist: function(){ return ck('c_vad') ? 2 : (chip('cormack') === 'III' || chip('cormack') === 'IV') ? 2 : null; },
@@ -1876,7 +1880,7 @@ function alerts(){
   if (ck('d_opioides')) add('warn', 'Uso de opioides sem prescrição', 'Tolerância provável: analgesia multimodal e cuidado com abstinência.');
   if (ck('d_inj')) add('warn', 'Uso de drogas injetáveis', 'Acesso venoso possivelmente difícil; risco infeccioso.');
   if (ck('d_bzd')) add('info', 'Uso de benzodiazepínicos sem prescrição', 'Tolerância a sedativos; risco de abstinência.');
-  var vad = ck('c_vad') || chip('va_dificil').indexOf('Sim') === 0 || chip('mallampati') === 'IV' || ['2 a 2,9 cm', '< 2 cm'].indexOf(txt('abertura')) > -1 || ['5 a 5,9 cm', '< 5 cm'].indexOf(chip('dtm')) > -1 || chip('ulbt').indexOf('Classe III') === 0 || /^Grau [34]/.test(chip('mob_cerv')) || (SC.egri && SC.egri.any && SC.egri.v >= 4);
+  var vad = ck('c_vad') || chip('va_dificil').indexOf('Sim') === 0 || chip('mallampati') === 'IV' || ['2 a 2,9 cm', '< 2 cm'].indexOf(txt('abertura')) > -1 || ['5 a 5,9 cm', '< 5 cm'].indexOf(chip('dtm')) > -1 || chip('ulbt').indexOf('Classe III') === 0 || chip('mob_flex') === 'Muito reduzida' || chip('mob_ext') === 'Muito reduzida' || (SC.egri && SC.egri.any && SC.egri.v >= 4);
   if (vad) add('crit', 'Via aérea difícil prevista', (SC.egri && SC.egri.any ? 'EGRI ' + SC.egri.v + '. ' : '') + 'Plano A/B/C, videolaringoscópio e carrinho de via aérea difícil em sala.');
   if (C.tfg !== null && C.tfg < 30) add('warn', 'TFG ' + fmt(C.tfg, 0) + ' mL/min/1,73 m² (CKD-EPI)', 'Ajustar doses de fármacos de eliminação renal; cuidado com nefrotóxicos e potássio.');
   if (SC.langeron && SC.langeron.v >= 2) add('warn', 'Ventilação sob máscara difícil provável', SC.langeron.v + ' preditores de Langeron.');
@@ -2676,7 +2680,7 @@ var EXAMPLE = {
   supl_status: 'Sim', supl: ['Ômega-3 / óleo de peixe'], supl_tab: [['Ômega-3', '1 g', '12h', 'ontem', '2 anos']],
   peso: '82', altura: '158', pa: '146/88', fc: '78', freq_resp: '16', spo2: '95', temp: '36,4', hgt: '142', glasgow: '15', eg: 'Bom', consciencia: 'Lúcido e orientado', mucosas: ['Coradas', 'Hidratadas'], nutricional: 'Obeso',
   acv: 'RCR em 2T, BNF, sem sopros', ap_resp: 'MV presente bilateralmente, sem ruídos adventícios', abdome: 'Globoso, flácido, doloroso em hipocôndrio direito', mmii: 'Sem edema; varizes de pequeno calibre', acesso_venoso: 'Bom',
-  mallampati: 'III', abertura: '> 4 cm ou 3 dedos', circ_cerv: '40 a 42 cm', dtm: '≥ 6,5 cm ou 4 dedos', dem: '≥ 12,5 cm', ulbt: 'Classe II — intermediário', oclusao: ['Relação normal'], mob_cerv: 'Grau 1: normal (> 35°)', cormack: 'Desconhecido', va_dificil: 'Não',
+  mallampati: 'III', abertura: '> 4 cm ou 3 dedos', circ_cerv: '40 a 42 cm', dtm: '≥ 6,5 cm ou 4 dedos', dem: '≥ 12,5 cm', ulbt: 'Classe II — intermediário', oclusao: ['Relação normal'], mob_flex: 'Normal', mob_ext: 'Normal', mob_rot: 'Normal', mob_latr: 'Reduzida', cormack: 'Desconhecido', va_dificil: 'Não',
   aspiracao: ['Refluxo sintomático / hérnia de hiato', 'Gastroparesia (DM, agonista GLP-1)'], nx_coluna: 'Processos palpáveis', nx_pele: 'Íntegra',
   hb: '12,8', ht: '38', leuco: '7200', bastoes: '2', plaq: '245000', tp: '12,4', atv_prot: '95', inr: '1,02', ttpa: '29 s (R 1,05)', tipagem: 'O+', bhcg: 'Não se aplica', sor_hiv: 'Não reagente', sor_hcv: 'Não reagente', sor_hbsag: 'Não reagente', na: '139', k: '4,3', ureia: '32', cr: '0,9', glic: '138', hba1c: '7,4', ecg: '08/2026 — ritmo sinusal, FC 76, sem alterações isquêmicas',
   asa: 'II', r_cir: true, ap_o: true, cap_maior: true,
