@@ -113,6 +113,91 @@ fieldset legend{padding:0;margin-bottom:5px}
 .vadp.on .vadp-n{color:var(--crit)}
 .vadp ul{margin:8px 0 4px;padding-left:20px;font-size:13.5px}
 .vadp li.vazio{list-style:none;margin-left:-20px;color:var(--muted)}
+.imp-box{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.imp-tx{display:flex;flex-direction:column;gap:2px;flex:1 1 260px;min-width:0;font-size:13px}
+.imp-tx span{color:var(--muted);font-size:12.5px}
+.imp-bt{display:flex;gap:8px;flex-wrap:wrap}
+.imp-box .pdfmsg{flex-basis:100%}
+.imp-box .pdfmsg:empty{display:none}
+.vl-acs{display:flex;gap:6px}
+.btn.mini{min-height:30px;padding:4px 10px;font-size:12.5px}
+.lista-tbl td.acs{white-space:nowrap}
+body.imp-lista .vlista{display:block!important}
+body.imp-lista .wrap{display:none!important}
+.imp-dlg{position:fixed;inset:0;z-index:1000;background:#47524E;display:flex;flex-direction:column}
+.imp-bar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.imp-bar b{margin-right:auto}
+.imp-bar .pdfmsg{flex-basis:100%;order:9}
+.imp-area{flex:1;overflow:auto;padding:12px}
+.imp-prev .pg{margin:0 auto 14px;box-shadow:0 2px 14px rgba(0,0,0,.35)}
+body.imp-aberto{overflow:hidden}
+#imp-root{position:absolute;left:-30000px;top:0;width:210mm}
+/* páginas A4 */
+.pg{width:210mm;height:297mm;box-sizing:border-box;padding:8mm 9mm 0;background:#fff;color:#111;display:flex;flex-direction:column;font:7.6pt/1.3 Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden}
+.pg *{box-sizing:border-box}
+.pg-cab{display:flex;justify-content:space-between;gap:6mm;padding-bottom:1.6mm;border-bottom:.5mm solid #0D6B53}
+.pg-cab>div{display:flex;flex-direction:column;gap:.4mm}
+.pg-cab b{font-size:9pt;color:#0D4F3E}
+.pg-cab small{font-size:6.6pt;color:#555}
+.pg-cab .r{text-align:right}
+.pg-tit{display:flex;align-items:baseline;justify-content:space-between;gap:4mm;margin:2mm 0 2.2mm}
+.pg-tit h1{margin:0;font-size:12.5pt;letter-spacing:.02em;text-transform:uppercase;color:#111}
+.pg-tit .st{font-size:7pt;font-weight:700;padding:.6mm 2mm;border-radius:1mm}
+.pg-tit .st.ok{background:#E3F3E8;color:#1E6B3A}
+.pg-tit .st.ras{background:#FFF1D9;color:#8A5300}
+.pg-run{font-size:7pt;color:#444;padding-bottom:1.2mm;margin-bottom:2mm;border-bottom:.3mm solid #9AB}
+.pg-b{flex:1 1 auto;min-height:0;overflow:hidden}
+.pg-f{flex:0 0 8mm;display:flex;justify-content:space-between;align-items:center;gap:4mm;font-size:6.4pt;color:#666;border-top:.3mm solid #BBB;margin-top:1.5mm}
+.band{margin-bottom:2mm}
+.band.duo{display:flex;gap:2.4mm;align-items:flex-start}
+.band .col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:2mm}
+.pbox{border:.3mm solid #9AAEA6;border-radius:1.2mm;overflow:hidden;background:#fff;break-inside:avoid}
+.pbox-h{background:#E6EFEB;padding:.8mm 2mm;font-weight:700;font-size:7.4pt;text-transform:uppercase;letter-spacing:.03em;color:#0D4F3E;border-bottom:.3mm solid #C5D3CD}
+.pbox-h .n{display:inline-block;min-width:5mm;color:#0D6B53;font-family:"Courier New",monospace}
+.pbox-b{padding:1.2mm 2mm 1.4mm}
+.pl{margin:0 0 .5mm;overflow-wrap:anywhere}
+.pl b{color:#222}
+.pl.th{font-weight:700;margin-top:.6mm}
+.pl.sub{padding-left:3mm;text-indent:-2mm}
+.pl.flow .it+.it:before{content:"  ·  ";color:#8A9A94;font-weight:700}
+.pl.sub:before{content:"• "}
+.pac .pgrid{display:grid;grid-template-columns:repeat(6,1fr)}
+.pc{padding:1mm 2mm;border-right:.3mm solid #D3DDD9;border-bottom:.3mm solid #D3DDD9;display:flex;flex-direction:column;gap:.3mm;min-width:0}
+.pc span{font-size:6.2pt;color:#5A6B65;text-transform:uppercase;letter-spacing:.03em}
+.pc b{font-size:8.2pt;overflow-wrap:anywhere}
+.pc.s3{grid-column:span 3}.pc.s6{grid-column:span 6;border-bottom:0}
+.alr{border-color:#B42318}
+.alr .pbox-h{background:#FCE9E7;color:#8E1B12;border-bottom-color:#F1C0BA}
+.alr-g{display:grid;grid-template-columns:1fr 1fr;gap:.8mm 3mm;padding:1.2mm 2mm 1.4mm}
+.al{padding-left:1.6mm;border-left:.8mm solid #ccc;overflow-wrap:anywhere}
+.al i{font-style:normal;font-size:5.8pt;font-weight:700;margin-right:1mm;letter-spacing:.04em}
+.al.crit{border-left-color:#B42318}.al.crit i{color:#B42318}
+.al.warn{border-left-color:#C77700}.al.warn i{color:#8A5300}
+.al.info{border-left-color:#1D5A94}.al.info i{color:#1D5A94}
+.esc-g{display:grid;grid-template-columns:repeat(6,1fr)}
+.esc-g div{padding:.8mm 2mm;border-right:.3mm solid #D3DDD9;border-bottom:.3mm solid #D3DDD9;display:flex;flex-direction:column}
+.esc-g span{font-size:6.2pt;color:#5A6B65}
+.esc-g b{font-size:8.4pt}
+.assn{display:grid;grid-template-columns:55% 1fr;gap:2.5mm;padding:1.6mm 2.5mm 2mm;border-color:#666;align-items:end}
+.as-c{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3mm}
+.as-c img{max-height:11mm;max-width:100%;object-fit:contain}
+.as-esp{height:11mm}
+.as-l{width:100%;border-top:.3mm solid #333;margin-bottom:.6mm}
+.as-c b{font-size:8.4pt}
+.as-c span{font-size:7pt;color:#333}
+.as-i{display:flex;flex-direction:column;gap:1mm;border-left:.3mm dashed #BBB;padding-left:2.5mm;align-self:stretch;justify-content:center}
+.as-i div{display:flex;flex-direction:column}
+.as-i span{font-size:6.2pt;color:#5A6B65;text-transform:uppercase;letter-spacing:.03em}
+.as-i code{font-size:5.2pt;overflow-wrap:anywhere;color:#444}
+@media print{
+  @page{size:A4 portrait;margin:0}
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  :root{padding:0!important}
+  body.imprimindo>*:not(#imp-root){display:none!important}
+  body.imprimindo #imp-root{position:static;left:auto;width:auto}
+  body.imprimindo .pg{break-after:page;page-break-after:always}
+  body.imprimindo .pg:last-child{break-after:auto;page-break-after:auto}
+}
 .cir-banner{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:14px 16px;border:1px solid var(--accent);border-left-width:4px;border-radius:10px;background:var(--accent-soft)}
 .cir-banner .cb-l{flex-basis:100%;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .cir-banner strong{font-size:20px;color:var(--ink)}
@@ -1543,6 +1628,9 @@ function render(){
       h('div', { 'class': 'f full resumo-actions' }, h('button', { type: 'button', 'class': 'btn primary', id: 'btn-gerar' }, 'Atualizar resumo'), h('button', { type: 'button', 'class': 'btn', id: 'btn-copiar' }, 'Copiar resumo'), h('span', { 'class': 'copied', id: 'copied', hidden: true }, 'Copiado')),
       h('div', { 'class': 'f full' }, h('textarea', { id: 'resumo', readonly: true, 'aria-label': 'Resumo da avaliação' })),
       h('div', { 'class': 'f full assin', id: 'assin-final', 'aria-label': 'Assinatura do anestesiologista' }),
+      h('div', { 'class': 'f full imp-box' }, h('div', { 'class': 'imp-tx' }, h('b', null, 'Impressão em folha A4'), h('span', null, 'Layout compacto em quadros, pronto para imprimir, assinar e anexar ao prontuário físico.')),
+        h('div', { 'class': 'imp-bt' }, h('button', { type: 'button', 'class': 'btn', id: 'btn-imp-ver' }, 'Visualizar'), h('button', { type: 'button', 'class': 'btn', id: 'btn-imp-print' }, 'Imprimir'), h('button', { type: 'button', 'class': 'btn primary', id: 'btn-imp-pdf' }, 'Baixar PDF')),
+        h('span', { 'class': 'pdfmsg', id: 'imp-msg' })),
       h('div', { 'class': 'f full enc-box', id: 'enc-box', hidden: true },
         h('button', { type: 'button', 'class': 'btn primary', id: 'btn-encerrar' }, 'Encerrar e assinar'),
         h('button', { type: 'button', 'class': 'btn primary', id: 'btn-pdf-pront', hidden: true }, 'Baixar prontuário assinado (PDF)'),
@@ -1605,12 +1693,12 @@ var ENC = null;
 function setAssinado(enc){ ENC = enc; update(); bloquearForm(!!enc); if (enc) $('resumo').value = summary(); }
 function bloquearForm(on){
   document.querySelectorAll('#form input, #form select, #form textarea, #form button').forEach(function(c){
-    if (c.closest('#enc-box') || c.id === 'btn-gerar' || c.id === 'btn-copiar') return;
+    if (c.closest('#enc-box') || c.closest('.imp-box') || c.id === 'btn-gerar' || c.id === 'btn-copiar') return;
     if (on){ if (!c.hasAttribute('data-enc')) c.setAttribute('data-enc', c.disabled ? '1' : '0'); c.disabled = true; }
     else if (c.hasAttribute('data-enc')){ c.disabled = c.getAttribute('data-enc') === '1'; c.removeAttribute('data-enc'); }
   });
   document.body.classList.toggle('encerrado', !!on);
-  $('btn-encerrar').hidden = !!on; $('btn-pdf-pront').hidden = !on; $('btn-reabrir').hidden = !on;
+  $('btn-encerrar').hidden = !!on; $('btn-pdf-pront').hidden = true; $('btn-reabrir').hidden = !on;
 }
 function encerrar(){
   var m = $('enc-msg'); m.textContent = ''; m.className = 'pdfmsg';
@@ -1622,7 +1710,7 @@ function encerrar(){
     update();
     bloquearForm(true);
     $('resumo').value = summary();
-    m.textContent = 'Avaliação encerrada e assinada. Copie o resumo ou baixe o PDF.'; m.className = 'pdfmsg';
+    m.textContent = 'Avaliação encerrada e assinada. Imprima ou baixe o PDF logo acima.'; m.className = 'pdfmsg';
     $('sec-resumo').scrollIntoView({ block: 'start' });
   }, function(err){ m.textContent = err && err.message ? err.message : 'Não foi possível assinar.'; m.className = 'pdfmsg err'; });
 }
@@ -1718,6 +1806,237 @@ function pdfProntuario(){
   var name = ('Prontuario pre-anestesico ' + (txt('nome') || 'paciente') + ' ' + stamp).replace(/[\\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim() + '.pdf';
   say('Gerando o PDF…');
   saveFile(doc.output('blob'), name, say);
+}
+
+/* ---------- Impressão A4 (layout compacto em quadros) ---------- */
+var IMP_SKIP = { nome: 1, prontuario: 1, dn: 1, idade: 1, sexo: 1, peso: 1, altura: 1, imc: 1, cirurgia: 1, data_cir: 1, hora_cir: 1, asa: 1, asa_e: 1, apto: 1, apto_motivo: 1, orient_cir: 1, anestesiologista: 1, crm_anest: 1, data_aval: 1, hora_aval: 1 };
+function impCel(rot, val, span){ return h('div', { 'class': 'pc' + (span ? ' s' + span : '') }, h('span', null, rot), h('b', null, val || '—')); }
+function impPaciente(){
+  var idade = $('idade') ? $('idade').textContent : '';
+  var dn = txt('dn') ? dBR(txt('dn')) + (idade && idade !== '—' ? ' (' + idade + ')' : '') : (idade && idade !== '—' ? idade : '');
+  var antr = [num('peso') !== null ? fmt(num('peso')) + ' kg' : '', num('altura') !== null ? fmt(num('altura'), 0) + ' cm' : '', C.bmi !== null && C.bmi !== undefined ? 'IMC ' + fmt(C.bmi) : ''].filter(Boolean).join(' · ');
+  var asa = chip('asa') ? chip('asa') + (chip('asa_e') ? '-E' : '') : '';
+  var cir = txt('data_cir') ? dBR(txt('data_cir')) + (txt('hora_cir') ? ' às ' + txt('hora_cir') : '') : '';
+  var apto = chip('apto') ? chip('apto') + (txt('apto_motivo') ? ' — ' + txt('apto_motivo') : '') : '';
+  var sx = comOutro('sexo', chip('sexo'));
+  return h('div', { 'class': 'pbox pac' }, h('div', { 'class': 'pgrid' },
+    impCel('Paciente', txt('nome') + (txt('nome_social') ? ' (nome social: ' + txt('nome_social') + ')' : ''), 3), impCel('Registro', txt('prontuario')), impCel('Nascimento (idade)', dn), impCel('Sexo', sx),
+    impCel('Cirurgia proposta', txt('cirurgia'), 3), impCel('Data e hora da cirurgia', cir), impCel('Peso · altura · IMC', antr), impCel('ASA', asa),
+    impCel('Conclusão', apto, 6)));
+}
+function impAlertas(){
+  var A = window.ACESSO && window.ACESSO.nivel('painel') === 'oculto' ? [] : alerts();
+  if (!A.length) return null;
+  var TAG = { crit: 'CRÍTICO', warn: 'ATENÇÃO', info: 'INFO' };
+  return h('div', { 'class': 'pbox alr' }, h('div', { 'class': 'pbox-h' }, 'Alertas de segurança (' + A.length + ')'),
+    h('div', { 'class': 'alr-g' }, A.map(function(a){ return h('div', { 'class': 'al ' + a.l }, h('i', null, TAG[a.l]), h('b', null, a.t), a.d ? ' — ' + a.d : ''); })));
+}
+function impEscores(){
+  var c = [];
+  function sc(r, v){ if (v && v !== '—') c.push([r, v]); }
+  sc('DASI / METs', SC.dasi && SC.dasi.any ? fmt(SC.dasi.v, 1) + ' / ' + fmt(SC.dasi.mets) : '');
+  sc('EMAPO', SC.emapo ? SC.emapo.v + ' pts' : '');
+  sc('Lee (RCRI)', SC.rcri ? SC.rcri.v + ' pts' : '');
+  sc('STOP-Bang', SC.stopbang ? SC.stopbang.v + ' / 8' : '');
+  sc('Apfel', SC.apfel ? SC.apfel.v + ' / 4' : '');
+  sc('Caprini', SC.caprini ? SC.caprini.v + ' pts' : '');
+  sc('ARISCAT', SC.ariscat && SC.ariscat.any ? SC.ariscat.v + ' pts' : '');
+  sc('EGRI', SC.egri && SC.egri.any ? SC.egri.v + ' / 12' : '');
+  sc('Langeron', SC.langeron ? SC.langeron.v + ' / 5' : '');
+  sc('TFG (CKD-EPI)', C.tfg === null || C.tfg === undefined ? '' : fmt(C.tfg, 0) + ' mL/min');
+  var cfs = txt('cfs'); sc('Fragilidade (CFS)', cfs ? cfs.split(' — ')[0] : '');
+  sc('Preditores VAD', vadPreditores().length ? String(vadPreditores().length) : '');
+  if (!c.length) return null;
+  return h('div', { 'class': 'pbox esc' }, h('div', { 'class': 'pbox-h' }, 'Escores'), h('div', { 'class': 'esc-g' }, c.map(function(x){ return h('div', null, h('span', null, x[0]), h('b', null, x[1])); })));
+}
+function impLinha(l){
+  if (/^  - /.test(l)) return h('div', { 'class': 'pl sub' }, l.slice(4));
+  var m = /^([^:]{1,90}):\s?([\s\S]*)$/.exec(l);
+  if (!m) return h('div', { 'class': 'pl' }, l);
+  if (!m[2]) return h('div', { 'class': 'pl th' }, m[1]);
+  return h('div', { 'class': 'pl' }, h('b', null, m[1] + ': '), m[2]);
+}
+function impSecao(b){
+  var corpo = h('div', { 'class': 'pbox-b' }), flow = null;
+  b.linhas.forEach(function(l){
+    var m = /^([^:]{1,90}):\s?([\s\S]*)$/.exec(l);
+    var curta = m && m[2] && !/^  - /.test(l) && l.length <= 72;
+    if (curta){
+      if (!flow){ flow = h('div', { 'class': 'pl flow' }); corpo.appendChild(flow); }
+      flow.appendChild(h('span', { 'class': 'it' }, h('b', null, m[1] + ': '), m[2]));
+    } else { flow = null; corpo.appendChild(impLinha(l)); }
+  });
+  return h('div', { 'class': 'pbox' }, h('div', { 'class': 'pbox-h' }, h('span', { 'class': 'n' }, b.num), b.titulo + (b.cont ? ' (continuação)' : '')), corpo);
+}
+function impAssinatura(){
+  var nome = ENC ? ENC.nome : (txt('anestesiologista') || ''), cred = ENC ? ENC.cred : txt('crm_anest');
+  var av = (txt('data_aval') ? dBR(txt('data_aval')) : '') + (txt('hora_aval') ? ' às ' + txt('hora_aval') : '');
+  var esq = h('div', { 'class': 'as-c' },
+    ENC && ENC.img ? h('img', { src: ENC.img, alt: 'Assinatura' }) : h('div', { 'class': 'as-esp' }),
+    h('div', { 'class': 'as-l' }), h('b', null, nome || 'Anestesiologista avaliador'), h('span', null, cred || 'CRM / UF · RQE'),
+    h('span', null, ENC ? 'Assinado eletronicamente em ' + tDate(ENC.em) : 'Assinatura e carimbo'));
+  var dir = h('div', { 'class': 'as-i' },
+    h('div', null, h('span', null, 'Avaliação realizada em'), h('b', null, av || '____/____/______  ____:____')),
+    ENC && ENC.hash ? h('div', null, h('span', null, 'Integridade (SHA-256)'), h('code', null, ENC.hash)) : null,
+    h('div', null, h('span', null, 'Documento'), h('b', null, ENC ? 'Assinado eletronicamente · via impressa para o prontuário físico' : 'Válido somente com assinatura e carimbo')));
+  return h('div', { 'class': 'pbox assn' }, esq, dir);
+}
+function impBlocos(){
+  computeBase(); applyAuto(); computeScores(); vadRefresh();
+  var B = [{ full: true, el: impPaciente }];
+  var al = impAlertas(); if (al) B.push({ full: true, el: function(){ return al; } });
+  var es = impEscores(); if (es) B.push({ full: true, el: function(){ return es; } });
+  SCHEMA.forEach(function(sec, si){
+    var L = linhasSecao(sec, IMP_SKIP);
+    if (!L || !L.length) return;
+    var tam = L.join('').length;
+    B.push({ full: tam > 2400, num: pad(si + 1), titulo: sec.title, linhas: L });
+  });
+  B.push({ full: false, el: impAssinatura, fim: true });
+  return B;
+}
+function impMontar(root){
+  root.innerHTML = '';
+  var cab = window.ACESSO && window.ACESSO.cabecalho ? window.ACESSO.cabecalho() : null;
+  var blocos = impBlocos(), pags = [], pg, body, band;
+  var gerado = tDate(new Date()), pac = txt('nome') || 'Paciente sem nome', reg = txt('prontuario');
+  function nova(){
+    pg = h('div', { 'class': 'pg' });
+    if (!pags.length){
+      pg.appendChild(h('div', { 'class': 'pg-cab' },
+        h('div', null, h('b', null, cab ? cab.empresa : 'Serviço de Anestesiologia'), cab && cab.dados ? h('small', null, cab.dados) : null),
+        h('div', { 'class': 'r' }, h('b', null, cab && cab.instituicao ? cab.instituicao : ''), h('small', null, 'Avaliação em ' + (txt('data_aval') ? dBR(txt('data_aval')) + (txt('hora_aval') ? ' ' + txt('hora_aval') : '') : '—')))));
+      pg.appendChild(h('div', { 'class': 'pg-tit' }, h('h1', null, 'Avaliação pré-anestésica'),
+        h('span', { 'class': 'st ' + (ENC ? 'ok' : 'ras') }, ENC ? 'Assinado eletronicamente por ' + ENC.nome + ' em ' + tDate(ENC.em) : 'Rascunho — não assinado eletronicamente')));
+    } else {
+      pg.appendChild(h('div', { 'class': 'pg-run' }, h('b', null, 'Avaliação pré-anestésica'), ' · ' + pac + (reg ? ' · registro ' + reg : '')));
+    }
+    body = h('div', { 'class': 'pg-b' });
+    pg.appendChild(body);
+    pg.appendChild(h('div', { 'class': 'pg-f' }, h('span', null, (cab && cab.lgpd ? 'Documento confidencial (LGPD). ' : 'Documento confidencial. ') + 'Gerado em ' + gerado), h('span', { 'class': 'pgn' })));
+    root.appendChild(pg); pags.push(pg); band = null;
+  }
+  function cheio(){ return body.scrollHeight > body.clientHeight + 1; }
+  function vazio(){ return !body.children.length; }
+  function cols(){
+    if (!band){ band = h('div', { 'class': 'band duo' }, h('div', { 'class': 'col' }), h('div', { 'class': 'col' })); body.appendChild(band); }
+    return band.children;
+  }
+  function meia(el){
+    var cs = cols(), ord = cs[0].offsetHeight <= cs[1].offsetHeight ? [0, 1] : [1, 0];
+    for (var k = 0; k < 2; k++){ cs[ord[k]].appendChild(el); if (!cheio()) return true; cs[ord[k]].removeChild(el); if (cs[0].offsetHeight === cs[1].offsetHeight) break; }
+    if (!cs[0].children.length && !cs[1].children.length){ body.removeChild(band); band = null; }
+    return false;
+  }
+  function inteira(el){
+    band = null; var bd = h('div', { 'class': 'band' }, el); body.appendChild(bd);
+    if (!cheio()) return true;
+    body.removeChild(bd); return false;
+  }
+  function parte(b, ls, cont){ return { full: b.full, num: b.num, titulo: b.titulo, linhas: ls, cont: cont }; }
+  function tentar(b){ var el = b.el ? b.el() : impSecao(b); return (b.full ? inteira(el) : meia(el)) ? el : null; }
+  function desfazer(el, full){
+    var pai = el.parentNode;
+    if (full){ pai.parentNode.removeChild(pai); band = null; return; }
+    pai.removeChild(el);
+    if (band && !band.children[0].children.length && !band.children[1].children.length){ body.removeChild(band); band = null; }
+  }
+  function parcial(b){
+    var n = b.linhas.length, lo = 3, hi = n - 2, best = 0;
+    while (lo <= hi){
+      var k = (lo + hi) >> 1, el = tentar(parte(b, b.linhas.slice(0, k), b.cont));
+      if (el){ best = k; desfazer(el, b.full); lo = k + 1; } else hi = k - 1;
+    }
+    if (!best) return false;
+    tentar(parte(b, b.linhas.slice(0, best), b.cont));
+    colocar(parte(b, b.linhas.slice(best), true));
+    return true;
+  }
+  function dividir(b){
+    if (!b.linhas || b.linhas.length < 2){ var bd = h('div', { 'class': 'band' }, b.el ? b.el() : impSecao(b)); band = null; body.appendChild(bd); return; }
+    var k = Math.ceil(b.linhas.length / 2);
+    colocar(parte(b, b.linhas.slice(0, k), b.cont));
+    colocar(parte(b, b.linhas.slice(k), true));
+  }
+  function colocar(b){
+    if (tentar(b)) return;
+    if (!vazio() && b.linhas && b.linhas.length >= 5 && parcial(b)) return;
+    if (!vazio()){ nova(); if (tentar(b)) return; }
+    if (b.linhas && b.linhas.length >= 2 && parcial(b)) return;
+    dividir(b);
+  }
+  nova();
+  blocos.forEach(colocar);
+  pags.forEach(function(p, i){ p.querySelector('.pgn').textContent = 'Paciente: ' + pac + (reg ? ' · registro ' + reg : '') + ' · Página ' + (i + 1) + ' de ' + pags.length; });
+  return pags;
+}
+function impRaiz(){
+  var r = $('imp-root');
+  if (!r){ r = h('div', { id: 'imp-root', 'aria-hidden': 'true' }); document.body.appendChild(r); }
+  return r;
+}
+function impNomeArq(){
+  var d = new Date(), st = pad(d.getDate()) + '-' + pad(d.getMonth() + 1) + '-' + d.getFullYear();
+  return ('Avaliacao pre-anestesica - ' + (txt('nome') || 'paciente') + ' - ' + st).replace(/[\\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim() + '.pdf';
+}
+function impImprimir(){
+  return new Promise(function(ok){
+    impMontar(impRaiz());
+    document.body.classList.add('imprimindo');
+    var feito = false;
+    function fim(){ if (feito) return; feito = true; document.body.classList.remove('imprimindo'); window.removeEventListener('afterprint', fim); ok(); }
+    window.addEventListener('afterprint', fim);
+    setTimeout(function(){ try { window.print(); } catch (e){} setTimeout(fim, 1500); }, 60);
+  });
+}
+var H2C = null;
+function carregarH2C(){
+  if (window.html2canvas) return Promise.resolve();
+  if (!H2C) H2C = new Promise(function(ok, ko){
+    var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    sc.onload = function(){ ok(); }; sc.onerror = function(){ H2C = null; ko(new Error('Não foi possível carregar o gerador de PDF. Verifique a internet.')); };
+    document.head.appendChild(sc);
+  });
+  return H2C;
+}
+function impPdf(say){
+  say = say || function(){};
+  if (!window.jspdf){ say('Não foi possível carregar o gerador de PDF. Recarregue a página.', true); return Promise.resolve(); }
+  say('Montando o PDF…');
+  return carregarH2C().then(function(){
+    var root = impRaiz(), pags = impMontar(root);
+    root.classList.add('cap');
+    var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', compress: true });
+    var seq = Promise.resolve();
+    pags.forEach(function(p, i){
+      seq = seq.then(function(){
+        say('Gerando página ' + (i + 1) + ' de ' + pags.length + '…');
+        return window.html2canvas(p, { scale: 2.4, backgroundColor: '#ffffff', logging: false, useCORS: true }).then(function(cv){
+          if (i) doc.addPage();
+          doc.addImage(cv.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+        });
+      });
+    });
+    return seq.then(function(){ root.classList.remove('cap'); return saveFile(doc.output('blob'), impNomeArq(), say); });
+  }).catch(function(e){ impRaiz().classList.remove('cap'); say(e && e.message ? e.message : 'Não foi possível gerar o PDF.', true); });
+}
+function impVisualizar(){
+  var d = $('imp-dlg');
+  if (!d){
+    d = h('div', { 'class': 'imp-dlg', id: 'imp-dlg', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Visualizar impressão' },
+      h('div', { 'class': 'imp-bar' }, h('b', null, 'Visualizar impressão (A4)'), h('span', { 'class': 'pdfmsg', id: 'imp-dlg-msg' }),
+        h('button', { type: 'button', 'class': 'btn', onclick: function(){ impImprimir(); } }, 'Imprimir'),
+        h('button', { type: 'button', 'class': 'btn primary', onclick: function(){ impPdf(dizDlg); } }, 'Baixar PDF'),
+        h('button', { type: 'button', 'class': 'btn', onclick: function(){ d.hidden = true; document.body.classList.remove('imp-aberto'); } }, 'Fechar')),
+      h('div', { 'class': 'imp-area' }, h('div', { 'class': 'imp-prev', id: 'imp-prev' })));
+    document.body.appendChild(d);
+  }
+  function dizDlg(t, err){ var m = $('imp-dlg-msg'); m.textContent = t; m.className = 'pdfmsg' + (err ? ' err' : ''); }
+  dizDlg('');
+  d.hidden = false; document.body.classList.add('imp-aberto');
+  var pv = $('imp-prev'); impMontar(pv);
+  var area = d.querySelector('.imp-area'), larg = pv.firstChild ? pv.firstChild.offsetWidth : 794;
+  pv.style.zoom = Math.min(1, (area.clientWidth - 24) / larg);
 }
 function assinaturaFinal(){
   var e = $('assin-final'); if (!e) return;
@@ -2091,14 +2410,11 @@ var LAST_ALERTS = [];
 
 /* ---------- Resumo ---------- */
 function dBR(v){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v); return m ? m[3] + '/' + m[2] + '/' + m[1] : v; }
-function summary(semAssinatura){
-  computeBase(); applyAuto(); computeScores();
-  var cab = window.ACESSO && window.ACESSO.cabecalho ? window.ACESSO.cabecalho() : null;
-  var out = ['AVALIAÇÃO PRÉ-ANESTÉSICA' + (cab ? ' — ' + cab.empresa + (cab.instituicao ? ' · ' + cab.instituicao : '') : ''), ''];
-  SCHEMA.forEach(function(sec, si){
-    var L = [];
-    if (window.ACESSO && window.ACESSO.nivel(sec.id) === 'oculto') return;
-    sec.fields.forEach(function(f){
+function linhasSecao(sec, skip){
+  if (window.ACESSO && window.ACESSO.nivel(sec.id) === 'oculto') return null;
+  var L = [];
+  sec.fields.forEach(function(f){
+    if (skip && f.id && skip[f.id]) return;
       if (f.only === 'F' && C.sexo === 'Masculino') return;
       var v;
       switch (f.t){
@@ -2143,6 +2459,15 @@ function summary(semAssinatura){
           break;
       }
     });
+  return L;
+}
+function summary(semAssinatura){
+  computeBase(); applyAuto(); computeScores();
+  var cab = window.ACESSO && window.ACESSO.cabecalho ? window.ACESSO.cabecalho() : null;
+  var out = ['AVALIAÇÃO PRÉ-ANESTÉSICA' + (cab ? ' — ' + cab.empresa + (cab.instituicao ? ' · ' + cab.instituicao : '') : ''), ''];
+  SCHEMA.forEach(function(sec, si){
+    var L = linhasSecao(sec);
+    if (L === null) return;
     if (L.length){ out.push(pad(si + 1) + '. ' + sec.title.toUpperCase()); L.forEach(function(l){ out.push(l); }); out.push(''); }
   });
   var A = window.ACESSO && window.ACESSO.nivel('painel') === 'oculto' ? [] : alerts();
@@ -2794,6 +3119,10 @@ function bind(){
   $('btn-exemplo').addEventListener('click', loadExample);
   $('btn-encerrar').addEventListener('click', encerrar);
   $('btn-pdf-pront').addEventListener('click', pdfProntuario);
+  function dizImp(t, err){ var m = $('imp-msg'); m.textContent = t; m.className = 'pdfmsg' + (err ? ' err' : ''); }
+  $('btn-imp-ver').addEventListener('click', impVisualizar);
+  $('btn-imp-print').addEventListener('click', function(){ dizImp(''); impImprimir(); });
+  $('btn-imp-pdf').addEventListener('click', function(){ impPdf(dizImp); });
   $('btn-reabrir').addEventListener('click', reabrir);
   $('btn-banner-limpar').addEventListener('click', function(){ clearAll(); window.scrollTo(0, 0); });
 }
@@ -2804,7 +3133,7 @@ SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){
   if (sec.id === 'sistemas' && f.t === 'conds'){ f.quando = true; if (['cv', 'infec'].indexOf(f.id) < 0) f.outro = true; }
 }); });
 render(); bind(); loadExample();
-window.PRONT = { clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
+window.PRONT = { imprimir: impImprimir, pdfA4: impPdf, clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
   coletarSecao: coletarSecao, aplicarSecao: aplicarSecao, setAssinado: setAssinado, syncDmy: syncDmy };
 })();
 </script>
@@ -2974,8 +3303,8 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
       <button class="btn primary" type="button" id="btn-novo">Novo prontuário</button>
     </form>
     <div class="card">
-      <div class="tbl-wrap" style="border:0;border-radius:0"><table class="tbl lista-tbl" style="min-width:860px">
-        <thead><tr><th>Paciente</th><th>Registro</th><th>Instituição</th><th>Cirurgia</th><th>Data da cirurgia</th><th>Situação</th><th>Última alteração</th></tr></thead>
+      <div class="tbl-wrap" style="border:0;border-radius:0"><table class="tbl lista-tbl" style="min-width:960px">
+        <thead><tr><th>Paciente</th><th>Registro</th><th>Instituição</th><th>Cirurgia</th><th>Data da cirurgia</th><th>Situação</th><th>Última alteração</th><th>Imprimir / PDF</th></tr></thead>
         <tbody id="vl-tbody"></tbody>
       </table></div>
       <div class="body" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><span class="adm-msg" id="vl-msg"></span><span class="legend" id="vl-count"></span></div>
@@ -3612,7 +3941,7 @@ function mostrarLista(){
   sel.value = atual;
   $('btn-novo').hidden = (PERM.ident || 'oculto') !== 'editar';
   window.scrollTo(0, 0);
-  carregarLista();
+  return carregarLista();
 }
 async function carregarLista(){
   var tb = $('vl-tbody'), m = $('vl-msg');
@@ -3633,7 +3962,7 @@ async function carregarLista(){
   var L = r.data || [];
   $('vl-count').textContent = L.length === 200 ? 'Mostrando os 200 mais recentes. Use os filtros para refinar.' : L.length + ' prontuário(s)';
   if (!L.length){
-    var tr0 = document.createElement('tr'), td0 = document.createElement('td'); td0.colSpan = 7; td0.className = 'vazio';
+    var tr0 = document.createElement('tr'), td0 = document.createElement('td'); td0.colSpan = 8; td0.className = 'vazio';
     td0.textContent = (b || $('f-inst').value || $('f-status').value || $('f-de').value || $('f-ate').value) ? 'Nenhum prontuário com esses filtros.' : 'Nenhum prontuário ainda. Clique em "Novo prontuário" para começar.';
     tr0.appendChild(td0); tb.appendChild(tr0); return;
   }
@@ -3651,10 +3980,37 @@ async function carregarLista(){
     tg.textContent = a.status === 'assinada' ? 'Assinado' : 'Em andamento';
     td(tg, a.status === 'assinada' ? (a.assinado_nome || '') + ' · ' + dataHora(a.assinado_em) : null);
     td(dataHora(a.atualizado_em), null, 'mono');
+    var acs = document.createElement('div'); acs.className = 'vl-acs';
+    [['imprimir', 'Imprimir'], ['pdf', 'PDF']].forEach(function(x){
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn mini'; bt.textContent = x[1];
+      bt.setAttribute('aria-label', (x[0] === 'pdf' ? 'Baixar PDF de ' : 'Imprimir prontuário de ') + (a.paciente_nome || 'paciente'));
+      bt.addEventListener('click', function(e){ e.stopPropagation(); imprimirDaLista(a.id, x[0], bt); });
+      bt.addEventListener('keydown', function(e){ e.stopPropagation(); });
+      acs.appendChild(bt);
+    });
+    td(acs, null, 'acs');
     tr.addEventListener('click', function(){ abrirProntuario(a.id); });
     tr.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrirProntuario(a.id); } });
     tb.appendChild(tr);
   });
+}
+async function imprimirDaLista(id, modo, bt){
+  var m = $('vl-msg'), y = window.scrollY;
+  document.querySelectorAll('.vl-acs .btn').forEach(function(b){ b.disabled = true; });
+  try {
+    await abrirProntuario(id);
+    if (!ATUAL || ATUAL.id !== id) return;
+    document.body.classList.add('imp-lista');
+    if (modo === 'pdf') await window.PRONT.pdfA4(function(t, err){ msg(m, t, err ? 'err' : ''); });
+    else await window.PRONT.imprimir();
+    var ultimo = m.textContent, erro = m.classList.contains('err');
+    await voltarLista();
+    if (modo === 'pdf') msg(m, ultimo, erro ? 'err' : '');
+    window.scrollTo(0, y);
+  } finally {
+    document.body.classList.remove('imp-lista');
+    document.querySelectorAll('.vl-acs .btn').forEach(function(b){ b.disabled = false; });
+  }
 }
 $('f-busca').addEventListener('input', function(){ clearTimeout(tBusca); tBusca = setTimeout(carregarLista, 350); });
 ['f-inst', 'f-status', 'f-de', 'f-ate'].forEach(function(id){ $(id).addEventListener('change', carregarLista); });
@@ -3803,7 +4159,7 @@ async function voltarLista(){
     var ok = await salvar();
     if (!ok){ estadoSalvo('As últimas alterações não foram salvas. Verifique a internet antes de sair deste prontuário.', true); return; }
   }
-  mostrarLista();
+  await mostrarLista();
 }
 window.addEventListener('beforeunload', function(e){ if (ATUAL && Object.keys(SUJO).length){ salvar(); e.preventDefault(); e.returnValue = ''; } });
 
