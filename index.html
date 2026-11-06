@@ -427,7 +427,7 @@ body.patient-mode .pm-only{display:flex}
     <div class="actions">
       <button type="button" class="btn" id="btn-exemplo">Carregar exemplo</button>
       <button type="button" class="btn" id="btn-limpar">Nova avaliação</button>
-      <button type="button" class="btn ext-btn" id="btn-extrator" hidden title="Extrator de exames: ler laudos e preencher os campos" aria-label="Extrator de exames"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3"/><path d="M7.2 15h9.6"/></svg><span>Extrator de exames</span></button>
+      <button type="button" class="btn ext-btn" id="btn-extrator" hidden title="Extrator de exames (PDF padrão do laboratório): ler os laudos e preencher os campos" aria-label="Extrator de exames"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3"/><path d="M7.2 15h9.6"/></svg><span>Extrator de exames</span></button>
       <a class="btn primary" href="#sec-resumo" style="text-decoration:none">Ir para o resumo</a>
     </div>
   </div>
@@ -1976,7 +1976,7 @@ function extLeitorServidor(){
   if (!window.ACESSO || !window.ACESSO.invocar) return Promise.resolve(EXT_LEITOR = false);
   return window.ACESSO.invocar('ler-exames', { ping: true }).then(function(r){
     EXT_LEITOR = !!(r && r.data && r.data.ok);
-    if (!EXT_LEITOR) EXT_MOTIVO = 'A leitura automática ainda não está ativada neste servidor (falta a chave da API do Claude no Supabase). Enquanto isso, use o Extrator de exames no claude.ai e cole o código na aba "Colar código do Extrator".';
+    if (!EXT_LEITOR) EXT_MOTIVO = 'A leitura automática ainda não está ativada neste servidor (falta a chave da API do Claude no Supabase). Enquanto isso, use o EXTRATOR DE PDF Padrão no claude.ai e cole o código na aba "Colar código do Extrator".';
     return EXT_LEITOR;
   }).catch(function(){ EXT_MOTIVO = 'Não foi possível falar com o leitor de exames do servidor. Verifique a internet ou use a aba "Colar código do Extrator".'; return (EXT_LEITOR = false); });
 }
@@ -2033,7 +2033,7 @@ function extAbrir(){
       h('div', { 'class': 'ext-body' },
         h('div', { 'data-pane': 'ler', 'class': 'ext-pane-ler' }, h('iframe', { id: 'ext-frame', title: 'Extrator de exames' })),
         h('div', { 'data-pane': 'colar', 'class': 'ext-pane-colar', hidden: true },
-          h('p', null, 'Use quando ler os exames no Extrator aberto no claude.ai: lá, clique em "Copiar para o sistema" e cole aqui.'),
+          h('p', null, 'Use quando ler os exames no EXTRATOR DE PDF Padrão aberto no claude.ai: lá, clique em "Copiar para o sistema" e cole aqui. Somente PDFs originais do laboratório (com texto); fotos e PDFs escaneados não são lidos.'),
           h('textarea', { id: 'ext-cod', rows: 8, placeholder: 'Cole aqui o código copiado do Extrator de exames', 'aria-label': 'Código do Extrator de exames' }),
           h('div', { 'class': 'ext-acts' }, h('button', { type: 'button', 'class': 'btn primary', onclick: function(){
             var t = $('ext-cod').value.trim(), dd;

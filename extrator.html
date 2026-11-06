@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{box-sizing:border-box}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>Extrator de Exames</title></head><body>
+<title>EXTRATOR DE PDF Padrão</title></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -122,8 +122,8 @@ footer{font-size:12px;color:var(--muted);max-width:90ch}
 <div class="wrap">
   <header>
     <div class="eyebrow">Pré-Anestesia · Exames · <span id="ver"></span></div>
-    <h1>Extrator de Exames</h1>
-    <p class="lede">Lê laudos laboratoriais, de imagem, ECG e pareceres de risco cirúrgico em PDF ou foto. Os laboratoriais são transcritos com o valor e a referência exatamente como estão no laudo. Imagem, ECG e pareceres com dúvida ficam em amarelo. Nada fica guardado nesta página.</p>
+    <h1>EXTRATOR DE PDF Padrão</h1>
+    <p class="lede">Lê apenas PDFs originais, emitidos pelo laboratório ou pela clínica (com texto selecionável): exames laboratoriais, laudos de imagem, ECG e pareceres. Os valores e as referências saem exatamente como estão no laudo. Fotos e PDFs escaneados não são aceitos. Nada fica guardado nesta página.</p>
   </header>
 
   <div class="steps">
@@ -143,15 +143,10 @@ footer{font-size:12px;color:var(--muted);max-width:90ch}
   </section>
 
   <section class="drop" id="drop" aria-label="Arquivos">
-    <p id="drop-txt">Arraste PDFs ou fotos dos exames para cá, ou cole com Ctrl+V</p>
+    <p id="drop-txt">Arraste os PDFs originais dos exames para cá</p>
     <div class="row">
-      <label class="btn" for="file">Escolher arquivos</label>
-      <input id="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" multiple hidden>
-      <label class="btn" for="gal" title="No Android abre a galeria com as fotos do Google Fotos">Galeria / Google Fotos</label>
-      <input id="gal" type="file" accept="image/*" multiple hidden>
-      <label class="btn" for="cam">Tirar foto (celular)</label>
-      <input id="cam" type="file" accept="image/*" capture="environment" hidden>
-      <button class="btn" type="button" id="colar" title="Cole uma imagem copiada (Ctrl+V)">Colar imagem</button>
+      <label class="btn" for="file">Escolher PDFs</label>
+      <input id="file" type="file" accept="application/pdf" multiple hidden>
     </div>
     <div class="files" id="files"></div>
     <div class="opts">
@@ -185,7 +180,7 @@ footer{font-size:12px;color:var(--muted);max-width:90ch}
     <section class="panel">
       <h2>Exames laboratoriais</h2>
       <div class="body">
-        <div class="legend"><span><span class="chip crit">crítico</span> valor crítico</span><span><span class="chip">↑ ↓</span> fora da referência</span><span><span class="chip">editado</span> corrigido</span><span><span class="chip">antigo</span> mais de 6 meses</span><span><span class="chip warn">OCR</span> lido de foto pelo navegador — confira com a imagem</span></div>
+        <div class="legend"><span><span class="chip crit">crítico</span> valor crítico</span><span><span class="chip">↑ ↓</span> fora da referência</span><span><span class="chip">editado</span> corrigido</span><span><span class="chip">antigo</span> mais de 6 meses</span></div>
         <div class="tbl"><table><thead><tr><th style="width:21%">Campo do prontuário</th><th style="width:13%">Valor</th><th>Unidade</th><th>Referência</th><th>Data</th><th>Como está no laudo</th><th>Situação</th><th></th></tr></thead><tbody id="tb-lab"></tbody></table></div>
       </div>
     </section>
@@ -256,17 +251,16 @@ footer{font-size:12px;color:var(--muted);max-width:90ch}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script>
 (function(){
 'use strict';
-var VERSAO = 'v2.1';
+var VERSAO = 'PDF v1.0';
 var $ = function(id){ return document.getElementById(id); };
 /* Dentro do Prontuário Pré-Anestésico: a página-mãe fornece o Claude (ou o leitor do servidor), o paciente e recebe a extração. */
 var PAI = null; try { if (window.parent !== window && window.parent.PRONT_EXT) PAI = window.parent.PRONT_EXT; } catch (e){ PAI = null; }
 function CAP(n){ try { if (PAI) return Promise.resolve(PAI.use(n)); return window.claude ? window.claude.use(n) : Promise.resolve(null); } catch (e){ return Promise.resolve(null); } }
 if (PAI) document.documentElement.classList.add('embutido');
-$('ver').textContent = 'Extrator ' + VERSAO; $('ver2').textContent = 'Versão do prompt: ' + VERSAO + '.';
+$('ver').textContent = 'Extrator de PDF Padrão ' + VERSAO; $('ver2').textContent = 'Versão do prompt: ' + VERSAO + '.';
 
 /* ---------- Catálogo de campos (chaves do Formulário Padrão) ---------- */
 var GRUPOS = ['Hemograma e tipagem','Coagulação','Bioquímica','Eletrólitos','Fígado e proteínas','Ferro e tireoide','Sorologias e beta-hCG','Marcadores cardíacos','Outros exames'];
@@ -301,9 +295,7 @@ var seq = 0, rodando = false;
   if (!sample && PAI){ var mot = ''; try { mot = PAI.motivo(); } catch (e){} diag('crit', mot || 'A leitura automática não está disponível neste endereço. Use a aba "Colar código do Extrator".'); setStatus('Leitura automática indisponível aqui.', true); return; }
   if (!sample){ diag('crit', 'Leitura indisponível nesta janela: o Claude não está conectado a esta página. Abra o extrator em claude.ai (Chrome) ou no app do Claude, logado na sua conta.'); setStatus('A leitura automática só funciona com o artefato aberto no Claude, com sua conta.', true); return; }
   lim = await sample.limits().catch(function(){ return null; });
-  if (lim && lim.images) diag('ok', 'Leitura disponível: PDFs do laboratório, PDFs escaneados e fotos.');
-  else if (temOCR()) diag('warn', 'Esta janela não envia imagens ao Claude. PDFs do laboratório são lidos normalmente; fotos e PDFs escaneados serão lidos pelo leitor de imagens (OCR) do navegador, com precisão menor — confira os valores marcados "OCR" com a miniatura.');
-  else diag('warn', 'Leitura parcial nesta janela: só PDFs originais do laboratório (com texto). O leitor de imagens (OCR) não carregou, então fotos e PDFs escaneados não serão lidos. Recarregue a página; se continuar, me avise.');
+  diag('ok', 'Leitura disponível para PDFs originais do laboratório (com texto). Fotos e PDFs escaneados não são aceitos neste extrator.');
   if (!lim || !lim.images){ setStatus('Esta visualização não envia imagens ao Claude: PDFs com texto digital serão lidos pelo texto; fotos e PDFs escaneados precisam do artefato aberto no app ou no site do Claude.', true); }
   atualizarGo();
 })();
@@ -337,45 +329,7 @@ var drop = $('drop');
 ['dragleave','drop'].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); }); });
 drop.addEventListener('drop', function(e){ adicionar(e.dataTransfer.files); });
 $('file').addEventListener('change', function(){ adicionar(this.files); this.value = ''; });
-$('cam').addEventListener('change', function(){ adicionar(this.files); this.value = ''; });
-$('gal').addEventListener('change', function(){ adicionar(this.files); this.value = ''; });
 $('limpar').addEventListener('click', function(){ arquivos = []; renderArquivos(); setStatus(''); });
-
-/* ---------- Colar (Ctrl+V / Cmd+V) ---------- */
-var nColado = 0;
-function nomearColado(f){
-  var ext = f.type === 'application/pdf' ? 'pdf' : (f.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
-  nColado++;
-  try { return new File([f], 'colado-' + nColado + '.' + ext, { type: f.type }); } catch (e){ return f; }
-}
-function aceitavel(f){ return f && (/^image\/(jpeg|png|webp)$/.test(f.type) || f.type === 'application/pdf'); }
-document.addEventListener('paste', function(e){
-  var alvo = e.target;
-  // colar texto em campos continua funcionando normalmente
-  var dt = e.clipboardData; if (!dt) return;
-  var fs = [];
-  Array.prototype.forEach.call(dt.items || [], function(it){ if (it.kind === 'file'){ var f = it.getAsFile(); if (aceitavel(f)) fs.push(f); } });
-  if (!fs.length) Array.prototype.forEach.call(dt.files || [], function(f){ if (aceitavel(f)) fs.push(f); });
-  if (!fs.length){
-    var temArq = Array.prototype.some.call(dt.items || [], function(it){ return it.kind === 'file'; });
-    if (temArq) setStatus('O que foi colado não é JPG, PNG ou PDF. No WhatsApp Web, clique com o botão direito na foto e escolha "Copiar imagem".', true);
-    return;
-  }
-  e.preventDefault();
-  adicionar(fs.map(nomearColado));
-});
-$('colar').addEventListener('click', async function(){
-  if (!navigator.clipboard || !navigator.clipboard.read){ setStatus('Use o atalho Ctrl+V (Cmd+V no Mac) para colar a imagem.'); return; }
-  try {
-    var itens = await navigator.clipboard.read(), fs = [];
-    for (var i = 0; i < itens.length; i++){
-      var tp = itens[i].types.filter(function(t){ return /^image\/(png|jpeg|webp)$/.test(t); })[0];
-      if (tp){ var b = await itens[i].getType(tp); fs.push(new File([b], 'colado.' + tp.split('/')[1], { type: tp })); }
-    }
-    if (fs.length) adicionar(fs.map(nomearColado));
-    else setStatus('Não há imagem copiada. No WhatsApp Web, clique com o botão direito na foto e escolha "Copiar imagem".', true);
-  } catch (e){ setStatus('O navegador não liberou a área de transferência por este botão. Use o atalho Ctrl+V (Cmd+V no Mac).'); }
-});
 
 async function pdfParaImagens(file){
   var data = new Uint8Array(await file.arrayBuffer());
@@ -411,7 +365,7 @@ async function adicionar(list){
     var f = fl[i], pags = [];
     try {
       if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) pags = await pdfParaImagens(f);
-      else if (/^image\/(jpeg|png|webp)$/.test(f.type)) pags = [{ blob: f, texto: '' }];
+      else if (/^image\//.test(f.type)){ setStatus(f.name + ': este extrator aceita só PDF original do laboratório. Fotos não são lidas.', true); continue; }
       else { setStatus(f.name + ': formato não aceito. Use PDF, JPG ou PNG (fotos HEIC do iPhone: exporte como JPG).', true); continue; }
     } catch (e){ setStatus(f.name + ': não consegui abrir o PDF. Se tiver senha, salve uma cópia sem senha ou fotografe as páginas.', true); continue; }
     arquivos.push({ nome: f.name || 'foto.jpg', tipo: 'auto', paginas: pags.map(function(b){ return { blob: b.blob, texto: b.texto, url: URL.createObjectURL(b.blob), rot: 0 }; }) });
@@ -421,7 +375,7 @@ async function adicionar(list){
   var semLeitura = 0; arquivos.forEach(function(a){ a.paginas.forEach(function(p){ if (!legivel(p)) semLeitura++; }); });
   if (!sample){ setStatus('A leitura automática só funciona com o extrator aberto no Claude (app ou claude.ai), com sua conta.', true); return; }
   if (semLeitura){
-    setStatus(semLeitura + ' página(s) são fotos ou escaneamento, e esta janela não envia imagens ao Claude — por isso não há extração. Abra o extrator em claude.ai no navegador (Chrome) ou no app do Claude e cole as imagens lá.', true);
+    setStatus(semLeitura + ' página(s) não têm texto (PDF escaneado ou foto em PDF) e serão ignoradas. Este extrator lê só PDFs originais do laboratório.', true);
     if (semLeitura === n) return;
   }
   if (rodando){ pendenteNova = true; setStatus('Leitura em andamento. As páginas novas serão lidas em seguida.'); return; }
@@ -443,49 +397,22 @@ function renderArquivos(){
     a.paginas.forEach(function(p, pi){
       g++;
       var img = el('img', { src: p.url, alt: 'Página ' + g }); img.style.transform = 'rotate(' + p.rot + 'deg)';
-      th.appendChild(el('div', { cls: 'th' }, [img, el('span', { cls: 'pg', text: 'pág. ' + g + (legivel(p) ? '' : ' · sem leitura aqui') }), el('div', { cls: 'tools' }, [
+      th.appendChild(el('div', { cls: 'th' }, [img, el('span', { cls: 'pg', text: 'pág. ' + g + (legivel(p) ? '' : ' · escaneada: ignorada') }), el('div', { cls: 'tools' }, [
         el('button', { cls: 'btn sm', type: 'button', 'aria-label': 'Girar página ' + g, text: '↻', onclick: function(){ p.rot = (p.rot + 90) % 360; renderArquivos(); } }),
         el('button', { cls: 'btn sm', type: 'button', 'aria-label': 'Remover página ' + g, text: '✕', onclick: function(){ a.paginas.splice(pi, 1); if (!a.paginas.length) arquivos.splice(ai, 1); renderArquivos(); } })
       ])]));
     });
     box.appendChild(el('div', { cls: 'file' }, [el('div', { cls: 'file-h' }, [el('b', { text: a.nome }), sel]), th]));
   });
-  $('drop-txt').textContent = arquivos.length ? arquivos.length + ' arquivo(s), ' + totalPaginas() + ' página(s). Pode adicionar mais.' : 'Arraste PDFs ou fotos dos exames para cá, ou cole com Ctrl+V';
+  $('drop-txt').textContent = arquivos.length ? arquivos.length + ' arquivo(s), ' + totalPaginas() + ' página(s). Pode adicionar mais.' : 'Arraste os PDFs originais dos exames para cá';
   $('limpar').hidden = !arquivos.length;
   atualizarGo();
 }
-function temImagem(){ return !!(lim && lim.images); }
-function temOCR(){ return !!(window.Tesseract && Tesseract.createWorker) && !ocrQuebrado; }
+function temImagem(){ return false; } // este extrator nunca envia imagens: só o texto do PDF
+function temOCR(){ return false; } // sem OCR nesta versão
 function temTexto(p){ return !!(p.texto && p.texto.replace(/\s/g, '').length > 80); }
 function legivel(p){ return temImagem() || temTexto(p) || temOCR(); }
 
-/* ---------- OCR no navegador (fotos e escaneados, quando a janela não envia imagens ao Claude) ---------- */
-var ocrWorker = null, ocrQuebrado = false, ocrProg = null;
-async function prepararOCR(blob){
-  // escala de cinza e tamanho adequado para o OCR
-  var bmp = await createImageBitmap(blob);
-  var lado = Math.max(bmp.width, bmp.height), esc = lado < 2200 ? 2200 / lado : (lado > 3400 ? 3400 / lado : 1);
-  var c = document.createElement('canvas'); c.width = Math.round(bmp.width * esc); c.height = Math.round(bmp.height * esc);
-  var x = c.getContext('2d'); x.filter = 'grayscale(1) contrast(1.25)'; x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(bmp, 0, 0, c.width, c.height);
-  return await new Promise(function(res){ c.toBlob(res, 'image/png'); });
-}
-async function ocrPagina(blob, aviso){
-  if (!ocrWorker){
-    aviso('preparando o leitor de imagens (só na primeira vez, cerca de 10 a 30 s)…');
-    try {
-      ocrWorker = await Tesseract.createWorker('por', 1, { logger: function(m){ if (ocrProg && m && m.status === 'recognizing text') ocrProg(Math.round((m.progress || 0) * 100)); } });
-      await ocrWorker.setParameters({ preserve_interword_spaces: '1', user_defined_dpi: '300' });
-    } catch (e){
-      ocrWorker = null; ocrQuebrado = true;
-      diag('crit', 'O leitor de imagens (OCR) não conseguiu carregar nesta janela' + (e && e.message ? ' (' + String(e.message).slice(0, 120) + ')' : '') + '. Fotos e escaneados não podem ser lidos aqui.');
-      throw { code: 'ocr_falhou' };
-    }
-  }
-  ocrProg = function(pc){ aviso('lendo a imagem (OCR) ' + pc + '%…'); };
-  var r = await ocrWorker.recognize(await prepararOCR(blob));
-  ocrProg = null;
-  return { texto: (r && r.data && r.data.text) || '', confianca: r && r.data ? Math.round(r.data.confidence || 0) : 0 };
-}
 function atualizarGo(){ var ok = false; arquivos.forEach(function(a){ a.paginas.forEach(function(p){ if (legivel(p)) ok = true; }); }); $('go').disabled = !ok || !sample || rodando; }
 async function girado(p){
   if (!p.rot) return p.blob;
@@ -577,13 +504,7 @@ async function extrair(){
       var texto = x.p.texto || '', temTxt = temTexto(x.p), ocr = null;
       var img = temImagem() ? await girado(x.p) : null;
       if (!img && !temTxt){
-        if (!temOCR()){ falhas++; logPag(pag, 'foto ou PDF escaneado: esta janela não envia imagens ao Claude e o leitor de imagens (OCR) não está disponível.', 'err'); continue; }
-        var chave = x.p.rot + '';
-        if (x.p.ocr && x.p.ocr.rot === chave) ocr = x.p.ocr;
-        else { ocr = await ocrPagina(await girado(x.p), function(m){ logPag(pag, m, 'run'); }); ocr.rot = chave; x.p.ocr = ocr; }
-        texto = ocr.texto;
-        if (texto.replace(/\s/g, '').length < 20){ falhas++; logPag(pag, 'o leitor de imagens não encontrou texto. Confira se a foto está nítida e na posição certa (use ↻ para girar).', 'err'); continue; }
-        logPag(pag, 'imagem lida por OCR (qualidade ' + ocr.confianca + '%) · extraindo os resultados…', 'run');
+        if (!temOCR()){ falhas++; logPag(pag, 'PDF escaneado (sem texto): não é lido neste extrator.', 'err'); continue; }
       }
       var d;
       try {
