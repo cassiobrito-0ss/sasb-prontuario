@@ -113,6 +113,33 @@ fieldset legend{padding:0;margin-bottom:5px}
 .vadp.on .vadp-n{color:var(--crit)}
 .vadp ul{margin:8px 0 4px;padding-left:20px;font-size:13.5px}
 .vadp li.vazio{list-style:none;margin-left:-20px;color:var(--muted)}
+.ext-btn svg{flex:0 0 auto}
+.reflab{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font-size:11.5px;line-height:1.35;color:var(--muted);margin-top:3px}
+.reflab .tag{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px}
+.reflab .tag.duv{background:var(--warn-soft);color:var(--warn)}
+.reflab .tag.crit{background:var(--crit-soft);color:var(--crit)}
+.ext-info{padding:8px 12px;border-radius:8px;background:var(--accent-soft);font-size:13px}
+.ext-dlg{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;flex-direction:column}
+.ext-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.ext-tit{display:flex;align-items:baseline;gap:4px;margin-right:auto;min-width:0}
+.ext-tit span{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ext-tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.ext-tabs button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:13.5px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;min-height:36px}
+.ext-tabs button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.ext-msg{margin:10px 14px 0;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13.5px;max-height:45vh;overflow:auto}
+.ext-msg.ok{border-color:var(--ok);background:var(--ok-soft)}
+.ext-msg.warn{border-color:var(--warn);background:var(--warn-soft)}
+.ext-msg.err{border-color:var(--crit);background:var(--crit-soft);color:var(--crit)}
+.ext-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+table.ext-conf{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px;background:var(--surface)}
+table.ext-conf th,table.ext-conf td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
+.ext-body{flex:1;min-height:0;display:flex;flex-direction:column}
+.ext-pane-ler{flex:1;min-height:0}
+.ext-pane-ler iframe{width:100%;height:100%;border:0;display:block;background:var(--bg)}
+.ext-pane-colar{padding:16px;max-width:900px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.ext-pane-colar p{margin:0;color:var(--muted)}
+.ext-pane-colar textarea{width:100%;min-height:180px;font-family:var(--mono, monospace);font-size:12.5px}
+body.ext-aberto{overflow:hidden}
 .imp-box{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
 .imp-tx{display:flex;flex-direction:column;gap:2px;flex:1 1 260px;min-width:0;font-size:13px}
 .imp-tx span{color:var(--muted);font-size:12.5px}
@@ -400,6 +427,7 @@ body.patient-mode .pm-only{display:flex}
     <div class="actions">
       <button type="button" class="btn" id="btn-exemplo">Carregar exemplo</button>
       <button type="button" class="btn" id="btn-limpar">Nova avaliação</button>
+      <button type="button" class="btn ext-btn" id="btn-extrator" hidden title="Extrator de exames: ler laudos e preencher os campos" aria-label="Extrator de exames"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3"/><path d="M7.2 15h9.6"/></svg><span>Extrator de exames</span></button>
       <a class="btn primary" href="#sec-resumo" style="text-decoration:none">Ir para o resumo</a>
     </div>
   </div>
@@ -970,6 +998,7 @@ var SCHEMA = [
   { t: 'sub', label: 'Hemograma' },
   { t: 'num', id: 'hb', label: 'Hemoglobina', unit: 'g/dL', span: 2 },
   { t: 'num', id: 'ht', label: 'Hematócrito', unit: '%', span: 2 },
+  { t: 'num', id: 'hemaceas', label: 'Hemáceas', unit: 'milhões/mm³', span: 3 },
   { t: 'num', id: 'leuco', label: 'Leucócitos', unit: '/mm³', span: 3 },
   { t: 'num', id: 'bastoes', label: 'Bastões', unit: '%', span: 2 },
   { t: 'num', id: 'plaq', label: 'Plaquetas', unit: '/mm³', span: 3 },
@@ -1048,7 +1077,8 @@ var SCHEMA = [
   { t: 'text', id: 'psg', label: 'Polissonografia', span: 6 },
   { t: 'text', id: 'outros_ex', label: 'Outros exames de imagem', span: 12 },
   { t: 'textarea', id: 'pareceres', label: 'Pareceres de especialistas (cardiologia, pneumologia, outros)', span: 12 },
-  { t: 'text', id: 'pendencias', label: 'Exames ou pareceres pendentes', span: 12 }
+  { t: 'text', id: 'pendencias', label: 'Exames ou pareceres pendentes', span: 12 },
+  { t: 'hidden', id: 'exames_ext' }
 ]},
 
 { id: 'risco', title: 'Estratificação de risco', fields: [
@@ -1298,6 +1328,7 @@ function renderField(f){
       return fs;
     case 'sub': return h('h3', { 'class': 'sub' }, f.label);
     case 'note': return h('p', { 'class': 'note' }, f.text);
+    case 'hidden': return h('input', { type: 'hidden', id: f.id });
     case 'vadpred': return h('div', { 'class': 'f full' }, h('div', { 'class': 'vadp', id: f.id }, h('div', { 'class': 'vadp-h' }, h('h3', null, 'Preditores de via aérea difícil'), h('span', { 'class': 'vadp-n', id: f.id + '_n' }, '0')), h('ul', { id: f.id + '_l' }), h('p', { 'class': 'legend' }, 'Considerados automaticamente: abertura bucal < 4 cm, circunferência cervical ≥ 40 cm, DTM < 6,5 cm, DEM < 12,5 cm, qualquer alteração maxilomandibular, ULBT classe II ou III, Mallampati III ou IV, mobilidade cervical muito reduzida e via aérea difícil prévia.')));
     case 'cirinfo': return h('div', { 'class': 'f full' }, h('div', { 'class': 'cir-banner', id: f.id }, h('span', { 'class': 'cb-l' }, 'Data e horário da cirurgia'), h('strong', { id: f.id + '_v' }, '—'), h('span', { 'class': 'cb-n', id: f.id + '_n' }, 'Informe na aba 02 (Procedimento proposto).')));
     case 'table': return renderTable(f);
@@ -1808,6 +1839,217 @@ function pdfProntuario(){
   saveFile(doc.output('blob'), name, say);
 }
 
+
+/* ---------- Extrator de exames integrado ---------- */
+var EXT_LAB = ['tipagem','hb','ht','hemaceas','leuco','bastoes','plaq','tc','ts','tp','atv_prot','inr','ttpa','fibrinog','d_dimero','antitrombina','prot_c','prot_s','glic','glic_acaso','hba1c','ureia','cr','ac_urico','col_total','ldl','hdl','na','k','cl','ca','mg','tgo','tgp','fa','ggt','albumina','proteinograma','ferritina','ferro','t3','t4l','tsh','bhcg','sor_hiv','sor_htlv','sor_hcv','sor_hbsag','bnp','troponina'];
+var EXT_DEF = null, EXT_ULT = null;
+function extDefs(){
+  if (EXT_DEF) return EXT_DEF;
+  EXT_DEF = {};
+  SCHEMA.forEach(function(sec){ if (sec.id === 'exames') sec.fields.forEach(function(f){ if (f.id && f.t !== 'sub' && f.t !== 'hidden') EXT_DEF[f.id] = f; }); });
+  return EXT_DEF;
+}
+function extDados(){ var e = $('exames_ext'); try { return e && e.value ? JSON.parse(e.value) : {}; } catch (x){ return {}; } }
+function extMontarRefs(){
+  if ($('ext-info')) return;
+  EXT_LAB.forEach(function(k){
+    var e = $(k) || document.querySelector('input[name="' + k + '"]'); if (!e) return;
+    var w = e.closest('.f'); if (!w || w.querySelector('.reflab')) return;
+    w.appendChild(h('div', { 'class': 'reflab', id: 'ref_' + k, hidden: true }));
+  });
+  var sec = $('sec-exames'); if (!sec) return;
+  var corpo = sec.querySelector('.grid') || sec;
+  corpo.insertBefore(h('div', { 'class': 'f full ext-info', id: 'ext-info', hidden: true }), corpo.firstChild);
+}
+function extRefsRender(){
+  extMontarRefs();
+  var raw = $('exames_ext') ? $('exames_ext').value : '';
+  if (raw === EXT_ULT) return; EXT_ULT = raw;
+  var d = extDados(), ref = d.ref || {}, duv = d.duv || [], crit = d.crit || [];
+  EXT_LAB.forEach(function(k){
+    var r = $('ref_' + k); if (!r) return;
+    r.innerHTML = '';
+    if (ref[k]) r.appendChild(h('span', null, 'Ref. do laudo: ' + ref[k]));
+    if (crit.indexOf(k) > -1) r.appendChild(h('span', { 'class': 'tag crit' }, 'valor crítico'));
+    if (duv.indexOf(k) > -1) r.appendChild(h('span', { 'class': 'tag duv' }, 'conferido com dúvida'));
+    r.hidden = !r.childNodes.length;
+  });
+  var info = $('ext-info');
+  if (info){
+    info.innerHTML = '';
+    if (d.em){
+      info.appendChild(h('span', null, h('b', null, 'Preenchido pelo Extrator de exames'), ' em ' + tDate(new Date(d.em)) + (d.por ? ' por ' + d.por : '') + (d.lab ? ' · ' + d.lab : '') + (d.coleta ? ' · coleta ' + dBR(d.coleta) : '') + '. Confira os valores com os laudos.'));
+      info.hidden = false;
+    } else info.hidden = true;
+  }
+}
+function extSemAc(x){ return String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function extNormal(f, v){
+  v = String(v == null ? '' : v).trim(); if (!v) return null;
+  if (f.t === 'chips' || f.t === 'select'){
+    var n = ' ' + extSemAc(v) + ' ';
+    n = n.replace(/ NAO REATIVO | NEGATIVO /g, f.id === 'bhcg' ? ' NEGATIVO ' : ' NAO REAGENTE ').replace(/ REATIVO | POSITIVO /g, f.id === 'bhcg' ? ' POSITIVO ' : ' REAGENTE ');
+    var best = null;
+    f.options.forEach(function(o){ var on = extSemAc(o); if (n.indexOf(' ' + on + ' ') > -1 && (!best || on.length > extSemAc(best).length)) best = o; });
+    return best;
+  }
+  if (f.t === 'date'){
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v) || null;
+    if (m) return m[1] + '-' + m[2] + '-' + m[3];
+    m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(v); return m ? m[3] + '-' + m[2] + '-' + m[1] : null;
+  }
+  return v;
+}
+function extAtual(f){
+  if (f.t === 'chips') return chip(f.id);
+  if (f.t === 'multi') return multi(f.id).join('; ');
+  var e = $(f.id); return e ? String(e.value || '').trim() : '';
+}
+function extMostrar(v, f){ return f.t === 'date' ? dBR(v) : v; }
+function extPreparar(d){
+  if (!d || d.origem !== 'extrator-exames' || !d.campos) throw new Error('Este código não veio do Extrator de exames.');
+  var defs = extDefs(), mud = [], ign = [];
+  Object.keys(d.campos).forEach(function(k){
+    var f = defs[k]; if (!f){ ign.push(k); return; }
+    var nv = extNormal(f, d.campos[k]);
+    if (nv === null){
+      if (String(d.campos[k] || '').trim()) mud.push({ k: 'outros_lab', f: defs.outros_lab, para: (f.label + ': ' + d.campos[k]), anexar: true });
+      return;
+    }
+    var cur = extAtual(f);
+    if (cur === nv) return;
+    mud.push({ k: k, f: f, de: cur, para: nv });
+  });
+  return { d: d, mud: mud, conf: mud.filter(function(m){ return m.de && !m.anexar; }), ign: ign };
+}
+function extAplicar(P, so_vazios){
+  var feitos = [];
+  P.mud.forEach(function(m){
+    if (so_vazios && m.de && !m.anexar) return;
+    var f = m.f;
+    if (m.anexar){ var e0 = $('outros_lab'), cur = e0.value.trim(); if (cur.indexOf(m.para) < 0) e0.value = cur ? cur + '; ' + m.para : m.para; feitos.push('outros_lab'); return; }
+    if (f.t === 'date'){ $(f.id).value = m.para; }
+    else setVal(f.id, m.para);
+    feitos.push(m.k);
+  });
+  syncDatas();
+  var d = P.d, ant = extDados(), ref = ant.ref || {};
+  Object.keys(d.referencias || {}).forEach(function(k){ if (feitos.indexOf(k) > -1 || (P.mud.every(function(m){ return m.k !== k; }) && extDefs()[k])) ref[k] = d.referencias[k]; });
+  var info = { em: new Date().toISOString(), por: (window.ACESSO && window.ACESSO.eu && window.ACESSO.eu()) || '', lab: d.laboratorio || '', coleta: d.data_coleta || '', ref: ref,
+    duv: (d.campos_duvida || []).filter(function(k){ return feitos.indexOf(k) > -1 || (ant.duv || []).indexOf(k) > -1; }),
+    crit: (d.campos_criticos || []).filter(function(k){ return extDefs()[k]; }), arquivos: d.arquivos_origem || [] };
+  $('exames_ext').value = JSON.stringify(info);
+  if (window.ACESSO && window.ACESSO.sujo) window.ACESSO.sujo('exames');
+  update();
+  return feitos;
+}
+function extMsg(conteudo, tipo){
+  var m = $('ext-msg'); if (!m) return;
+  m.innerHTML = ''; m.className = 'ext-msg' + (tipo ? ' ' + tipo : '');
+  if (conteudo) m.appendChild(conteudo);
+  m.hidden = !conteudo;
+}
+function extRotulo(k){ var f = extDefs()[k]; return f ? f.label : k; }
+function extReceber(d){
+  var P;
+  try { P = extPreparar(d); } catch (e){ extMsg(h('span', null, e.message), 'err'); return; }
+  function concluir(so_vazios){
+    var feitos = extAplicar(P, so_vazios);
+    var lista = feitos.filter(function(k, i, a){ return a.indexOf(k) === i; }).map(extRotulo);
+    extMsg(h('div', null, h('b', null, lista.length ? lista.length + ' campo(s) preenchido(s) na aba 14.' : 'Nenhum campo novo para preencher.'),
+      lista.length ? h('span', null, ' ' + lista.join(' · ') + '.') : null,
+      h('div', { 'class': 'ext-acts' }, h('button', { type: 'button', 'class': 'btn primary', onclick: function(){ extFechar(); var s = $('sec-exames'); if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }, 'Ver os exames no prontuário'))), 'ok');
+  }
+  if (!P.mud.length){ extMsg(h('span', null, 'Os valores do Extrator já estão no prontuário. Nada a alterar.'), 'ok'); return; }
+  if (!P.conf.length){ concluir(false); return; }
+  var tb = h('table', { 'class': 'ext-conf' }, h('thead', null, h('tr', null, h('th', null, 'Campo'), h('th', null, 'Valor atual'), h('th', null, 'Valor do Extrator'))),
+    h('tbody', null, P.conf.map(function(m){ return h('tr', null, h('td', null, m.f.label), h('td', null, extMostrar(m.de, m.f)), h('td', null, h('b', null, extMostrar(m.para, m.f)))); })));
+  extMsg(h('div', null, h('b', null, P.conf.length + ' campo(s) já têm valor diferente no prontuário.'), ' Escolha o que fazer:', tb,
+    h('div', { 'class': 'ext-acts' },
+      h('button', { type: 'button', 'class': 'btn primary', onclick: function(){ concluir(false); } }, 'Substituir pelos valores do Extrator'),
+      h('button', { type: 'button', 'class': 'btn', onclick: function(){ concluir(true); } }, 'Preencher só os campos vazios'),
+      h('button', { type: 'button', 'class': 'btn', onclick: function(){ extMsg(null); } }, 'Cancelar'))), 'warn');
+}
+var EXT_LEITOR = null;
+function extLeitorServidor(){
+  if (EXT_LEITOR !== null) return Promise.resolve(EXT_LEITOR);
+  if (!window.ACESSO || !window.ACESSO.invocar) return Promise.resolve(EXT_LEITOR = false);
+  return window.ACESSO.invocar('ler-exames', { ping: true }).then(function(r){
+    EXT_LEITOR = !!(r && r.data && r.data.ok);
+    if (!EXT_LEITOR) EXT_MOTIVO = 'A leitura automática ainda não está ativada neste servidor (falta a chave da API do Claude no Supabase). Enquanto isso, use o Extrator de exames no claude.ai e cole o código na aba "Colar código do Extrator".';
+    return EXT_LEITOR;
+  }).catch(function(){ EXT_MOTIVO = 'Não foi possível falar com o leitor de exames do servidor. Verifique a internet ou use a aba "Colar código do Extrator".'; return (EXT_LEITOR = false); });
+}
+var EXT_MOTIVO = '';
+function blobB64(b){ return new Promise(function(ok, ko){ var r = new FileReader(); r.onload = function(){ ok(String(r.result).split(',')[1]); }; r.onerror = ko; r.readAsDataURL(b); }); }
+var LEITOR_SERVIDOR = {
+  limits: function(){ return Promise.resolve({ images: true }); },
+  json: async function(input, opts){
+    opts = opts || {};
+    var imgs = [];
+    for (var i = 0; i < (opts.images || []).length; i++){ var b = opts.images[i]; imgs.push({ tipo: b.type || 'image/jpeg', dados: await blobB64(b) }); }
+    if (opts.signal && opts.signal.aborted) throw { code: 'cancelled', message: 'Leitura interrompida.' };
+    var r = await window.ACESSO.invocar('ler-exames', { prompt: typeof input === 'string' ? input : JSON.stringify(input), imagens: imgs, nivel: opts.modelTier || 'default' });
+    if (opts.signal && opts.signal.aborted) throw { code: 'cancelled', message: 'Leitura interrompida.' };
+    var d = r && r.data;
+    if (r && r.error && !d) throw { code: 'servidor', message: 'O leitor do servidor não respondeu.' };
+    if (!d || d.erro) throw { code: (d && d.code) || 'servidor', message: (d && d.erro) || 'Falha na leitura.' };
+    return d.json;
+  }
+};
+var DOWNLOADS_LOCAL = { save: function(o){ return saveFile(o.data, o.filename, function(){}); } };
+window.PRONT_EXT = {
+  use: function(n){
+    if (window.claude && window.claude.use) return window.claude.use(n);
+    if (n === 'downloads') return Promise.resolve(DOWNLOADS_LOCAL);
+    if (n === 'sample') return extLeitorServidor().then(function(ok){ return ok ? LEITOR_SERVIDOR : null; });
+    return Promise.resolve(null);
+  },
+  motivo: function(){ return EXT_MOTIVO; },
+  paciente: function(){ return { nome: txt('nome'), nasc: txt('dn'), registro: txt('prontuario'), cirurgia: txt('cirurgia') }; },
+  aplicar: function(d){ extReceber(d); var m = $('ext-msg'); if (m) m.scrollIntoView({ block: 'nearest' }); }
+};
+function extPodeUsar(){
+  return !ENC && document.body.classList.contains('com-pront') && !!(window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel('exames') === 'editar');
+}
+function extAba(t){
+  var d = $('ext-dlg');
+  d.querySelectorAll('.ext-tabs button').forEach(function(b){ var on = b.dataset.tab === t; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+  d.querySelectorAll('[data-pane]').forEach(function(p){ p.hidden = p.dataset.pane !== t; });
+  if (t === 'ler'){ var fr = $('ext-frame'); if (!fr.getAttribute('src')) fr.setAttribute('src', 'extrator.html'); }
+}
+function extAbrir(){
+  if (!extPodeUsar()) return;
+  var d = $('ext-dlg');
+  if (!d){
+    d = h('div', { 'class': 'ext-dlg', id: 'ext-dlg', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Extrator de exames', hidden: true },
+      h('div', { 'class': 'ext-bar' },
+        h('div', { 'class': 'ext-tit' }, h('b', null, 'Extrator de exames'), h('span', { id: 'ext-pac' })),
+        h('div', { 'class': 'ext-tabs', role: 'tablist' },
+          h('button', { type: 'button', role: 'tab', 'data-tab': 'ler', onclick: function(){ extAba('ler'); } }, 'Ler exames'),
+          h('button', { type: 'button', role: 'tab', 'data-tab': 'colar', onclick: function(){ extAba('colar'); } }, 'Colar código do Extrator')),
+        h('button', { type: 'button', 'class': 'btn', onclick: extFechar }, 'Fechar')),
+      h('div', { 'class': 'ext-msg', id: 'ext-msg', hidden: true, 'aria-live': 'polite' }),
+      h('div', { 'class': 'ext-body' },
+        h('div', { 'data-pane': 'ler', 'class': 'ext-pane-ler' }, h('iframe', { id: 'ext-frame', title: 'Extrator de exames' })),
+        h('div', { 'data-pane': 'colar', 'class': 'ext-pane-colar', hidden: true },
+          h('p', null, 'Use quando ler os exames no Extrator aberto no claude.ai: lá, clique em "Copiar para o sistema" e cole aqui.'),
+          h('textarea', { id: 'ext-cod', rows: 8, placeholder: 'Cole aqui o código copiado do Extrator de exames', 'aria-label': 'Código do Extrator de exames' }),
+          h('div', { 'class': 'ext-acts' }, h('button', { type: 'button', 'class': 'btn primary', onclick: function(){
+            var t = $('ext-cod').value.trim(), dd;
+            try { dd = JSON.parse(t); } catch (e){ extMsg(h('span', null, 'Código inválido. Copie de novo no Extrator ("Copiar para o sistema") e cole inteiro.'), 'err'); return; }
+            extReceber(dd);
+          } }, 'Aplicar no prontuário')))));
+    document.body.appendChild(d);
+    d.addEventListener('keydown', function(e){ if (e.key === 'Escape') extFechar(); });
+  }
+  $('ext-pac').textContent = txt('nome') ? ' · ' + txt('nome') : '';
+  extMsg(null);
+  d.hidden = false; document.body.classList.add('ext-aberto');
+  extAba(window.claude || EXT_LEITOR ? 'ler' : 'colar');
+  if (!window.claude && EXT_LEITOR === null) extLeitorServidor().then(function(ok){ if (ok && !d.hidden) extAba('ler'); });
+}
+function extFechar(){ var d = $('ext-dlg'); if (d){ d.hidden = true; } document.body.classList.remove('ext-aberto'); }
 /* ---------- Impressão A4 (layout compacto em quadros) ---------- */
 var IMP_SKIP = { nome: 1, prontuario: 1, dn: 1, idade: 1, sexo: 1, peso: 1, altura: 1, imc: 1, cirurgia: 1, data_cir: 1, hora_cir: 1, asa: 1, asa_e: 1, apto: 1, apto_motivo: 1, orient_cir: 1, anestesiologista: 1, crm_anest: 1, data_aval: 1, hora_aval: 1 };
 function impCel(rot, val, span){ return h('div', { 'class': 'pc' + (span ? ' s' + span : '') }, h('span', null, rot), h('b', null, val || '—')); }
@@ -2248,6 +2490,8 @@ function alerts(){
   if (ck('d_opioides')) add('warn', 'Uso de opioides sem prescrição', 'Tolerância provável: analgesia multimodal e cuidado com abstinência.');
   if (ck('d_inj')) add('warn', 'Uso de drogas injetáveis', 'Acesso venoso possivelmente difícil; risco infeccioso.');
   if (ck('d_bzd')) add('info', 'Uso de benzodiazepínicos sem prescrição', 'Tolerância a sedativos; risco de abstinência.');
+  var exc = extDados().crit || [];
+  if (exc.length) add('crit', 'Valor crítico em exame (Extrator)', exc.map(function(k){ var f = extDefs()[k]; return (f ? f.label : k) + ': ' + (f && f.t === 'chips' ? chip(k) : txt(k)) + (f && f.unit ? ' ' + f.unit : ''); }).join('; ') + '. Confira o laudo.');
   var vp = vadPreditores();
   var vad = vp.length > 0 || ck('c_vad') || chip('va_dificil').indexOf('Sim') === 0 || chip('mallampati') === 'IV' || ['2 a 2,9 cm', '< 2 cm'].indexOf(txt('abertura')) > -1 || ['5 a 5,9 cm', '< 5 cm'].indexOf(chip('dtm')) > -1 || chip('ulbt').indexOf('Classe III') === 0 || chip('mob_flex') === 'Muito reduzida' || chip('mob_ext') === 'Muito reduzida' || (SC.egri && SC.egri.any && SC.egri.v >= 4);
   if (vad) add('crit', 'Via aérea difícil prevista', (vp.length ? 'Preditores: ' + vp.join('; ') + '. ' : '') + (SC.egri && SC.egri.any ? 'EGRI ' + SC.egri.v + '. ' : '') + 'Plano A/B/C, videolaringoscópio e carrinho de via aérea difícil em sala.');
@@ -2399,7 +2643,8 @@ function update(){
       var on = el && el.tagName === 'SELECT' ? el.value === 'Outro' : !!document.querySelector('input[name="' + fid + '"][value="Outro"]:checked');
       i.hidden = !on;
     });
-    computeBase(); applyAuto(); computeScores(); vadRefresh();
+    computeBase(); applyAuto(); computeScores(); vadRefresh(); extRefsRender();
+    var b = $('btn-extrator'); if (b) b.hidden = !extPodeUsar();
     var A = alerts(); renderAlerts(A); renderStrip(); renderPanelScores(); renderUI();
     LAST_ALERTS = A;
     tcleRefresh();
@@ -3075,7 +3320,7 @@ var EXAMPLE = {
   acv: 'RCR em 2T, BNF, sem sopros', ap_resp: 'MV presente bilateralmente, sem ruídos adventícios', abdome: 'Globoso, flácido, doloroso em hipocôndrio direito', mmii: 'Sem edema; varizes de pequeno calibre', acesso_venoso: 'Bom',
   mallampati: 'III', abertura: '> 4 cm ou 3 dedos', circ_cerv: '40 a 42 cm', dtm: '≥ 6,5 cm ou 4 dedos', dem: '≥ 12,5 cm', ulbt: 'Classe II — intermediário', oclusao: ['Relação normal'], mob_flex: 'Normal', mob_ext: 'Normal', mob_rot: 'Normal', mob_latr: 'Reduzida', cormack: 'Desconhecido', va_dificil: 'Não',
   aspiracao: ['Refluxo sintomático / hérnia de hiato', 'Gastroparesia (DM, agonista GLP-1)'], nx_coluna: 'Processos palpáveis', nx_pele: 'Íntegra',
-  hb: '12,8', ht: '38', leuco: '7200', bastoes: '2', plaq: '245000', tp: '12,4', atv_prot: '95', inr: '1,02', ttpa: '29 s (R 1,05)', tipagem: 'O+', bhcg: 'Não se aplica', sor_hiv: 'Não reagente', sor_hcv: 'Não reagente', sor_hbsag: 'Não reagente', na: '139', k: '4,3', ureia: '32', cr: '0,9', glic: '138', hba1c: '7,4', ecg: '08/2026 — ritmo sinusal, FC 76, sem alterações isquêmicas',
+  hb: '12,8', hemaceas: '4,35', ht: '38', leuco: '7200', bastoes: '2', plaq: '245000', tp: '12,4', atv_prot: '95', inr: '1,02', ttpa: '29 s (R 1,05)', tipagem: 'O+', bhcg: 'Não se aplica', sor_hiv: 'Não reagente', sor_hcv: 'Não reagente', sor_hbsag: 'Não reagente', na: '139', k: '4,3', ureia: '32', cr: '0,9', glic: '138', hba1c: '7,4', ecg: '08/2026 — ritmo sinusal, FC 76, sem alterações isquêmicas',
   asa: 'II', r_cir: true, ap_o: true, cap_maior: true,
   apto: 'Apto com ressalvas', apto_motivo: 'Definir conduta para semaglutida; provável AOS: poupar opioides',
   tecnica: ['Geral balanceada'], va_plano: ['Intubação orotraqueal', 'Sequência rápida'], monit: ['Padrão (ECG, PNI, SpO₂, EtCO₂)', 'Temperatura', 'TOF (bloqueio neuromuscular)'],
@@ -3121,6 +3366,7 @@ function bind(){
   $('btn-pdf-pront').addEventListener('click', pdfProntuario);
   function dizImp(t, err){ var m = $('imp-msg'); m.textContent = t; m.className = 'pdfmsg' + (err ? ' err' : ''); }
   $('btn-imp-ver').addEventListener('click', impVisualizar);
+  $('btn-extrator').addEventListener('click', extAbrir);
   $('btn-imp-print').addEventListener('click', function(){ dizImp(''); impImprimir(); });
   $('btn-imp-pdf').addEventListener('click', function(){ impPdf(dizImp); });
   $('btn-reabrir').addEventListener('click', reabrir);
@@ -4110,6 +4356,8 @@ function estadoSalvo(t, err){ var e = $('pbar-salvo'); if (!e) return; e.textCon
 
 /* ---------- Salvamento automático por aba ---------- */
 function podeGravar(aba){ return !!(ATUAL && EU && ATUAL.status === 'rascunho' && PERM[aba] === 'editar'); }
+window.ACESSO.invocar = function(fn, body){ return sb.functions.invoke(fn, { body: body }); };
+window.ACESSO.eu = function(){ return EU ? EU.nome_completo : ''; };
 window.ACESSO.sujo = function(aba){
   if (!podeGravar(aba)) return;
   SUJO[aba] = 1; estadoSalvo('Alterações ainda não salvas…');
