@@ -140,6 +140,33 @@ table.ext-conf th,table.ext-conf td{text-align:left;padding:5px 8px;border-botto
 .ext-pane-colar p{margin:0;color:var(--muted)}
 .ext-pane-colar textarea{width:100%;min-height:180px;font-family:var(--mono, monospace);font-size:12.5px}
 body.ext-aberto{overflow:hidden}
+.reuso-box{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--accent);border-left-width:4px;border-radius:10px;background:var(--accent-soft);font-size:13.5px}
+.reuso-box p{margin:0}
+.reuso-box .modo{display:inline-block;font-weight:700;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--accent)}
+.reuso-box .rv-ok{color:var(--ok);font-weight:600}
+.reuso-box .rv-pend{color:var(--warn)}
+.reuso-box .rv-alerta{padding:8px 10px;border-radius:8px;background:var(--crit-soft);color:var(--crit);font-weight:600}
+.rv-acts{display:flex;flex-wrap:wrap;gap:8px}
+.revbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 12px;padding:8px 12px;border-radius:8px;font-size:13px}
+.revbar .tx{flex:1 1 260px}
+.revbar.pend{background:var(--warn-soft);border:1px solid var(--warn);color:var(--ink)}
+.revbar.ok{background:var(--ok-soft);border:1px solid var(--ok);color:var(--ok)}
+.btn.ghost{background:transparent}
+.pac-h td{background:var(--surface-2);border-top:2px solid var(--line-strong)}
+.pac-h .ph{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.pac-h .ph b{font-size:15px}
+.pac-h .ph small{color:var(--muted)}
+.pac-h .ph .btn{margin-left:auto}
+tr.aval td.nome{padding-left:28px}
+tr.aval td.nome small.orig{display:block;color:var(--muted)}
+.reuso-op{display:flex;flex-direction:column;gap:8px}
+#dlg-reuso .reuso-op label{display:flex;flex-direction:row;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13.5px;color:var(--ink)}
+#dlg-reuso .reuso-op input{width:18px;height:18px;min-height:0;flex:0 0 auto;margin:2px 0 0;padding:0}
+#dlg-reuso .reuso-op label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.reuso-op label span{display:flex;flex-direction:column;gap:2px}
+.reuso-op small{color:var(--muted)}
+.reuso-op .rec{font-size:11px;font-weight:700;color:var(--ok);background:var(--ok-soft);padding:1px 7px;border-radius:999px;margin-left:6px}
+.ant-banner{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 12px;border:1px solid var(--info, #1D5A94);border-radius:10px;background:var(--surface-2);font-size:13.5px;margin-bottom:12px}
 .imp-box{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
 .imp-tx{display:flex;flex-direction:column;gap:2px;flex:1 1 260px;min-width:0;font-size:13px}
 .imp-tx span{color:var(--muted);font-size:12.5px}
@@ -479,6 +506,22 @@ body.patient-mode .pm-only{display:flex}
           score (escore somado), ref (tabela de referência). */
 
 var SCHEMA = [
+{ id: 'atualizacao', title: 'Atualização desde a avaliação anterior', especial: true, fields: [
+  { t: 'reusoinfo', id: 'reuso_box' },
+  { t: 'hidden', id: 'at_info' }, { t: 'hidden', id: 'at_revisao' }, { t: 'hidden', id: 'at_concluido' },
+  { t: 'chips', id: 'at_meds', label: 'Houve mudança nos medicamentos (início, suspensão ou mudança de dose)?', options: ['Não', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'text', id: 'at_meds_txt', label: 'Quais mudanças? (atualize também a aba 10 – Medicamentos)', showIf: ['at_meds', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'chips', id: 'at_proc', label: 'Fez cirurgia, procedimento ou internação desde a última avaliação?', options: ['Não', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'text', id: 'at_proc_txt', label: 'Qual, quando e se houve intercorrência anestésica', showIf: ['at_proc', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'chips', id: 'at_comorb', label: 'Surgiu nova doença, diagnóstico ou comorbidade?', options: ['Não', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'text', id: 'at_comorb_txt', label: 'Qual? (atualize também a aba 09 – Sistemas)', showIf: ['at_comorb', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'chips', id: 'at_clin', label: 'Situação clínica atual em relação à avaliação anterior', options: ['Estável, sem mudanças', 'Melhorou', 'Piorou'], span: 12, modo: 'rapido' },
+  { t: 'text', id: 'at_clin_txt', label: 'Descreva a situação clínica atual', span: 12, modo: 'rapido' },
+  { t: 'chips', id: 'at_outros', label: 'Mudou algo mais? (alergias, hábitos, peso, gestação, capacidade funcional, exames)', options: ['Não', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'text', id: 'at_outros_txt', label: 'O que mudou?', showIf: ['at_outros', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'chips', id: 'at_importante', label: 'Há alguma condição que sugira mudança importante?', options: ['Não', 'Sim'], span: 12, modo: 'rapido' },
+  { t: 'text', id: 'at_importante_txt', label: 'Qual condição? (recomenda-se a revisão completa por seção)', showIf: ['at_importante', 'Sim'], span: 12, modo: 'rapido' }
+]},
 { id: 'ident', title: 'Identificação', fields: [
   { t: 'text', id: 'nome', label: 'Nome completo', span: 6 },
   { t: 'text', id: 'nome_social', label: 'Nome social', span: 3, upper: true },
@@ -1332,6 +1375,7 @@ function renderField(f){
     case 'sub': return h('h3', { 'class': 'sub' }, f.label);
     case 'note': return h('p', { 'class': 'note' }, f.text);
     case 'hidden': return h('input', { type: 'hidden', id: f.id });
+    case 'reusoinfo': return h('div', { 'class': 'f full' }, h('div', { 'class': 'reuso-box', id: f.id }));
     case 'vadpred': return h('div', { 'class': 'f full' }, h('div', { 'class': 'vadp', id: f.id }, h('div', { 'class': 'vadp-h' }, h('h3', null, 'Preditores de via aérea difícil'), h('span', { 'class': 'vadp-n', id: f.id + '_n' }, '0')), h('ul', { id: f.id + '_l' }), h('p', { 'class': 'legend' }, 'Considerados automaticamente: abertura bucal < 4 cm, circunferência cervical ≥ 40 cm, DTM < 6,5 cm, DEM < 12,5 cm, qualquer alteração maxilomandibular, ULBT classe II ou III, Mallampati III ou IV, mobilidade cervical muito reduzida e via aérea difícil prévia.')));
     case 'cirinfo': return h('div', { 'class': 'f full' }, h('div', { 'class': 'cir-banner', id: f.id }, h('span', { 'class': 'cb-l' }, 'Data e horário da cirurgia'), h('strong', { id: f.id + '_v' }, '—'), h('span', { 'class': 'cb-n', id: f.id + '_n' }, 'Informe na aba 02 (Procedimento proposto).')));
     case 'table': return renderTable(f);
@@ -1645,16 +1689,17 @@ function renderRef(f){
     h('p', null, 'Referência de apoio (SBC 2024, ASRA, ASA). Individualizar e alinhar com cirurgião e médico assistente.'));
 }
 
+var NUMS = (function(){ var m = {}, k = 0; SCHEMA.forEach(function(sec){ m[sec.id] = sec.especial ? '00' : pad(++k); }); m._fim = pad(k + 1); return m; })();
 function render(){
   var main = $('form'), nav = $('secnav');
   SCHEMA.forEach(function(sec, i){
-    var n = pad(i + 1);
+    var n = NUMS[sec.id];
     nav.appendChild(h('a', { href: '#sec-' + sec.id, id: 'nav-' + sec.id }, h('span', { 'class': 'n' }, n), sec.title));
     var grid = h('div', { 'class': 'grid' });
     sec.fields.forEach(function(f){ var e = renderField(f); if (e) grid.appendChild(e); });
     main.appendChild(h('section', { 'class': 'sec', id: 'sec-' + sec.id }, h('header', null, h('span', { 'class': 'num' }, n), h('h2', null, sec.title)), grid));
   });
-  var n2 = pad(SCHEMA.length + 1);
+  var n2 = NUMS._fim;
   nav.appendChild(h('a', { href: '#sec-resumo' }, h('span', { 'class': 'n' }, n2), 'Resumo'));
   main.appendChild(h('section', { 'class': 'sec', id: 'sec-resumo' }, h('header', null, h('span', { 'class': 'num' }, n2), h('h2', null, 'Resumo para o prontuário')),
     h('div', { 'class': 'grid' },
@@ -1736,6 +1781,8 @@ function bloquearForm(on){
 }
 function encerrar(){
   var m = $('enc-msg'); m.textContent = ''; m.className = 'pdfmsg';
+  var rp = reusoPendentes();
+  if (reusoInfo() && rp.length){ m.textContent = 'Antes de assinar, termine a conferência dos dados copiados da avaliação anterior. Falta: ' + rp.join(' · ') + '.'; m.className = 'pdfmsg err'; var sa = $('sec-atualizacao'); if (sa) sa.scrollIntoView({ block: 'start', behavior: 'smooth' }); return; }
   if (!window.ACESSO || !window.ACESSO.assinar){ m.textContent = 'Entre no sistema para assinar.'; m.className = 'pdfmsg err'; return; }
   var acao = window.ACESSO.encerrarProntuario ? window.ACESSO.encerrarProntuario() : window.ACESSO.assinar('Encerrar a avaliação e assinar o prontuário');
   acao.then(function(a){
@@ -1843,6 +1890,90 @@ function pdfProntuario(){
 }
 
 
+
+/* ---------- Avaliação baseada em avaliação anterior ---------- */
+var REUSO_SECS = ['ident','hist','habitos','alergias','capfunc','transf','proteses','sistemas','meds','suplementos','exfis','va','exames','risco'];
+var REUSO_Q = [['at_meds', 'at_meds_txt'], ['at_proc', 'at_proc_txt'], ['at_comorb', 'at_comorb_txt'], ['at_clin', null], ['at_outros', 'at_outros_txt'], ['at_importante', 'at_importante_txt']];
+function reusoInfo(){ var e = $('at_info'); if (!e || !e.value) return null; try { return JSON.parse(e.value); } catch (x){ return null; } }
+function reusoRevisao(){ var e = $('at_revisao'); try { return e && e.value ? JSON.parse(e.value) : {}; } catch (x){ return {}; } }
+function reusoVisivel(id){ return !!$('sec-' + id) && !(window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel(id) === 'oculto'); }
+function reusoPodeEditar(){ return !ENC && !!(window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel('atualizacao') === 'editar'); }
+function reusoIntervalo(v){
+  var a = new Date(String(v.origem_data)), b = new Date(), m = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()) - (b.getDate() < a.getDate() ? 1 : 0);
+  if (isNaN(m)) return '';
+  if (m < 1){ var d = Math.max(0, Math.round((b - a) / 864e5)); return 'há ' + d + (d === 1 ? ' dia' : ' dias'); }
+  var y = Math.floor(m / 12), r = m % 12;
+  return 'há ' + (y ? y + (y > 1 ? ' anos' : ' ano') + (r ? ' e ' : '') : '') + (r ? r + (r > 1 ? ' meses' : ' mês') : '');
+}
+function reusoPendentes(){
+  var v = reusoInfo(); if (!v) return [];
+  if (v.modo === 'rapido'){
+    return REUSO_Q.filter(function(q){ var c = chip(q[0]); return !c || (q[1] && c === 'Sim' && !txt(q[1])); }).map(function(q){ var f = SCHEMA[0].fields.find(function(x){ return x.id === q[0]; }); return f ? f.label : q[0]; });
+  }
+  var rv = reusoRevisao();
+  return REUSO_SECS.filter(function(id){ return reusoVisivel(id) && !rv[id]; }).map(function(id){ var sc = SCHEMA.find(function(x){ return x.id === id; }); return NUMS[id] + ' ' + (sc ? sc.title : id); });
+}
+function reusoMarcar(id, est){
+  if (!reusoPodeEditar()) return;
+  var rv = reusoRevisao(); if (est) rv[id] = est; else delete rv[id];
+  $('at_revisao').value = JSON.stringify(rv);
+  if (window.ACESSO && window.ACESSO.sujo) window.ACESSO.sujo('atualizacao');
+  update();
+}
+function reusoMontar(){
+  if ($('rev_ident')) return;
+  REUSO_SECS.forEach(function(id){
+    var sec = $('sec-' + id); if (!sec) return;
+    var bar = h('div', { 'class': 'revbar', id: 'rev_' + id, hidden: true });
+    var hd = sec.querySelector('header'); hd.parentNode.insertBefore(bar, hd.nextSibling);
+  });
+}
+function reusoRender(){
+  reusoMontar();
+  var v = reusoInfo(), sec = $('sec-atualizacao'), nav = $('nav-atualizacao');
+  var oculto = window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel('atualizacao') === 'oculto';
+  if (sec) sec.hidden = !v || oculto; if (nav) nav.hidden = !v || oculto;
+  var pend = reusoPendentes(), ok = !!v && !pend.length;
+  var c = $('at_concluido');
+  if (c && v && c.value !== (ok ? '1' : '')){ c.value = ok ? '1' : ''; if (reusoPodeEditar() && window.ACESSO && window.ACESSO.sujo) window.ACESSO.sujo('atualizacao'); }
+  // perguntas do modo rápido
+  SCHEMA[0].fields.forEach(function(f){ if (!f.modo) return; var e = $(f.id) || document.querySelector('input[name="' + f.id + '"]'); var w = e && e.closest('.f'); if (!w) return; if (!v || v.modo !== f.modo) w.hidden = true; else if (!f.showIf) w.hidden = false; });
+  var box = $('reuso_box');
+  if (box){
+    box.innerHTML = '';
+    if (v){
+      var rapido = v.modo === 'rapido';
+      box.appendChild(h('p', null, h('b', null, 'Prontuário iniciado com os dados da avaliação de ' + dBR(String(v.origem_data).slice(0, 10))), ' (' + reusoIntervalo(v) + ')' + (v.origem_por ? ', assinada por ' + v.origem_por : '') + '. Procedimento, plano, orientações, TCLE e reavaliação começaram em branco.'));
+      box.appendChild(h('p', null, h('span', { 'class': 'modo' }, rapido ? 'Atualização rápida' : 'Revisão completa por seção'), ' ',
+        rapido ? 'Responda às perguntas abaixo sobre o que mudou desde a avaliação anterior.' : 'Em cada seção marcada, confira as respostas copiadas e informe se houve alteração.'));
+      if (ok) box.appendChild(h('p', { 'class': 'rv-ok' }, rapido ? 'Todas as perguntas respondidas.' : 'Todas as seções conferidas.'));
+      else box.appendChild(h('div', { 'class': 'rv-pend' }, h('b', null, (rapido ? 'Falta responder: ' : 'Falta conferir ' + pend.length + ' seção(ões): ')), pend.join(' · '), '. A assinatura fica liberada depois disso.'));
+      var acts = h('div', { 'class': 'rv-acts' });
+      if (!ENC && reusoPodeEditar()){
+        if (rapido && chip('at_importante') === 'Sim') box.appendChild(h('div', { 'class': 'rv-alerta' }, 'Há condição que sugere mudança importante: recomenda-se a revisão completa por seção.'));
+        acts.appendChild(h('button', { type: 'button', 'class': 'btn' + (rapido && chip('at_importante') === 'Sim' ? ' primary' : ''), onclick: function(){ if (window.ACESSO && window.ACESSO.modoReuso) window.ACESSO.modoReuso(rapido ? 'completo' : 'rapido'); } }, rapido ? 'Mudar para revisão completa por seção' : 'Mudar para atualização rápida'));
+      }
+      if (v.origem) acts.appendChild(h('button', { type: 'button', 'class': 'btn', onclick: function(){ if (window.ACESSO && window.ACESSO.abrirOutro) window.ACESSO.abrirOutro(v.origem); } }, 'Abrir a avaliação anterior'));
+      box.appendChild(acts);
+    }
+  }
+  var rv = reusoRevisao(), completo = v && v.modo !== 'rapido';
+  REUSO_SECS.forEach(function(id){
+    var bar = $('rev_' + id); if (!bar) return;
+    bar.hidden = !completo || !reusoVisivel(id);
+    if (bar.hidden) return;
+    var est = rv[id], pode = reusoPodeEditar();
+    bar.className = 'revbar ' + (est ? 'ok' : 'pend');
+    bar.innerHTML = '';
+    bar.appendChild(h('span', { 'class': 'tx' }, est === 'sem' ? 'Conferida: sem alterações desde ' + dBR(String(v.origem_data).slice(0, 10)) + '.' : est === 'alt' ? 'Conferida: houve alterações, já atualizadas.' : 'Dados copiados da avaliação de ' + dBR(String(v.origem_data).slice(0, 10)) + '. Houve alteração nas respostas desta seção?'));
+    if (pode){
+      if (!est){
+        bar.appendChild(h('button', { type: 'button', 'class': 'btn mini', onclick: function(){ reusoMarcar(id, 'sem'); } }, 'Não houve alteração'));
+        bar.appendChild(h('button', { type: 'button', 'class': 'btn mini', onclick: function(){ reusoMarcar(id, 'alt'); } }, 'Houve: já atualizei'));
+      } else bar.appendChild(h('button', { type: 'button', 'class': 'btn mini ghost', onclick: function(){ reusoMarcar(id, null); } }, 'Desfazer'));
+    }
+  });
+}
 /* ---------- Extrator de exames integrado ---------- */
 var EXT_LAB = ['tipagem','hb','ht','hemaceas','leuco','bastoes','plaq','tc','ts','tp','atv_prot','inr','ttpa','fibrinog','d_dimero','antitrombina','prot_c','prot_s','glic','glic_acaso','hba1c','ureia','cr','ac_urico','col_total','ldl','hdl','na','k','cl','ca','mg','tgo','tgp','fa','ggt','albumina','proteinograma','ferritina','ferro','t3','t4l','tsh','bhcg','sor_hiv','sor_htlv','sor_hcv','sor_hbsag','bnp','troponina'];
 var EXT_DEF = null, EXT_ULT = null;
@@ -2152,7 +2283,7 @@ function impBlocos(){
     var L = linhasSecao(sec, IMP_SKIP);
     if (!L || !L.length) return;
     var tam = L.join('').length;
-    B.push({ full: tam > 2400, num: pad(si + 1), titulo: sec.title, linhas: L });
+    B.push({ full: tam > 2400, num: NUMS[sec.id], titulo: sec.title, linhas: L });
   });
   B.push({ full: false, el: impAssinatura, fim: true });
   return B;
@@ -2663,7 +2794,7 @@ function update(){
       var on = el && el.tagName === 'SELECT' ? el.value === 'Outro' : !!document.querySelector('input[name="' + fid + '"][value="Outro"]:checked');
       i.hidden = !on;
     });
-    computeBase(); applyAuto(); computeScores(); vadRefresh(); extRefsRender();
+    computeBase(); applyAuto(); computeScores(); vadRefresh(); extRefsRender(); reusoRender();
     var b = $('btn-extrator'); if (b) b.hidden = !extPodeUsar();
     var lk = $('lnk-extrator'); if (lk) lk.hidden = !extPodeUsar();
     var A = alerts(); renderAlerts(A); renderStrip(); renderPanelScores(); renderUI();
@@ -2678,9 +2809,11 @@ var LAST_ALERTS = [];
 function dBR(v){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v); return m ? m[3] + '/' + m[2] + '/' + m[1] : v; }
 function linhasSecao(sec, skip){
   if (window.ACESSO && window.ACESSO.nivel(sec.id) === 'oculto') return null;
+  if (sec.especial && !reusoInfo()) return null;
   var L = [];
   sec.fields.forEach(function(f){
     if (skip && f.id && skip[f.id]) return;
+    if (f.modo && (reusoInfo() || {}).modo !== f.modo) return;
       if (f.only === 'F' && C.sexo === 'Masculino') return;
       var v;
       switch (f.t){
@@ -2689,6 +2822,7 @@ function linhasSecao(sec, skip){
           v = f.semAlt ? semAlt(f.id, txt(f.id)) : txt(f.id); if (v) L.push(f.label + ': ' + v + (f.unit && f.t === 'num' ? ' ' + f.unit : '')); break;
         case 'select': v = comOutro(f.id, txt(f.id)); if (v) L.push(f.label + ': ' + v); break;
         case 'ratio': v = $(f.id).textContent; if (v && v !== '—') L.push('Relação circunferência cervical / DTM: ' + v + ($(f.id + '_i').dataset.alerta ? ' (≥ 5: preditor de intubação difícil)' : '')); break;
+        case 'reusoinfo': v = reusoInfo(); if (v){ L.push('Avaliação iniciada com os dados da avaliação de ' + dBR(String(v.origem_data).slice(0, 10)) + ' (' + reusoIntervalo(v) + '). Modo: ' + (v.modo === 'rapido' ? 'atualização rápida' : 'revisão completa por seção') + '.'); if (v.modo !== 'rapido'){ var rv = reusoRevisao(); L.push('Conferência por seção: ' + REUSO_SECS.filter(reusoVisivel).map(function(id){ return NUMS[id] + ' ' + (rv[id] === 'sem' ? 'sem alteração' : rv[id] === 'alt' ? 'alterada' : 'pendente'); }).join('; ') + '.'); } } break;
         case 'vadpred': v = vadPreditores(); if (v.length) L.push('Preditores de via aérea difícil: ' + v.join('; ')); break;
         case 'cirinfo': v = txt('data_cir'); if (v) L.push('Data e horário da cirurgia: ' + dBR(v) + (txt('hora_cir') ? ' às ' + txt('hora_cir') : '')); break;
         case 'jejum':
@@ -2734,7 +2868,7 @@ function summary(semAssinatura){
   SCHEMA.forEach(function(sec, si){
     var L = linhasSecao(sec);
     if (L === null) return;
-    if (L.length){ out.push(pad(si + 1) + '. ' + sec.title.toUpperCase()); L.forEach(function(l){ out.push(l); }); out.push(''); }
+    if (L.length){ out.push(NUMS[sec.id] + '. ' + sec.title.toUpperCase()); L.forEach(function(l){ out.push(l); }); out.push(''); }
   });
   var A = window.ACESSO && window.ACESSO.nivel('painel') === 'oculto' ? [] : alerts();
   if (A.length){ out.push('ALERTAS DE SEGURANÇA'); A.forEach(function(a){ out.push('[' + (a.l === 'crit' ? 'CRÍTICO' : a.l === 'warn' ? 'ATENÇÃO' : 'INFO') + '] ' + a.t + (a.d ? ' — ' + a.d : '')); }); }
@@ -3400,7 +3534,7 @@ SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){
   if (sec.id === 'sistemas' && f.t === 'conds'){ f.quando = true; if (['cv', 'infec'].indexOf(f.id) < 0) f.outro = true; }
 }); });
 render(); bind(); loadExample();
-window.PRONT = { imprimir: impImprimir, pdfA4: impPdf, clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
+window.PRONT = { reusoAtivo: function(){ return !!reusoInfo(); }, imprimir: impImprimir, pdfA4: impPdf, clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
   coletarSecao: coletarSecao, aplicarSecao: aplicarSecao, setAssinado: setAssinado, syncDmy: syncDmy };
 })();
 </script>
@@ -3574,7 +3708,7 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
     </form>
     <div class="card">
       <div class="tbl-wrap" style="border:0;border-radius:0"><table class="tbl lista-tbl" style="min-width:960px">
-        <thead><tr><th>Paciente</th><th>Registro</th><th>Instituição</th><th>Cirurgia</th><th>Data da cirurgia</th><th>Situação</th><th>Última alteração</th><th>Imprimir / PDF</th></tr></thead>
+        <thead><tr><th>Paciente / avaliação</th><th>Registro</th><th>Instituição</th><th>Cirurgia</th><th>Data da cirurgia</th><th>Situação</th><th>Última alteração</th><th>Imprimir / PDF</th></tr></thead>
         <tbody id="vl-tbody"></tbody>
       </table></div>
       <div class="body" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><span class="adm-msg" id="vl-msg"></span><span class="legend" id="vl-count"></span></div>
@@ -3613,6 +3747,24 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
     <label>Nome completo do paciente<input id="novo-nome" autocomplete="off"></label>
     <div class="adm-msg" id="dlg-novo-msg" role="alert"></div>
     <div class="dlg-acts"><button class="btn" type="button" id="dlg-novo-cancelar">Cancelar</button><button class="btn primary" type="submit" id="dlg-novo-ok">Criar e abrir</button></div>
+  </form>
+</div>
+
+<div class="dlg" id="dlg-reuso" hidden role="dialog" aria-modal="true" aria-labelledby="dlg-reuso-t">
+  <form class="dlg-card" id="dlg-reuso-form" style="max-width:600px" novalidate>
+    <h2 id="dlg-reuso-t">Nova avaliação do paciente</h2>
+    <p class="note" id="reuso-pac" style="margin:0"></p>
+    <label>Aproveitar os dados da avaliação de<select id="reuso-origem"></select></label>
+    <p class="note" id="reuso-int" style="margin:0"></p>
+    <label id="reuso-inst-l">Instituição do novo atendimento<select id="reuso-inst"></select></label>
+    <div class="reuso-op" role="radiogroup" aria-label="Como começar a nova avaliação">
+      <label><input type="radio" name="reuso-modo" value="completo"><span><b>Revisão completa por seção<i class="rec" data-rec="completo" hidden>recomendado</i></b><small>Copia os dados e pede, em cada seção, a confirmação se houve alteração nas respostas. Indicado quando passaram mais de 2 meses (e sempre acima de 1 ano).</small></span></label>
+      <label><input type="radio" name="reuso-modo" value="rapido"><span><b>Atualização rápida<i class="rec" data-rec="rapido" hidden>recomendado</i></b><small>Copia os dados e pergunta só o que pode ter mudado: medicamentos, novo procedimento, nova comorbidade, situação clínica atual e outras mudanças. Indicado para intervalo de até 2 meses.</small></span></label>
+      <label id="reuso-op-branco"><input type="radio" name="reuso-modo" value="branco"><span><b>Começar em branco</b><small>Cria uma avaliação nova só com o nome e a data de nascimento.</small></span></label>
+    </div>
+    <p class="note" style="margin:0">Não são copiados: procedimento proposto, plano anestésico, orientações, TCLE e reavaliação. A avaliação anterior não é alterada.</p>
+    <div class="adm-msg" id="dlg-reuso-msg" role="alert"></div>
+    <div class="dlg-acts"><button class="btn" type="button" id="dlg-reuso-cancelar">Cancelar</button><button class="btn primary" type="submit" id="dlg-reuso-ok">Criar e abrir</button></div>
   </form>
 </div>
 
@@ -4074,7 +4226,8 @@ function aplicarPermissoes(){
   S.forEach(function(sec){
     var nv = PERM[sec.id] || 'oculto', el = $('sec-' + sec.id), nav = $('nav-' + sec.id);
     if (!el) return;
-    el.hidden = nv === 'oculto'; if (nav) nav.hidden = nv === 'oculto';
+    var esc = sec.especial && !(window.PRONT.reusoAtivo && window.PRONT.reusoAtivo());
+    el.hidden = nv === 'oculto' || esc; if (nav) nav.hidden = nv === 'oculto' || esc;
     el.classList.toggle('ro', nv === 'ver');
     el.querySelectorAll('input, select, textarea, button').forEach(function(c){
       if (nv === 'ver'){ if (!c.hasAttribute('data-ro')) c.setAttribute('data-ro', c.disabled ? '1' : '0'); c.disabled = true; }
@@ -4216,7 +4369,7 @@ function mostrarLista(){
 async function carregarLista(){
   var tb = $('vl-tbody'), m = $('vl-msg');
   msg(m, 'Carregando…');
-  var q = sb.from('avaliacoes').select('id, instituicao_id, paciente_nome, paciente_nascimento, registro, cirurgia, data_cirurgia, status, atualizado_em, assinado_nome, assinado_em')
+  var q = sb.from('avaliacoes').select('id, instituicao_id, paciente_nome, paciente_nascimento, paciente_sexo, registro, cirurgia, data_cirurgia, status, criado_em, atualizado_em, assinado_nome, assinado_em, origem_id, reuso_modo')
     .order('atualizado_em', { ascending: false }).limit(200);
   var b = $('f-busca').value.replace(/[%,()*\\]/g, ' ').trim();
   if (b) q = q.or('paciente_nome.ilike.%' + b + '%,registro.ilike.%' + b + '%');
@@ -4236,12 +4389,31 @@ async function carregarLista(){
     td0.textContent = (b || $('f-inst').value || $('f-status').value || $('f-de').value || $('f-ate').value) ? 'Nenhum prontuário com esses filtros.' : 'Nenhum prontuário ainda. Clique em "Novo prontuário" para começar.';
     tr0.appendChild(td0); tb.appendChild(tr0); return;
   }
-  L.forEach(function(a){
-    var tr = document.createElement('tr'); tr.tabIndex = 0; tr.setAttribute('role', 'link');
+  var G = [], GK = {};
+  L.forEach(function(a){ var k = chavePac(a); if (!GK[k]){ GK[k] = { k: k, itens: [] }; G.push(GK[k]); } GK[k].itens.push(a); });
+  var podeNovo = (PERM.ident || 'oculto') === 'editar';
+  G.forEach(function(g){
+    g.itens.sort(function(x, y){ return String(y.criado_em || '').localeCompare(String(x.criado_em || '')); });
+    var a0 = g.itens[0], trh = document.createElement('tr'); trh.className = 'pac-h';
+    var th = document.createElement('td'); th.colSpan = 8;
+    var ph = document.createElement('div'); ph.className = 'ph';
+    var bn = document.createElement('b'); bn.textContent = a0.paciente_nome || 'Paciente sem nome'; ph.appendChild(bn);
+    var sm = document.createElement('small'); sm.textContent = [a0.paciente_nascimento ? 'nasc. ' + dataBR(a0.paciente_nascimento) + ' (' + idadeDe(a0.paciente_nascimento) + ')' : 'sem data de nascimento', g.itens.length + (g.itens.length > 1 ? ' avaliações' : ' avaliação')].join(' · '); ph.appendChild(sm);
+    if (podeNovo){
+      var bnv = document.createElement('button'); bnv.type = 'button'; bnv.className = 'btn mini'; bnv.textContent = 'Nova avaliação deste paciente';
+      bnv.addEventListener('click', function(e){ e.stopPropagation(); abrirReuso(g.itens, null); });
+      ph.appendChild(bnv);
+    }
+    th.appendChild(ph); trh.appendChild(th); tb.appendChild(trh);
+    g.itens.forEach(function(a){ linhaAval(a); });
+  });
+  function linhaAval(a){
+    var tr = document.createElement('tr'); tr.className = 'aval'; tr.tabIndex = 0; tr.setAttribute('role', 'link');
     tr.setAttribute('aria-label', 'Abrir prontuário de ' + (a.paciente_nome || 'paciente sem nome'));
     function td(t, sub, cls){ var c = document.createElement('td'); if (cls) c.className = cls; if (t instanceof Node) c.appendChild(t); else c.textContent = t; if (sub){ var s = document.createElement('small'); s.textContent = sub; c.appendChild(s); } tr.appendChild(c); return c; }
-    var nb = document.createElement('b'); nb.textContent = a.paciente_nome || 'Paciente sem nome';
-    td(nb, idadeDe(a.paciente_nascimento), 'nome');
+    var nb = document.createElement('b'); nb.textContent = 'Avaliação de ' + dataBR(a.criado_em);
+    var cn = td(nb, null, 'nome');
+    if (a.origem_id){ var so = document.createElement('small'); so.className = 'orig'; var oa = L.find(function(x){ return x.id === a.origem_id; }); so.textContent = 'com dados da de ' + (oa ? dataBR(oa.criado_em) : 'avaliação anterior') + ' · ' + (a.reuso_modo === 'rapido' ? 'atualização rápida' : 'revisão completa'); cn.appendChild(so); }
     td(a.registro || '—', null, 'mono');
     td(nomeInst(a.instituicao_id));
     td(a.cirurgia || '—');
@@ -4262,8 +4434,95 @@ async function carregarLista(){
     tr.addEventListener('click', function(){ abrirProntuario(a.id); });
     tr.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrirProntuario(a.id); } });
     tb.appendChild(tr);
-  });
+  }
 }
+function chavePac(a){ return (a.paciente_nascimento || 'sem-dn') + '|' + String(a.paciente_nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+
+/* Nova avaliação aproveitando uma anterior do mesmo paciente */
+var REUSO = null;
+function mesesEntre(d){ var a = new Date(d), b = new Date(); return (b - a) / (30.44 * 864e5); }
+function intervaloTxt(d){ var m = mesesEntre(d); if (isNaN(m)) return ''; if (m < 1){ var dd = Math.round(m * 30.44); return dd + (dd === 1 ? ' dia' : ' dias'); } var mm = Math.floor(m), y = Math.floor(mm / 12), r = mm % 12; return (y ? y + (y > 1 ? ' anos' : ' ano') + (r ? ' e ' : '') : '') + (r ? r + (r > 1 ? ' meses' : ' mês') : ''); }
+function abrirReuso(itens, destino){
+  REUSO = { itens: itens.slice().sort(function(x, y){ return String(y.criado_em || '').localeCompare(String(x.criado_em || '')); }), destino: destino };
+  var a0 = REUSO.itens[0];
+  $('reuso-pac').textContent = (a0.paciente_nome || 'Paciente') + (a0.paciente_nascimento ? ' · nasc. ' + dataBR(a0.paciente_nascimento) : '');
+  $('dlg-reuso-t').textContent = destino ? 'Aproveitar dados de uma avaliação anterior' : 'Nova avaliação do paciente';
+  var so = $('reuso-origem'); so.innerHTML = '';
+  REUSO.itens.forEach(function(a){ var o = document.createElement('option'); o.value = a.id; o.textContent = dataBR(a.criado_em) + ' · ' + (a.cirurgia || 'cirurgia não informada') + ' · ' + nomeInst(a.instituicao_id) + ' · ' + (a.status === 'assinada' ? 'assinada' : 'em andamento'); so.appendChild(o); });
+  var si = $('reuso-inst'); si.innerHTML = '';
+  INSTS.filter(function(i){ return i.ativa && (!EU.instituicao_id || i.id === EU.instituicao_id); }).forEach(function(i){ var o = document.createElement('option'); o.value = i.id; o.textContent = i.nome + (i.cidade ? ' – ' + i.cidade : ''); si.appendChild(o); });
+  $('reuso-inst-l').hidden = !!destino; $('reuso-op-branco').hidden = !!destino;
+  msg($('dlg-reuso-msg'), '');
+  reusoAtualizarDlg(true);
+  $('dlg-reuso').hidden = false;
+  setTimeout(function(){ so.focus(); }, 30);
+}
+function reusoAtualizarDlg(escolher){
+  var a = REUSO.itens.find(function(x){ return x.id === $('reuso-origem').value; }) || REUSO.itens[0];
+  var m = mesesEntre(a.criado_em), rec = m <= 2 ? 'rapido' : 'completo';
+  $('reuso-int').textContent = 'Intervalo desde essa avaliação: ' + intervaloTxt(a.criado_em) + '. ' + (m > 12 ? 'Mais de 1 ano: recomenda-se a revisão completa por seção.' : m > 2 ? 'Mais de 2 meses: recomenda-se a revisão completa por seção.' : 'Até 2 meses: a atualização rápida é suficiente, salvo mudança importante.');
+  document.querySelectorAll('#dlg-reuso [data-rec]').forEach(function(e){ e.hidden = e.getAttribute('data-rec') !== rec; });
+  if (escolher) document.querySelectorAll('#dlg-reuso input[name="reuso-modo"]').forEach(function(r){ r.checked = r.value === rec; });
+  var si = $('reuso-inst'); if ([].some.call(si.options, function(o){ return o.value === a.instituicao_id; })) si.value = a.instituicao_id;
+}
+$('reuso-origem').addEventListener('change', function(){ reusoAtualizarDlg(true); });
+$('dlg-reuso-cancelar').addEventListener('click', function(){ $('dlg-reuso').hidden = true; });
+$('dlg-reuso-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var m = $('dlg-reuso-msg'), modo = (document.querySelector('#dlg-reuso input[name="reuso-modo"]:checked') || {}).value, origem = $('reuso-origem').value;
+  if (!modo) return msg(m, 'Escolha como começar a nova avaliação.', 'err');
+  $('dlg-reuso-ok').disabled = true; msg(m, 'Criando…');
+  try {
+    var id;
+    if (modo === 'branco'){
+      var a = REUSO.itens[0];
+      var r0 = await sb.from('avaliacoes').insert({ instituicao_id: $('reuso-inst').value || a.instituicao_id, paciente_nome: a.paciente_nome, paciente_nascimento: a.paciente_nascimento, paciente_sexo: a.paciente_sexo || null, registro: a.registro || null, criado_por: EU.id }).select('id').single();
+      if (r0.error || !r0.data) throw new Error('Não foi possível criar o prontuário' + (r0.error ? ': ' + r0.error.message : '.'));
+      id = r0.data.id;
+    } else {
+      if (REUSO.destino) await salvar();
+      var r = await sb.rpc('reaproveitar_avaliacao', { p_origem: origem, p_modo: modo, p_destino: REUSO.destino || null, p_instituicao: REUSO.destino ? null : ($('reuso-inst').value || null) });
+      if (r.error || !r.data) throw new Error('Não foi possível criar a avaliação' + (r.error ? ': ' + r.error.message : '.'));
+      id = r.data;
+    }
+    $('dlg-reuso').hidden = true;
+    await abrirProntuario(id, true);
+    if (modo !== 'branco'){ var sa = $('sec-atualizacao'); if (sa && !sa.hidden) sa.scrollIntoView({ block: 'start' }); }
+  } catch (err){ msg(m, /fetch|network|Failed/i.test(err.message) ? SEM_REDE : err.message, 'err'); }
+  finally { $('dlg-reuso-ok').disabled = false; }
+});
+window.ACESSO.modoReuso = async function(modo){
+  if (!ATUAL || ATUAL.status !== 'rascunho') return;
+  var e = $('at_info'); var v = {}; try { v = JSON.parse(e.value || '{}'); } catch (x){}
+  v.modo = modo; e.value = JSON.stringify(v); ATUAL.reuso_modo = modo;
+  window.ACESSO.sujo('atualizacao'); window.PRONT.update();
+  try { await sb.from('avaliacoes').update({ reuso_modo: modo }).eq('id', ATUAL.id); } catch (x){}
+};
+window.ACESSO.abrirOutro = async function(id){
+  if (ATUAL && Object.keys(SUJO).length){ if (!await salvar()) return; }
+  await abrirProntuario(id);
+};
+/* Aviso no prontuário novo quando o paciente já tem avaliações anteriores */
+var tAnt = null;
+async function checarAnteriores(){
+  var host = $('ant-host'); if (host) host.remove();
+  if (!ATUAL || ATUAL.status !== 'rascunho' || ATUAL.origem_id || PERM.ident !== 'editar') return;
+  var nome = campo('nome'), dn = campo('dn');
+  if (!dn || nome.length < 5) return;
+  var r;
+  try { r = await sb.from('avaliacoes').select('id, instituicao_id, paciente_nome, paciente_nascimento, paciente_sexo, registro, cirurgia, status, criado_em').eq('paciente_nascimento', dn).ilike('paciente_nome', nome.replace(/[%_\\]/g, ' ')).limit(30); } catch (e){ return; }
+  var L = (r && r.data || []).filter(function(a){ return a.id !== ATUAL.id; });
+  if (!L.length || !ATUAL || $('ant-host')) return;
+  L.sort(function(x, y){ return String(y.criado_em || '').localeCompare(String(x.criado_em || '')); });
+  var b = document.createElement('div'); b.className = 'ant-banner'; b.id = 'ant-host';
+  var t = document.createElement('span'); t.textContent = 'Este paciente já tem ' + L.length + (L.length > 1 ? ' avaliações anteriores' : ' avaliação anterior') + ' (a mais recente em ' + dataBR(L[0].criado_em) + ').';
+  var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn mini primary'; bt.textContent = 'Aproveitar dados de uma avaliação anterior';
+  bt.addEventListener('click', function(){ abrirReuso(L, ATUAL.id); });
+  b.appendChild(t); b.appendChild(bt);
+  var sec = $('sec-ident'); if (sec){ var hd = sec.querySelector('header'); hd.parentNode.insertBefore(b, hd.nextSibling); }
+}
+['nome', 'dn_txt', 'dn'].forEach(function(id){ var e = $(id); if (e) e.addEventListener('change', function(){ clearTimeout(tAnt); tAnt = setTimeout(checarAnteriores, 600); }); });
+document.addEventListener('focusout', function(e){ if (e.target && (e.target.id === 'nome' || e.target.id === 'dn_txt')){ clearTimeout(tAnt); tAnt = setTimeout(checarAnteriores, 600); } });
 async function imprimirDaLista(id, modo, bt){
   var m = $('vl-msg'), y = window.scrollY;
   document.querySelectorAll('.vl-acs .btn').forEach(function(b){ b.disabled = true; });
@@ -4357,6 +4616,7 @@ async function abrirProntuario(id, novo){
   if (ATUAL.status === 'assinada'){ var em = $('enc-msg'); if (em){ em.textContent = 'Prontuário assinado: disponível para leitura e impressão. A edição está bloqueada.'; em.className = 'pdfmsg'; } }
   window.scrollTo(0, 0);
   try { sb.rpc('registrar_leitura', { p_id: id }); } catch (e){}
+  checarAnteriores();
 }
 function renderPbar(){
   var h = $('pbar-host'); h.innerHTML = '';
