@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>Questionário do Paciente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: uma coluna estreita de leitura (celular primeiro), uma etapa por tela, barra de navegação fixa no rodapé.
+   Tokens herdados do Formulário Padrão (Prontuário Pré-Anestésico) para os dois parecerem do mesmo sistema. */
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --surface-2:#F6F8F7; --ink:#14201C; --muted:#56655F; --line:#D5DDD9; --line-strong:#B9C6C0;
+  --accent:#0D6B53; --accent-ink:#FFFFFF; --accent-soft:#DDEFE8;
+  --crit:#B42318; --crit-soft:#FCE9E7; --warn:#8A5300; --warn-soft:#FFF1D9; --info:#1D5A94; --info-soft:#E6EFF9; --ok:#1E6B3A; --ok-soft:#E3F3E8;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1412; --surface:#151D1A; --surface-2:#1A2420; --ink:#E4ECE8; --muted:#98A9A2; --line:#2A3632; --line-strong:#3A4A44;
+    --accent:#4FC49F; --accent-ink:#0B1A15; --accent-soft:#17332A;
+    --crit:#FF8B7B; --crit-soft:#3A1B17; --warn:#F0B55C; --warn-soft:#33260F; --info:#8DB9EE; --info-soft:#172536; --ok:#7CD39B; --ok-soft:#16301F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1412; --surface:#151D1A; --surface-2:#1A2420; --ink:#E4ECE8; --muted:#98A9A2; --line:#2A3632; --line-strong:#3A4A44;
+  --accent:#4FC49F; --accent-ink:#0B1A15; --accent-soft:#17332A;
+  --crit:#FF8B7B; --crit-soft:#3A1B17; --warn:#F0B55C; --warn-soft:#33260F; --info:#8DB9EE; --info-soft:#172536; --ok:#7CD39B; --ok-soft:#16301F;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.app{max-width:660px;margin:0 auto;padding-inline:16px;padding-block:0 140px}
+
+/* Topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);padding-block:12px 10px}
+.top-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-family:var(--cond);font-weight:600;font-size:15px;letter-spacing:.01em}
+.brand small{display:block;font-family:var(--sans);font-weight:400;font-size:12.5px;color:var(--muted)}
+.stepno{font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.bar{margin-top:10px;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+.demo{margin-top:10px;font-size:13px;padding:7px 11px;border-radius:8px;background:var(--warn-soft);color:var(--warn)}
+
+/* Etapa */
+.step-h{padding-block:18px 6px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-family:var(--cond);font-weight:600;font-size:clamp(27px,6vw,34px);line-height:1.12;margin:4px 0 8px;text-wrap:balance}
+.intro{margin:0;color:var(--muted);max-width:60ch}
+.qs{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.q.err{border-color:var(--crit)}
+.q>fieldset{border:0;margin:0;padding:0;min-width:0}
+.qt{display:block;font-weight:600;font-size:17px;line-height:1.35;margin:0 0 4px;padding:0}
+.help{display:block;font-size:14.5px;color:var(--muted);margin:0 0 10px}
+.opt-tag{font-weight:400;font-size:13px;color:var(--muted)}
+.errmsg{margin:8px 0 0;font-size:14px;color:var(--crit);font-weight:500}
+.subh{font-family:var(--cond);font-weight:600;font-size:19px;margin:10px 0 -4px;text-wrap:balance}
+.note{font-size:14.5px;padding:12px 14px;border-radius:10px;background:var(--info-soft);color:var(--ink)}
+.note b{color:var(--info)}
+
+input[type=text],input[type=tel],input[type=date],input[type=number],textarea,select{
+  width:100%;font:inherit;font-size:17px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:10px;padding:11px 12px;min-height:50px}
+input:disabled{opacity:.45}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);background:var(--surface);outline:none}
+textarea{min-height:96px;resize:vertical}
+.numrow{display:flex;align-items:center;gap:10px}
+.numrow input{max-width:150px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.numrow span{color:var(--muted);font-size:15px}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.pair label{display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--muted);min-width:0}
+
+/* Opções grandes */
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts.inline{flex-direction:row;flex-wrap:wrap}
+.opts.inline .opt{flex:1 1 120px}
+.opt{position:relative;display:flex;flex-direction:column}
+.opt>label{display:flex;gap:12px;align-items:flex-start;min-height:50px;padding:12px 14px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);cursor:pointer;line-height:1.35}
+.opt input[type=radio],.opt input[type=checkbox]{width:22px;height:22px;margin:0;flex:0 0 auto;accent-color:var(--accent)}
+.opt input:checked+span{font-weight:600}
+.opt:has(input:checked)>label{border-color:var(--accent);background:var(--accent-soft)}
+.opt.none>label{border-style:dashed}
+.opt .det{margin-top:6px}
+.opt .det input{min-height:46px;font-size:16px}
+
+/* DASI: sim/não por linha */
+.yn{display:flex;flex-direction:column}
+.yn-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.yn-row:last-child{border-bottom:0}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:10px 14px;min-width:62px;font-weight:500;min-height:46px}
+.seg button+button{border-left:1px solid var(--line-strong)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* Linhas repetidas (cirurgias, remédios) */
+.rows{display:flex;flex-direction:column;gap:10px}
+.rowcard{border:1px solid var(--line-strong);border-radius:10px;padding:12px;background:var(--surface-2);display:flex;flex-direction:column;gap:10px}
+.rowcard-h{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.rowcard label{display:flex;flex-direction:column;gap:5px;font-size:14.5px;color:var(--muted)}
+.linkbtn{border:0;background:none;color:var(--crit);font-size:14px;padding:6px 4px;text-decoration:underline}
+.addbtn{align-self:flex-start;border:1px dashed var(--accent);color:var(--accent);background:none;border-radius:10px;padding:11px 16px;font-weight:600;min-height:48px}
+
+/* Rodapé fixo */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.nav-in{max-width:660px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:12px;padding:12px 18px;font-weight:600;min-height:52px}
+.btn.primary{flex:1;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-size:17px}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted);font-weight:500}
+.saved{font-size:12.5px;color:var(--muted);text-align:center;margin-top:6px}
+
+/* Boas-vindas */
+.welcome{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px}
+.welcome ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.resume{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--radius);background:var(--accent-soft)}
+.resume .btns{display:flex;flex-wrap:wrap;gap:8px}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:15.5px}
+.termo-box{margin-top:10px;max-height:300px;overflow-y:auto;overscroll-behavior:contain;border:1px solid var(--line-strong);border-radius:10px;padding:12px 14px;background:var(--surface-2);display:flex;flex-direction:column;gap:10px;font-size:15px;color:var(--muted)}
+.termo-box p{margin:0;max-width:60ch}
+.termo-box b{color:var(--ink);font-weight:600}
+.termo-box:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.termo-end{font-family:var(--mono);font-size:12px;text-align:center;padding-top:8px;border-top:1px dashed var(--line-strong)}
+.termo-hint{margin:10px 0;font-size:14.5px;color:var(--info);font-weight:500}
+.termo-hint.ok{color:var(--ok)}
+.termo-hint.warn{color:var(--crit)}
+.consent.locked{opacity:.55}
+.consent.locked input{cursor:not-allowed}
+
+details.more{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+details.more summary{cursor:pointer;color:var(--info);font-size:15px;font-weight:500;padding:4px 0;min-height:32px}
+.more-body{display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted);padding-top:4px}
+.more-body p{margin:0;max-width:60ch}
+.more-body b{color:var(--ink);font-weight:600}
+.termo-ver{font-family:var(--mono);font-size:12px}
+
+/* Campos agrupados (endereço, contato, plano) */
+.fgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.fcell{grid-column:span 6;display:flex;flex-direction:column;gap:6px;min-width:0}
+.fcell.w2{grid-column:span 2}.fcell.w3{grid-column:span 3}.fcell.w4{grid-column:span 4}
+.flbl{font-size:14.5px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipb{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:9px 15px;min-height:44px;font-size:15.5px}
+.chipb.sm{min-height:38px;padding:6px 12px;font-size:14px}
+.chipb[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+
+/* Data de nascimento em três caixas */
+.dob{display:flex;gap:10px}
+.dobc{display:flex;flex-direction:column;gap:6px;flex:0 0 76px}
+.dobc.y{flex:0 0 108px}
+.dobc input{text-align:center;font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums;padding-inline:6px}
+.dobout{margin:10px 0 0;font-size:15.5px;min-height:1.5em}
+.dobout.ok{color:var(--ok);font-weight:600}
+.dobout.bad{color:var(--crit);font-weight:500}
+.consent input{width:22px;height:22px;margin:2px 0 0;flex:0 0 auto;accent-color:var(--accent)}
+.demo-link{align-self:flex-start;border:0;background:none;color:var(--info);text-decoration:underline;font-size:14px;padding:4px 0}
+
+/* Revisão */
+.rev-sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.rev-sec h2{margin:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;background:var(--surface-2);border-bottom:1px solid var(--line);font-family:var(--cond);font-weight:600;font-size:18px}
+.rev-sec h2 button{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:6px 12px;font-family:var(--sans);font-size:14px;font-weight:500}
+.rev-sec dl{margin:0;padding:6px 16px 12px}
+.rev-sec dt{font-size:14px;color:var(--muted);margin-top:10px}
+.rev-sec dd{margin:2px 0 0;font-weight:500;overflow-wrap:anywhere}
+.rev-empty{padding:12px 16px;color:var(--muted);font-size:15px;margin:0}
+
+/* Fim */
+.done{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 18px;display:flex;flex-direction:column;gap:12px}
+.done .check{width:56px;height:56px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;font-size:30px;font-weight:700}
+details.team{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-top:14px}
+details.team summary{padding:14px 16px;cursor:pointer;font-weight:600}
+.team-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
+.team-body p{margin:0;font-size:14.5px;color:var(--muted)}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{font-family:var(--mono);font-size:13px;padding:5px 10px;border-radius:8px;background:var(--accent-soft);font-variant-numeric:tabular-nums}
+pre.json{margin:0;max-height:360px;overflow:auto;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-family:var(--mono);font-size:12.5px;line-height:1.45;white-space:pre}
+.copyrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.copied{color:var(--ok);font-weight:600;font-size:14px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar i{transition:none}}
+</style>
+</head><body>
+
+<div class="app">
+  <header class="top">
+    <div class="top-row">
+      <div class="brand">Avaliação pré-anestésica<small>Questionário antes da consulta</small></div>
+      <div class="stepno" id="stepno"></div>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    <div class="demo" id="demo">Versão de teste: as respostas ficam só neste aparelho e ainda não são enviadas à equipe.</div>
+  </header>
+  <main id="main" tabindex="-1"></main>
+</div>
+<nav class="nav" id="nav" aria-label="Navegação do questionário">
+  <div class="nav-in">
+    <button class="btn" id="btn-back" type="button">Voltar</button>
+    <button class="btn primary" id="btn-next" type="button">Continuar</button>
+  </div>
+  <div class="saved" id="saved"></div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* =========================================================================
+   Perguntas em linguagem leiga, cada uma ligada aos campos do Formulário Padrão.
+   Tipos: text, tel, num, date, area, single, checks, rows, dasi, h (subtítulo), info.
+   single.opts: [rótulo, conjunto]  → conjunto = { campo: valor }; "+campo" acrescenta a um campo de múltipla escolha.
+   checks.items: { l: rótulo, k: id da condição (marca k e grava detalhe em k_det), m: opção do campo múltiplo q.mf, s: conjunto extra, d: texto de ajuda do detalhe (false = sem detalhe) }
+   ========================================================================= */
+
+var YES = 'Sim', NO = 'Não';
+/* [rótulo para o paciente, valor da coluna "Tipo de anestesia" do Prontuário (opções: Raquianestesia, Peridural, Geral, Bloqueio, Local, Sedação)] */
+var ANEST_TIPOS = [['Dormiu totalmente', 'Geral'], ['Tomou nas costas e as pernas ficaram dormentes', ''], ['Só o braço ou a perna ficou dormente', 'Bloqueio'], ['Ficou sonolento(a), com anestesia no local', 'Local; Sedação'], ['Não sei', '']];
+var PLANOS = [['Unimed', 'UNIMED'], ['Planserv', 'PLANSERV'], ['Bradesco Saúde', 'BRADESCO'], ['Cassi', 'CASSI'], ['SulAmérica', 'SULAMÉRICA'], ['Plansul', 'PLANSUL'], ['Amil', 'AMIL'], ['Saúde Caixa', 'SAÚDE CAIXA'], ['Postal Saúde', 'POSTAL SAÚDE'], ['FUSEX (Exército)', 'FUSEX'], ['Camed', 'CAMED']];
+function pad2m(n){ n = parseInt(n, 10); return (n < 10 ? '0' : '') + n; }
+function ymTexto(a, m){
+  a = parseInt(a, 10); m = parseInt(m, 10); var p = [];
+  if (a > 0){ a = Math.min(a, 60); p.push(a + (a === 1 ? ' ano' : ' anos')); }
+  if (m > 0){ m = Math.min(m, 11); p.push(m + (m === 1 ? ' mês' : ' meses')); }
+  return p.length ? p.join(' e ') : ((a === 0 || m === 0) ? 'menos de 1 mês' : '');
+}
+function age(A){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(A.dn || ''); if (!m) return null; var b = new Date(+m[1], m[2]-1, +m[3]), t = new Date(); var a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return a >= 0 && a < 130 ? a : null; }
+function pick(A, id){ var q = QI[id]; var i = A[id]; return (q && i !== undefined && i !== null && q.opts[i]) ? q.opts[i][0] : ''; }
+function fem(A){ return pick(A, 'sexo') === 'Feminino'; }
+
+var STEPS = [
+{ id: 'inicio', kind: 'welcome', title: 'Antes de começar', qs: [
+  { t: 'single', id: 'quem', q: 'Quem está respondendo?', req: 1, opts: [
+    ['Eu, o próprio paciente', { informante: 'Paciente' }],
+    ['Um familiar ou acompanhante, pelo paciente', { informante: 'Familiar / acompanhante' }],
+    ['O responsável legal (paciente menor de idade ou que não pode responder)', { informante: 'Responsável legal' }]] },
+  { t: 'fields', id: 'resp_quem', q: 'Sobre você, que está respondendo', when: function(A){ return A.quem === 1 || A.quem === 2; },
+    cols: [{ k: 'nome', l: 'Seu nome', ac: 'name' }, { k: 'par', l: 'Parentesco com o paciente', opts: ['Filho(a)', 'Cônjuge', 'Pai / mãe', 'Irmão(ã)', 'Cuidador(a)', 'Outro'] }] }
+]},
+
+{ id: 'dados', title: 'Dados do paciente', intro: 'Usamos estes dados para identificar o paciente e entrar em contato, se precisar.', qs: [
+  { t: 'text', id: 'nome', q: 'Nome completo', f: 'nome', req: 1, ac: 'name' },
+  { t: 'single', id: 'usa_ns', q: 'Usa um nome diferente do que está no documento?', inline: 1, opts: [[NO], [YES]] },
+  { t: 'text', id: 'nome_social', q: 'Nome social', help: 'O nome pelo qual prefere ser chamado(a).', f: 'nome_social', when: function(A){ return pick(A, 'usa_ns') === YES; } },
+  { t: 'dob', id: 'dn', q: 'Data de nascimento', f: 'dn', req: 1 },
+  { t: 'single', id: 'sexo', q: 'Sexo', help: 'Como consta no registro de nascimento. Alguns cálculos de risco dependem disso.', req: 1, inline: 1, f: 'sexo', opts: [['Feminino'], ['Masculino']] },
+  { t: 'text', id: 'responsavel', q: 'Nome do responsável legal', f: 'responsavel', when: function(A){ var a = age(A); return a !== null && a < 18 && A.quem !== 2; } },
+  { t: 'text', id: 'responsavel_parent', q: 'Parentesco ou vínculo do responsável', ph: 'mãe, pai, tutor, curador…', f: 'responsavel_parent', when: function(A){ return !!A.responsavel && A.quem !== 2; } },
+  { t: 'tel', id: 'telefone', q: 'Telefone com WhatsApp', f: 'telefone', ph: '(73) 90000-0000', mask: 'tel' },
+  { t: 'fields', id: 'emerg', q: 'Contato para emergência', help: 'Alguém próximo que possamos chamar, se precisar.',
+    cols: [{ k: 'nome', l: 'Nome' }, { k: 'par', l: 'Parentesco', opts: ['Filho(a)', 'Cônjuge', 'Pai / mãe', 'Irmão(ã)', 'Amigo(a)', 'Outro'] }, { k: 'tel', l: 'Telefone', mask: 'tel', ph: '(73) 90000-0000' }],
+    build: function(v, put){ var who = [clean(v.nome), v.par ? v.par.toLowerCase() : ''].filter(Boolean).join(', '); var s = [who, clean(v.tel)].filter(Boolean).join(' — '); if (s) put('contato_emerg', s); } },
+  { t: 'single', id: 'estado_civil', q: 'Estado civil', f: 'estado_civil', opts: [['Solteiro(a)'], ['Casado(a) ou em união estável', { estado_civil: 'Casado(a) / união estável' }], ['Divorciado(a)'], ['Viúvo(a)']] },
+  { t: 'text', id: 'profissao', q: 'Profissão ou ocupação', f: 'profissao' },
+  { t: 'single', id: 'cor', q: 'Cor ou raça', help: 'Como você se declara (padrão do IBGE).', opts: [['Preta', { cor: 'Preta' }], ['Branca', { cor: 'Branca' }], ['Parda', { cor: 'Parda' }], ['Amarela', { cor: 'Amarela' }], ['Indígena', { cor: 'Indígena' }], ['Prefiro não declarar', { cor: 'Não declarar' }]] },
+  { t: 'single', id: 'escolaridade', q: 'Até quando estudou?', opts: [['Não sei ler e escrever', { escolaridade: 'Não alfabetizado' }], ['Ensino fundamental incompleto (não terminou o 9º ano)', { escolaridade: 'Fundamental incompleto' }], ['Ensino fundamental completo', { escolaridade: 'Fundamental completo' }], ['Ensino médio incompleto', { escolaridade: 'Médio incompleto' }], ['Ensino médio completo', { escolaridade: 'Médio completo' }], ['Faculdade', { escolaridade: 'Superior' }], ['Pós-graduação', { escolaridade: 'Pós-graduação' }]] },
+  { t: 'single', id: 'religiao', q: 'Religião', help: 'Algumas religiões têm orientações sobre transfusão de sangue.', opts: [['Católica', { religiao: 'Católica' }], ['Evangélica', { religiao: 'Evangélica' }], ['Candomblé ou Umbanda', { religiao: 'Candomblé / Umbanda' }], ['Testemunha de Jeová', { religiao: 'Testemunha de Jeová' }], ['Outra religião', { religiao: 'Outro' }], ['Não tenho religião', {}]] },
+  { t: 'text', id: 'religiao_outro', q: 'Qual religião?', f: 'religiao_outro', when: function(A){ return pick(A, 'religiao') === 'Outra religião'; } },
+  { t: 'text', id: 'naturalidade', q: 'Cidade onde nasceu', f: 'naturalidade', opt: 1 },
+  { t: 'fields', id: 'end', q: 'Endereço', help: 'Comece pelo CEP.', cep: 1,
+    cols: [{ k: 'cep', l: 'CEP', mask: 'cep', ph: '45600-000', w: 3, ac: 'postal-code' }, { k: 'rua', l: 'Rua', ac: 'address-line1' }, { k: 'num', l: 'Número', w: 2, mode: 'numeric' }, { k: 'compl', l: 'Complemento', w: 4, ph: 'apto, casa, bloco' },
+      { k: 'bairro', l: 'Bairro' }, { k: 'cidade', l: 'Cidade', w: 4, ac: 'address-level2' }, { k: 'uf', l: 'Estado', w: 2, ph: 'BA', ac: 'address-level1' }],
+    build: function(v, put){
+      var e = [clean(v.rua), clean(v.num) ? 'nº ' + clean(v.num) : '', clean(v.compl), clean(v.bairro), clean(v.cep) ? 'CEP ' + clean(v.cep) : ''].filter(Boolean).join(', ');
+      if (e) put('endereco', e);
+      var c = [clean(v.cidade), clean(v.uf).toUpperCase()].filter(Boolean).join(' / '); if (c) put('cidade', c); } },
+  { t: 'single', id: 'pagto', q: 'Como será o atendimento?', opts: [['Particular', { convenio: 'PARTICULAR' }], ['Plano de saúde', {}], ['SUS', {}]] },
+  { t: 'single', id: 'plano_nome', q: 'Qual plano de saúde?', when: function(A){ return pick(A, 'pagto') === 'Plano de saúde'; },
+    opts: PLANOS.map(function(x){ return [x[0], { convenio: x[1] }]; }).concat([['Outro plano', {}]]) },
+  { t: 'text', id: 'plano_outro', q: 'Nome do plano', when: function(A){ return pick(A, 'plano_nome') === 'Outro plano'; } },
+  { t: 'text', id: 'carteirinha', q: 'Número da carteirinha', mode: 'numeric', opt: 1, when: function(A){ return pick(A, 'pagto') === 'Plano de saúde'; } },
+  { t: 'checks', id: 'comunic', q: 'Alguma destas situações vale para o paciente?', help: 'Assim a equipe se prepara para conversar da melhor forma.', none: 'Nenhuma', items: [
+    { l: 'Não ouve bem', v: 'dificuldade auditiva', cm: 'Surdez', d: false }, { l: 'Não enxerga bem', v: 'deficiência visual', cm: 'Deficiência visual', d: false },
+    { l: 'Não fala português', v: 'não fala português', cm: 'Outro idioma', d: 'qual idioma?' }, { l: 'Tem dificuldade para entender explicações', v: 'dificuldade de compreensão', cm: 'Deficiência cognitiva', d: false },
+    { l: 'Precisa de acompanhante o tempo todo', v: 'necessita acompanhante', cm: 'Outro', d: false }] }
+]},
+
+{ id: 'cirurgia', title: 'A cirurgia marcada', intro: 'Responda com as palavras que o seu médico usou. Não precisa ser o nome técnico.', qs: [
+  { t: 'text', id: 'cirurgia', q: 'Qual cirurgia ou procedimento vai fazer?', help: 'Se tiver o pedido do cirurgião em mãos, copie o nome que está nele.', ph: 'ex.: tirar a vesícula por vídeo', f: 'cirurgia' },
+  { t: 'single', id: 'lado', q: 'É de algum lado do corpo?', opts: [['Lado direito', { lateralidade: 'Direita' }], ['Lado esquerdo', { lateralidade: 'Esquerda' }], ['Os dois lados', { lateralidade: 'Bilateral' }], ['Não tem lado', { lateralidade: 'Não se aplica' }], ['Não sei', {}]] },
+  { t: 'text', id: 'cirurgiao', q: 'Nome do cirurgião', f: 'cirurgiao' },
+  { t: 'single', id: 'hospital', q: 'Onde será a cirurgia?', opts: [['Hospital de Ilhéus', { hospital: 'Hospital de Ilhéus' }], ['Clínica CEM Dores', { hospital: 'Clínica CEM Dores' }], ['Hospital de Olhos Cenoe', { hospital: 'Outro', hospital_outro: 'Hospital de Olhos Cenoe' }], ['Outro', { hospital: 'Outro' }]] },
+  { t: 'text', id: 'hospital_outro', q: 'Qual hospital ou clínica?', f: 'hospital_outro', when: function(A){ return pick(A, 'hospital') === 'Outro'; } },
+  { t: 'date', id: 'data_cir', q: 'Data da cirurgia', f: 'data_cir', alt: 'Ainda não tem data marcada' },
+]},
+
+{ id: 'anestesias', title: 'Cirurgias e anestesias anteriores', qs: [
+  { t: 'single', id: 'anest_previa', q: 'O paciente já fez alguma cirurgia ou recebeu anestesia?', help: 'Conta também anestesia para exame (endoscopia, colonoscopia), parto e dentista com sedação.', inline: 1, opts: [[NO, { anest_previa: 'Não' }], [YES, { anest_previa: 'Sim' }]] },
+  { t: 'rows', id: 'cirurgias', q: 'Quais foram?', help: 'Coloque as mais importantes. Se não lembrar de algo, pule.', add: 'Adicionar outra cirurgia', f: 'cirurgias', min: 1,
+    when: function(A){ return pick(A, 'anest_previa') === YES; },
+    cols: [{ k: 'proc', l: 'Qual cirurgia ou exame', ph: 'cesárea, joelho, endoscopia…' },
+      { k: 'mes', l: 'Mês (1 a 12)', ph: '6', mode: 'numeric', alt: 'Não lembro' },
+      { k: 'ano', l: 'Ano', ph: '2015', mode: 'numeric', alt: 'Não lembro' },
+      { k: 'tipo', l: 'Como foi a anestesia?', rl: 'anestesia', opts: ANEST_TIPOS.map(function(x){ return x[0]; }) },
+      { k: 'hosp', l: 'Hospital', ph: 'opcional' },
+      { k: 'teve', l: 'Teve algum problema?', rl: 'teve problema', opts: [NO, YES] },
+      { k: 'prob', l: 'O que aconteceu?', when: function(r){ return r.teve === YES; } }],
+    /* Colunas do Prontuário: Data (mm/aaaa) | Procedimento | Tipo de anestesia | Hospital | Intercorrências */
+    row: function(r){
+      var t = ANEST_TIPOS.filter(function(x){ return x[0] === r.tipo; })[0];
+      var ano = r.ano_alt ? '' : clean(r.ano).replace(/\D/g, ''), mes = r.mes_alt ? '' : clean(r.mes).replace(/\D/g, '');
+      var okAno = /^(19|20)\d\d$/.test(ano), okMes = +mes >= 1 && +mes <= 12;
+      var data = okAno && okMes ? pad2m(mes) + '/' + ano : '';
+      var proc = clean(r.proc);
+      if (!data && okAno) proc += (proc ? ' ' : '') + '(' + ano + ')';
+      if (t && t[0] === ANEST_TIPOS[1][0]) proc += (proc ? ' — ' : '') + 'anestesia nas costas (raqui ou peridural, a confirmar)';
+      return [data, proc, t ? t[1] : '', clean(r.hosp), r.teve === YES ? (clean(r.prob) || 'Sim, sem detalhes') : (r.teve === NO ? 'Nenhuma' : '')];
+    } },
+  { t: 'single', id: 'compl_pos', q: 'Depois de alguma cirurgia, teve algum problema ao acordar ou nos dias seguintes?', inline: 1, when: function(A){ return pick(A, 'anest_previa') === YES; }, opts: [[NO], [YES], ['Não lembro']] },
+  { t: 'checks', id: 'compl_anest_pos', q: 'O que aconteceu?', when: function(A){ return pick(A, 'anest_previa') === YES && pick(A, 'compl_pos') === YES; }, items: [
+    { k: 'c_nvpo', l: 'Enjoo ou vômito forte' },
+    { k: 'c_desp', l: 'Demorou muito para acordar' },
+    { k: 'c_delirium', l: 'Acordou muito agitado(a) ou confuso(a)' },
+    { k: 'c_dor', l: 'Dor muito forte, difícil de controlar' },
+    { k: 'c_cpp', l: 'Dor de cabeça forte depois de anestesia nas costas, que piorava ao ficar de pé', d: 'precisou de algum tratamento?' },
+    { k: 'c_retencao', l: 'Não conseguiu urinar e precisou de sonda' }] },
+  { t: 'single', id: 'compl_intra', q: 'Algum médico já contou que aconteceu algum problema durante a sua anestesia?', inline: 1, when: function(A){ return pick(A, 'anest_previa') === YES; }, opts: [[NO], [YES], ['Não sei']] },
+  { t: 'checks', id: 'compl_anest_intra', q: 'O que contaram?', when: function(A){ return pick(A, 'anest_previa') === YES && pick(A, 'compl_intra') === YES; }, items: [
+    { k: 'c_vad', l: 'Foi difícil colocar o tubo para respirar', d: 'recebeu carta ou relatório sobre isso?' },
+    { k: 'c_anafilaxia', l: 'Teve alergia grave', d: 'a quê? o que aconteceu?' },
+    { k: 'c_broncoesp', l: 'Teve crise de falta de ar ou chiado' },
+    { k: 'c_hm', l: 'Teve febre muito alta ou os músculos ficaram duros' },
+    { k: 'c_desp', dp: 'demorou para voltar a respirar sozinho(a)', l: 'Demorou muito para voltar a respirar sozinho(a)' },
+    { k: 'c_aspir', l: 'Vomitou e o vômito foi para o pulmão' },
+    { k: 'c_hemod', l: 'Teve parada do coração ou queda grave da pressão' },
+    { k: 'c_uti', l: 'Precisou ir para a UTI sem estar previsto' },
+    { k: 'c_lesao_dent', l: 'Quebrou ou machucou algum dente' },
+    { k: 'c_bloqueio', l: 'A anestesia nas costas, no braço ou na perna não pegou, ou ficou dormência depois' },
+    { k: 'c_awareness', l: 'Acordou ou lembra de algo durante a cirurgia' }] },
+  { t: 'single', id: 'cinetose', q: 'Costuma enjoar em carro, barco ou avião?', inline: 1, opts: [[YES, { ap_h: true }], [NO], ['Às vezes', { ap_h: true }]] },
+  { t: 'single', id: 'fam_tri', q: 'Alguém da família de sangue (pais, irmãos, avós, tios, filhos) tem pressão alta ou diabetes, ou já teve problema sério com anestesia, sangramento fácil, trombose, doença dos músculos ou infarto cedo?', opts: [[NO], [YES], ['Não sei']] },
+  { t: 'checks', id: 'fam_anest', q: 'Quem e o quê?', help: 'Marque o que aconteceu e escreva quem foi.', when: function(A){ return pick(A, 'fam_tri') === YES; }, items: [
+    { k: 'f_hm', l: 'Febre muito alta, problema grave ou morte durante anestesia, sem explicação', d: 'quem?' },
+    { k: 'f_genetica', dp: 'demora para voltar a respirar após anestesia', l: 'Demorou muito para voltar a respirar depois de anestesia', d: 'quem?' },
+    { k: 'f_miopatia', l: 'Doença dos músculos (distrofia muscular)', d: 'quem?' },
+    { k: 'f_coag', l: 'Hemofilia ou sangramento fácil', d: 'quem?' },
+    { k: 'f_tev', l: 'Trombose (coágulo nas pernas ou no pulmão)', d: 'quem?' },
+    { k: 'f_dac', l: 'Infarto ou morte súbita cedo (homem antes dos 55, mulher antes dos 65 anos)', d: 'quem? com que idade?' },
+    { k: 'f_has', l: 'Pressão alta', d: 'quem?' },
+    { k: 'f_dm', l: 'Diabetes', d: 'quem?' },
+    { k: 'f_genetica', dp: 'porfiria', l: 'Porfiria', d: 'quem?' },
+    { k: 'f_genetica', l: 'Outra doença genética ou hereditária', d: 'qual? quem?' }] }
+]},
+
+{ id: 'alergias', title: 'Alergias', qs: [
+  { t: 'single', id: 'alergia', q: 'O paciente tem alguma alergia?', help: 'A remédios, alimentos, materiais ou qualquer outra coisa.', opts: [['Não tenho alergia conhecida', { alergia_status: 'Nega alergias' }], ['Sim, tenho alergia', { alergia_status: 'Sim' }], ['Não sei', {}]] },
+  { t: 'checks', id: 'alerg_esp', q: 'A quê?', help: 'Marque tudo o que se aplica e conte o que aconteceu (coceira, inchaço, falta de ar, desmaio…).', when: function(A){ return pick(A, 'alergia').indexOf('Sim') === 0; }, items: [
+    { k: 'a_analg', l: 'Dipirona (Novalgina) ou anti-inflamatório (ibuprofeno, diclofenaco, nimesulida)', a: 'Dipirona / AINE', d: 'qual? o que aconteceu?' },
+    { k: 'a_atb', l: 'Antibiótico (penicilina, Benzetacil, amoxicilina, cefalexina)', a: 'Antibiótico', d: 'qual? o que aconteceu?' },
+    { k: 'a_latex', l: 'Látex ou borracha (luva, balão, preservativo)', a: 'Látex', d: 'o que aconteceu?' },
+    { k: 'a_adesivo', l: 'Esparadrapo, fita ou curativo adesivo', a: 'Adesivos', d: 'o que aconteceu?' },
+    { k: 'a_iodo', l: 'Iodo ou contraste de exame', a: 'Iodo / contraste', d: 'o que aconteceu?' },
+    { k: 'a_clorex', l: 'Antisséptico de hospital (clorexidina)', a: 'Clorexidina', d: 'o que aconteceu?' },
+    { k: 'a_al', l: 'Anestesia de dentista ou anestesia local', a: 'Anestésico local', d: 'o que aconteceu?' },
+    { k: 'a_opioide', l: 'Remédio forte para dor (morfina, tramadol, codeína)', a: 'Opioide', d: 'qual? o que aconteceu?' },
+    { k: 'a_alim', l: 'Alimentos', a: 'Alimentos', d: 'quais? o que aconteceu?' },
+    { l: 'Outra coisa', a: 'Outros', d: 'a quê? o que aconteceu?' }] },
+  { t: 'checks', id: 'latex_risco', q: 'Alguma destas situações vale para o paciente?', mf: 'latex_risco', none: 'Nenhuma', items: [
+    { l: 'Trabalha na área da saúde ou usa luvas de borracha com frequência', m: 'Exposição ocupacional (profissional de saúde)', d: false },
+    { l: 'Fez muitas cirurgias desde criança', m: 'Múltiplas cirurgias (espinha bífida, malformações urológicas)', d: false },
+    { l: 'Tem alergia a banana, abacate, kiwi ou castanha', m: 'Alergia a frutas tropicais', d: false },
+    { l: 'Tem rinite, asma ou dermatite alérgica', m: 'Atopia', d: false }] }
+]},
+
+{ id: 'remedios', title: 'Remédios em uso', intro: 'Inclua remédios de uso contínuo, injeções, pomadas, colírios, bombinhas e anticoncepcional. Se ficar mais fácil, pegue as caixas ou as receitas.', qs: [
+  { t: 'single', id: 'meds_usa', q: 'O paciente usa algum remédio?', inline: 1, opts: [['Não uso remédios', { meds_status: 'Não usa medicamentos' }], ['Sim', { meds_status: 'Sim' }]] },
+  { t: 'rows', id: 'meds', q: 'Quais remédios?', add: 'Adicionar outro remédio', f: 'meds_tab', min: 1,
+    when: function(A){ return pick(A, 'meds_usa') === 'Sim'; },
+    cols: [{ k: 'n', l: 'Nome do remédio', ph: 'Losartana' }, { k: 'd', l: 'Dose', ph: '50 mg' }, { k: 'p', l: 'Horários ou como toma', ph: '8h e 20h' }, { k: 'i', l: 'Para que serve', ph: 'pressão' }, { k: 't', l: 'Há quanto tempo usa', ph: '2 anos' }],
+    /* Colunas do Prontuário: Nome | Dose | Horário | Última dose | Tempo de uso */
+    row: function(r){ var n = clean(r.n); if (n && clean(r.i)) n += ' (para ' + clean(r.i) + ')'; return [n, clean(r.d), clean(r.p), '', clean(r.t)]; } },
+  { t: 'checks', id: 'meds_classes', q: 'Usa algum destes? Marque mesmo que já tenha escrito acima.', help: 'Alguns precisam ser suspensos dias antes da cirurgia.', mf: 'meds_classes', none: 'Nenhum destes', rowsTo: 'meds_tab', items: [
+    { l: 'Ozempic, Wegovy, Mounjaro, Saxenda, Victoza, Trulicity ou Rybelsus (caneta ou comprimido para diabetes ou emagrecer)', m: 'Agonista GLP-1 / tirzepatida (semaglutida, liraglutida…)', a: 'Agonista GLP-1', d: 'qual? em que dia foi a última dose?' },
+    { l: 'Marevan ou Coumadin (varfarina)', m: 'Varfarina', a: 'Varfarina', d: 'última dose?' },
+    { l: 'Xarelto, Eliquis, Pradaxa ou Lixiana (para afinar o sangue)', m: 'Anticoagulante oral direto (rivaroxabana, apixabana, dabigatrana, edoxabana)', a: 'Anticoagulante oral direto', d: 'qual? última dose?' },
+    { l: 'Injeção na barriga para trombose (Clexane, enoxaparina)', m: 'Heparina / enoxaparina', a: 'Enoxaparina', d: 'dose e última aplicação?' },
+    { l: 'AAS, Aspirina ou Somalgin', m: 'AAS', a: 'AAS', d: false },
+    { l: 'Clopidogrel (Plavix), Brilinta ou Effient', m: 'Clopidogrel / prasugrel / ticagrelor', a: 'Antiagregante', d: 'qual? última dose?' },
+    { l: 'Forxiga, Jardiance, Xigduo ou Glyxambi', m: 'iSGLT2 (dapagliflozina, empagliflozina…)', a: 'iSGLT2', d: false },
+    { l: 'Insulina', m: 'Insulina', a: 'Insulina', d: 'qual e quantas unidades?' },
+    { l: 'Comprimido para diabetes (metformina, Glifage, gliclazida…)', m: 'Antidiabético oral', d: false },
+    { l: 'Remédio para pressão', m: '', d: false },
+    { l: 'Corticoide (prednisona, prednisolona, dexametasona) por mais de 3 semanas', m: 'Corticoide sistêmico', d: false },
+    { l: 'Remédio para emagrecer (sibutramina, anfepramona, femproporex…)', m: 'Anorexígeno / emagrecedor', d: false },
+    { l: 'Viagra ou Cialis (sildenafila, tadalafila)', m: 'Inibidor da PDE-5 (sildenafila, tadalafila)', d: false },
+    { l: 'Anticoncepcional, reposição hormonal ou tamoxifeno', m: 'Anticoncepcional / TRH / tamoxifeno', d: false },
+    { l: 'Antidepressivo', m: 'Antidepressivo', d: false },
+    { l: 'Calmante ou remédio para dormir (Rivotril, clonazepam, alprazolam, diazepam)', m: 'Benzodiazepínico', d: false },
+    { l: 'Lítio', m: 'Lítio', d: false },
+    { l: 'Remédio forte para dor todos os dias (morfina, tramadol, metadona, buprenorfina)', m: 'Opioide crônico / buprenorfina / metadona', d: false },
+    { l: 'Remédio para convulsão', m: 'Anticonvulsivante', d: false },
+    { l: 'Remédio para tireoide', m: 'Levotiroxina / antitireoidiano', d: false },
+    { l: 'Bombinha para asma ou bronquite', m: 'Broncodilatador inalatório', d: false },
+    { l: 'Colírio para glaucoma', m: 'Colírio para glaucoma', d: false },
+    { l: 'Remédio que baixa a imunidade ou injeção biológica (artrite, psoríase, transplante)', m: 'Imunossupressor / biológico', d: false },
+    { l: 'Canabidiol ou cannabis medicinal', m: 'Canabidiol / cannabis medicinal', d: false }] },
+  { t: 'single', id: 'supl_usa', q: 'Usa suplemento, vitamina, chá ou remédio natural?', inline: 1, opts: [[NO, { supl_status: 'Não' }], [YES, { supl_status: 'Sim' }]] },
+  { t: 'checks', id: 'supl', q: 'Quais?', mf: 'supl', when: function(A){ return pick(A, 'supl_usa') === YES; }, items: [
+    'Ômega-3 / óleo de peixe', 'Vitamina E', 'Ginkgo biloba', 'Alho (cápsulas)', 'Ginseng', 'Gengibre', 'Erva-de-são-joão (hipérico)', 'Kava-kava', 'Valeriana', 'Equinácea', 'Cúrcuma', 'Extrato de chá verde', 'Castanha-da-índia', 'Melatonina', 'Whey / creatina', 'Termogênicos / pré-treino', 'Fórmulas para emagrecer', ['Chás, garrafadas ou homeopatia', 'Chás, garrafadas, homeopatia']].map(function(x){ return Array.isArray(x) ? { l: x[0], m: x[1], d: false } : { l: x, m: x, d: false }; }) },
+  { t: 'rows', id: 'supl_rows', q: 'Como toma cada um?', help: 'Opcional. Ajuda a decidir quando parar antes da cirurgia.', add: 'Adicionar outro produto', f: 'supl_tab', min: 1, opt: 1, when: function(A){ return pick(A, 'supl_usa') === YES; },
+    cols: [{ k: 'n', l: 'Produto', ph: 'Ômega-3' }, { k: 'd', l: 'Quanto toma', ph: '1 cápsula' }, { k: 'h', l: 'Horário', ph: 'no almoço' }, { k: 'u', l: 'Última vez que tomou', ph: 'ontem' }, { k: 't', l: 'Há quanto tempo usa', ph: '2 anos' }],
+    /* Colunas do Prontuário: Nome do produto | Dose | Horário | Última dose | Tempo de uso */
+    row: function(r){ return [clean(r.n), clean(r.d), clean(r.h), clean(r.u), clean(r.t)]; } }
+]},
+
+{ id: 'coracao', title: 'Coração e circulação', intro: 'Marque o que o paciente tem ou já teve. Se quiser, conte mais no espaço que aparece.', qs: [
+  { t: 'checks', id: 'cv_doencas', q: 'Tem ou já teve?', sys: 'cv', none: 'Não tenho nenhum destes', items: [
+    { k: 'has', l: 'Pressão alta', d: 'há quanto tempo? costuma ficar controlada?' },
+    { k: 'iam', l: 'Infarto', d: 'quando?' },
+    { k: 'dac', l: 'Angina ou entupimento nas artérias do coração' },
+    { k: 'revasc', l: 'Cateterismo com stent ou ponte de safena', d: 'quando?' },
+    { k: 'icc', l: 'Insuficiência cardíaca ("coração fraco" ou "coração grande")' },
+    { k: 'valv', l: 'Problema nas válvulas do coração', d: 'qual válvula? sabe o nome?' },
+    { k: 'arritmia', l: 'Arritmia, coração acelerado ou batendo irregular', d: 'usa remédio para afinar o sangue?' },
+    { k: 'sopro', l: 'Sopro no coração' },
+    { k: 'cong', l: 'Problema no coração desde o nascimento' },
+    { k: 'chagas', l: 'Doença de Chagas' },
+    { k: 'fr', l: 'Febre reumática' },
+    { k: 'hp', l: 'Pressão alta no pulmão (hipertensão pulmonar)' },
+    { k: 'tev', l: 'Trombose (coágulo) na perna ou no pulmão', d: 'quando? como tratou?' },
+    { k: 'varizes', l: 'Varizes' },
+    { k: 'dap', l: 'Dor nas pernas ao caminhar, que passa quando para' },
+    { k: 'aneur', l: 'Aneurisma da aorta' }] },
+  { t: 'checks', id: 'cv_sint', q: 'Nos últimos meses, tem sentido algum destes?', sys: 'cv', none: 'Nenhum destes', items: [
+    { k: 'dor_tor', l: 'Dor ou aperto no peito', d: 'quando aparece? quanto tempo dura?' },
+    { k: 'palp', l: 'Coração batendo forte ou acelerado sem motivo' },
+    { k: 'sincope', l: 'Desmaio ou sensação de que vai desmaiar' },
+    { k: 'dpn', l: 'Falta de ar ao deitar, precisa de mais travesseiros ou acorda sem ar' },
+    { k: 'edema', l: 'Pernas ou tornozelos inchados' }] }
+]},
+
+{ id: 'pulmao', title: 'Pulmões e sono', qs: [
+  { t: 'checks', id: 'resp_doencas', q: 'Tem ou já teve?', sys: 'resp', none: 'Não tenho nenhum destes', items: [
+    { k: 'asma', l: 'Asma ou bronquite', d: 'quando foi a última crise? já precisou internar?' },
+    { k: 'dpoc', l: 'Enfisema ou DPOC' },
+    { k: 'saos', l: 'Apneia do sono diagnosticada', d: 'usa CPAP?' },
+    { k: 'covid', l: 'COVID-19', d: 'quando? precisou internar?' },
+    { k: 'pneumonia', l: 'Pneumonia nos últimos meses' },
+    { k: 'tb', l: 'Tuberculose', d: 'quando? fez o tratamento completo?' },
+    { k: 'intersticial', l: 'Fibrose no pulmão' },
+    { k: 'bronquiect', l: 'Bronquiectasia ou fibrose cística' },
+    { k: 'ressec', l: 'Já operou o pulmão' },
+    { k: 'o2dom', l: 'Usa oxigênio em casa' }] },
+  { t: 'checks', id: 'resp_sint', q: 'Tem sentido algum destes?', sys: 'resp', none: 'Nenhum destes', items: [
+    { k: 'ivas', l: 'Gripe, resfriado, tosse ou febre nas últimas 4 semanas', d: 'quando começou? ainda tem sintomas?' },
+    { k: 'tosse', l: 'Tosse ou catarro quase todo dia' },
+    { k: 'dispneia', l: 'Falta de ar nas atividades do dia a dia' },
+    { k: 'hemoptise', l: 'Tosse com sangue' }] },
+  { t: 'checks', id: 'sono', q: 'Sobre o sono:', sys: 'resp', none: 'Nenhum destes', items: [
+    { k: 'ronco', l: 'Ronca alto (dá para ouvir de outro cômodo, ou alguém reclama)', d: false },
+    { k: 'sb_o', l: 'Alguém já viu o paciente parar de respirar ou engasgar dormindo', d: false, nosys: 1 },
+    { k: 'sb_t', l: 'Sente cansaço ou sono durante o dia com frequência', d: false, nosys: 1 }] }
+]},
+
+{ id: 'neuro', title: 'Cérebro, nervos e emoções', qs: [
+  { t: 'checks', id: 'neuro_d', q: 'Tem ou já teve?', sys: 'neuro', none: 'Não tenho nenhum destes', items: [
+    { k: 'avc', l: 'Derrame (AVC) ou isquemia passageira', d: 'quando? ficou alguma sequela?' },
+    { k: 'epilepsia', l: 'Epilepsia ou convulsões', d: 'quando foi a última crise?' },
+    { k: 'cefaleia', l: 'Enxaqueca ou dor de cabeça frequente' },
+    { k: 'desmaio', l: 'Desmaios ou perda de consciência' },
+    { k: 'parestesia', l: 'Dormência ou formigamento', d: 'em que parte do corpo?' },
+    { k: 'paralisia', l: 'Fraqueza ou paralisia em alguma parte do corpo', d: 'onde?' },
+    { k: 'demencia', l: 'Problema de memória ou demência' },
+    { k: 'parkinson', l: 'Doença de Parkinson' },
+    { k: 'neuromusc', l: 'Doença dos músculos ou dos nervos (miastenia, distrofia, ELA)', d: 'qual?' },
+    { k: 'em', l: 'Esclerose múltipla' },
+    { k: 'neuropatia', l: 'Neuropatia (nervos das mãos ou pés afetados)' },
+    { k: 'lesao_med', l: 'Lesão na medula (coluna)', d: 'em que altura?' },
+    { k: 'tce', l: 'Pancada forte na cabeça (traumatismo craniano)' },
+    { k: 'hic', l: 'Tumor no cérebro' },
+    { k: 'aneur_cer', l: 'Aneurisma no cérebro' },
+    { k: 'hidrocef', l: 'Hidrocefalia' }] },
+  { t: 'checks', id: 'psiq_d', q: 'Faz ou já fez tratamento para algum destes?', help: 'Ajuda a equipe a deixar o paciente mais tranquilo e a escolher os remédios certos.', sys: 'psiq', none: 'Nenhum destes', items: [
+    { k: 'ansiedade', l: 'Ansiedade' },
+    { k: 'depressao', l: 'Depressão' },
+    { k: 'insonia', l: 'Insônia frequente' },
+    { k: 'bipolar', l: 'Transtorno bipolar', d: 'usa lítio?' },
+    { k: 'esquizo', l: 'Esquizofrenia ou psicose' },
+    { k: 'tdah', l: 'TDAH' },
+    { k: 'tea', l: 'Autismo (TEA)', d: 'o que ajuda a acalmar?' },
+    { k: 'tca', l: 'Transtorno alimentar (anorexia, bulimia, compulsão)' },
+    { k: 'dep_quim', l: 'Dependência de álcool ou drogas, em tratamento' }] }
+]},
+
+{ id: 'metab', title: 'Hormônios, rins e digestão', qs: [
+  { t: 'checks', id: 'endo_d', q: 'Diabetes, tireoide e hormônios:', sys: 'endo', none: 'Não tenho nenhum destes', items: [
+    { k: 'dm2', l: 'Diabetes tipo 2', d: 'há quanto tempo? sabe a última hemoglobina glicada?' },
+    { k: 'dm1', l: 'Diabetes tipo 1' },
+    { k: 'dm_insulina', l: 'Usa insulina', d: 'qual e quantas unidades?' },
+    { k: 'dm_compl', l: 'O diabetes já afetou rins, nervos, olhos ou estômago' },
+    { k: 'hipotireo', l: 'Hipotireoidismo (tireoide lenta)' },
+    { k: 'hipertireo', l: 'Hipertireoidismo (tireoide acelerada)' },
+    { k: 'bocio', l: 'Bócio ou nódulo na tireoide' },
+    { k: 'obesidade', l: 'Obesidade' },
+    { k: 'dislip', l: 'Colesterol ou triglicerídeos altos' },
+    { k: 'gota', l: 'Gota ou ácido úrico alto' },
+    { k: 'adrenal', l: 'Problema na glândula suprarrenal, ou usa corticoide há muito tempo' },
+    { k: 'cushing', l: 'Síndrome de Cushing' },
+    { k: 'feo', l: 'Feocromocitoma' },
+    { k: 'paratireo', l: 'Problema nas paratireoides' },
+    { k: 'hipofise', l: 'Problema na hipófise ou acromegalia' },
+    { k: 'porfiria', l: 'Porfiria' }] },
+  { t: 'checks', id: 'renal_d', q: 'Rins e urina:', sys: 'renal', none: 'Não tenho nenhum destes', items: [
+    { k: 'drc', l: 'Doença nos rins ("rins fracos")' },
+    { k: 'dialise', l: 'Faz hemodiálise ou diálise', d: 'que dias? quando foi a última?' },
+    { k: 'tx_renal', l: 'Transplante de rim' },
+    { k: 'litiase', l: 'Pedra nos rins' },
+    { k: 'itu', l: 'Infecção urinária agora ou frequente' },
+    { k: 'hpb', l: 'Próstata aumentada ou dificuldade para urinar' },
+    { k: 'disuria', l: 'Dor ou ardência ao urinar, ou sangue na urina' }] },
+  { t: 'checks', id: 'gi_d', q: 'Estômago, intestino e fígado:', sys: 'gi', none: 'Não tenho nenhum destes', items: [
+    { k: 'drge', l: 'Refluxo ou azia', d: 'tem sentido com frequência?' },
+    { k: 'hiato', l: 'Hérnia de hiato' },
+    { k: 'ulcera', l: 'Gastrite ou úlcera' },
+    { k: 'gastrop', l: 'Estômago que demora a esvaziar (gastroparesia)' },
+    { k: 'disfagia', l: 'Dificuldade para engolir' },
+    { k: 'nv', l: 'Enjoo ou vômito frequente' },
+    { k: 'vesicula', l: 'Pedra na vesícula' },
+    { k: 'bariatrica', l: 'Cirurgia bariátrica (redução do estômago)', d: 'quando? qual técnica?' },
+    { k: 'dii', l: 'Doença de Crohn ou retocolite' },
+    { k: 'hepatite', l: 'Hepatite', d: 'qual (A, B, C)? está curada?' },
+    { k: 'esteatose', l: 'Gordura no fígado' },
+    { k: 'cirrose', l: 'Cirrose' },
+    { k: 'varizes_esof', l: 'Varizes no esôfago' },
+    { k: 'pancreat', l: 'Pancreatite' },
+    { k: 'esquisto', l: 'Esquistossomose ("barriga d\'água")' },
+    { k: 'hda', l: 'Sangramento pelo estômago ou intestino (vômito com sangue, fezes pretas)' },
+    { k: 'obstr', l: 'Intestino parado há dias com barriga muito estufada' },
+    { k: 'perda_peso', l: 'Perdeu muito peso nos últimos 6 meses sem querer', d: 'quantos quilos?' }] }
+]},
+
+{ id: 'sangue', title: 'Sangue, imunidade e câncer', qs: [
+  { t: 'checks', id: 'hemato_d', q: 'Sangue e coagulação:', sys: 'hemato', none: 'Não tenho nenhum destes', items: [
+    { k: 'sangr', l: 'Sangra muito ao extrair dente, em cortes, na menstruação ou em cirurgias', d: 'em que situação?' },
+    { k: 'equimose', l: 'Fica roxo(a) com facilidade ou sangra na gengiva' },
+    { k: 'anemia', l: 'Anemia' },
+    { k: 'falciforme', l: 'Anemia falciforme ou traço falcêmico' },
+    { k: 'talassemia', l: 'Talassemia' },
+    { k: 'hemofilia', l: 'Hemofilia ou doença de von Willebrand' },
+    { k: 'plaqueto', l: 'Plaquetas baixas' },
+    { k: 'trombofilia', l: 'Trombofilia', d: 'qual?' },
+    { k: 'hit', l: 'Reação à heparina com queda das plaquetas' },
+    { k: 'g6pd', l: 'Deficiência de G6PD' },
+    { k: 'policit', l: 'Sangue grosso (policitemia) ou plaquetas altas' },
+    { k: 'hem_malig', l: 'Leucemia, linfoma ou mieloma' }] },
+  { t: 'checks', id: 'imuno_d', q: 'Imunidade e reumatismo:', sys: 'imuno', none: 'Não tenho nenhum destes', items: [
+    { k: 'ar', l: 'Artrite reumatoide' },
+    { k: 'les', l: 'Lúpus' },
+    { k: 'ea', l: 'Espondilite anquilosante' },
+    { k: 'esclero', l: 'Esclerodermia' },
+    { k: 'vasculite', l: 'Vasculite' },
+    { k: 'colagenose', l: 'Síndrome de Sjögren ou dermatomiosite' },
+    { k: 'dor_cronica', l: 'Fibromialgia ou dor crônica', d: 'usa remédio forte para dor?' },
+    { k: 'hiv', l: 'HIV', d: 'faz tratamento?' },
+    { k: 'imunossup', l: 'Transplante de órgão ou usa remédio que baixa a imunidade' },
+    { k: 'imunodef', l: 'Imunidade baixa (imunodeficiência)' }] },
+  { t: 'checks', id: 'onco_d', q: 'Câncer:', sys: 'onco', none: 'Nunca tive câncer', items: [
+    { k: 'cancer', l: 'Câncer', d: 'qual? quando? como está hoje?' },
+    { k: 'metast', l: 'O câncer se espalhou (metástase)' },
+    { k: 'quimio', l: 'Fez ou faz quimioterapia', d: 'quando foi a última sessão?' },
+    { k: 'radio', l: 'Fez ou faz radioterapia', d: 'em que parte do corpo?' },
+    { k: 'imunoter', l: 'Imunoterapia ou hormonioterapia para câncer' },
+    { k: 'tumor_va', l: 'Tumor na cabeça, no pescoço ou no peito' }] },
+  { t: 'checks', id: 'infec_d', q: 'Infecções:', sys: 'infec', none: 'Nenhuma destas', items: [
+    { k: 'inf_ativa', l: 'Infecção ou febre agora' },
+    { k: 'sindr_gripal', l: 'Gripe ou COVID agora' },
+    { k: 'arbo', l: 'Dengue, zika ou chikungunya no último mês' },
+    { k: 'inf_sitio', l: 'Ferida ou infecção de pele no local da cirurgia' },
+    { k: 'mdr', l: 'Já disseram que tem bactéria resistente (ficou em isolamento)' },
+    { k: 'ist', l: 'Sífilis ou outra infecção sexualmente transmissível' }] }
+]},
+
+{ id: 'corpo', title: 'Ossos, pele, olhos e ouvidos', qs: [
+  { t: 'checks', id: 'musc_d', q: 'Ossos, músculos e coluna:', sys: 'musc', none: 'Não tenho nenhum destes', items: [
+    { k: 'coluna', l: 'Hérnia de disco, bico de papagaio ou dor na coluna', d: 'em que parte? já operou?' },
+    { k: 'cervical', l: 'Pescoço que não dobra bem, ou cirurgia no pescoço' },
+    { k: 'atm', l: 'Dificuldade para abrir bem a boca ou problema na mandíbula' },
+    { k: 'escoliose', l: 'Escoliose ou corcunda' },
+    { k: 'artrose', l: 'Artrose', d: 'onde?' },
+    { k: 'osteopor', l: 'Osteoporose' },
+    { k: 'miopatia', l: 'Fraqueza nos músculos' },
+    { k: 'amput', l: 'Amputação ou deformidade' },
+    { k: 'mobilidade', l: 'Dificuldade para se movimentar ou fica acamado(a)' }] },
+  { t: 'checks', id: 'orl_d', q: 'Nariz, garganta, olhos e pele:', sys: 'orl', none: 'Não tenho nenhum destes', items: [
+    { k: 'rinite', l: 'Rinite ou sinusite' },
+    { k: 'amigdal', l: 'Amigdalite frequente ou amígdalas grandes' },
+    { k: 'rouq', l: 'Rouquidão' },
+    { k: 'estridor', l: 'Barulho alto na garganta ao respirar' },
+    { k: 'epistaxe', l: 'Sangramento no nariz com frequência' },
+    { k: 'surdez', l: 'Perda de audição' },
+    { k: 'glaucoma', l: 'Glaucoma' },
+    { k: 'visao', l: 'Enxerga mal, mesmo com óculos' },
+    { k: 'pele', l: 'Doença de pele (psoríase, dermatite)' },
+    { k: 'queim', l: 'Queimaduras ou cicatrizes grandes' }] },
+  { t: 'area', id: 'outras', q: 'Tem alguma outra doença ou problema de saúde que não apareceu nas listas?', f: 'outras_doencas', opt: 1 }
+]},
+
+{ id: 'mulher', title: 'Saúde da mulher', when: function(A){ var a = age(A); return fem(A) && (a === null || a >= 10); }, qs: [
+  { t: 'single', id: 'menstr', q: 'Sobre a menstruação:', opts: [['Ainda menstruo'], ['Já entrei na menopausa', { menopausa: true }], ['Não menstruo por outro motivo']] },
+  { t: 'date', id: 'dum', q: 'Data da última menstruação', help: 'O dia em que começou a última menstruação.', f: 'dum', alt: 'Não lembro', when: function(A){ return pick(A, 'menstr') === 'Ainda menstruo'; } },
+  { t: 'text', id: 'menop_idade', q: 'Com que idade entrou na menopausa?', opt: 1, when: function(A){ return pick(A, 'menstr') === 'Já entrei na menopausa'; } },
+  { t: 'single', id: 'gravidez', q: 'Existe chance de estar grávida?', opts: [[NO], ['Estou grávida', { gestante: true }], ['Talvez, a menstruação está atrasada', { poss_gest: true }]] },
+  { t: 'text', id: 'ig', q: 'De quantas semanas?', f: 'ig', when: function(A){ return pick(A, 'gravidez') === 'Estou grávida'; } },
+  { t: 'single', id: 'amament', q: 'Está amamentando?', inline: 1, opts: [[NO], [YES, { amament: true }]] },
+  { t: 'nums', id: 'gpa_n', q: 'Quantas vezes já…', help: 'Coloque 0 se nunca.', cols: [{ k: 'g', l: 'ficou grávida' }, { k: 'pn', l: 'teve parto normal' }, { k: 'pc', l: 'teve cesárea' }, { k: 'ab', l: 'perdeu a gestação (aborto)' }] },
+  { t: 'checks', id: 'gine_d', q: 'Alguma destas?', none: 'Nenhuma', items: [
+    { k: 'aco', l: 'Usa anticoncepcional', d: 'qual?' },
+    { k: 'trh', l: 'Faz reposição hormonal' },
+    { k: 'pre_ecl', l: 'Teve pressão alta ou diabetes na gravidez' },
+    { k: 'abortos', l: 'Perdeu 3 ou mais gestações, ou o bebê nasceu sem vida' },
+    { k: 'endom', l: 'Endometriose ou mioma' }] }
+]},
+
+{ id: 'crianca', title: 'Saúde da criança', intro: 'Perguntas para quando o paciente é criança.', when: function(A){ var a = age(A); return a !== null && a < 14; }, qs: [
+  { t: 'checks', id: 'ped_d', q: 'Alguma destas situações?', none: 'Nenhuma', items: [
+    { k: 'prematuro', l: 'Nasceu antes do tempo (prematuro)', d: 'com quantas semanas e que peso?' },
+    { k: 'neonatal', l: 'Ficou em UTI ou teve problema logo depois de nascer' },
+    { k: 'sindrome', l: 'Tem alguma síndrome (Down, Pierre Robin…)', d: 'qual?' },
+    { k: 'desenv', l: 'Atraso no desenvolvimento' },
+    { k: 'vacinas', l: 'Tomou vacina nas últimas 2 semanas ou está com vacinas atrasadas' },
+    { k: 'ivas_ped', l: 'Gripe, resfriado ou febre nas últimas 4 semanas' },
+    { k: 'sibilancia', l: 'Chiado no peito com frequência ou bronquiolite' },
+    { k: 'fum_pass', l: 'Alguém fuma dentro de casa' },
+    { k: 'apneia_ped', l: 'Ronca ou para de respirar dormindo' }] }
+]},
+
+{ id: 'habitos', title: 'Hábitos', intro: 'Estas respostas são protegidas pelo sigilo médico. Servem para a sua segurança: cigarro, álcool e outras substâncias mudam a forma como o corpo reage à anestesia.', qs: [
+  { t: 'single', id: 'tab', q: 'Cigarro:', opts: [['Nunca fumei', { tab: 'Nunca fumou' }], ['Fumo atualmente', { tab: 'Fumante atual' }], ['Já fumei, mas parei', { tab: 'Ex-fumante' }]] },
+  { t: 'nums', id: 'tab_n', q: 'Quanto fuma ou fumava?', when: function(A){ return pick(A, 'tab') && pick(A, 'tab') !== 'Nunca fumei'; }, cols: [{ k: 'cig', l: 'cigarros por dia', f: 'tab_cig' }, { k: 'anos', l: 'anos fumando', f: 'tab_anos' }] },
+  { t: 'nums', id: 'tab_parou', q: 'Há quanto tempo parou?', help: 'Coloque 0 se não se aplica.', when: function(A){ return pick(A, 'tab') === 'Já fumei, mas parei'; }, cols: [{ k: 'a', l: 'anos' }, { k: 'm', l: 'meses' }] },
+  { t: 'checks', id: 'tab_outros', q: 'Usa algum destes?', mf: 'tab_outros', none: 'Nenhum', items: [
+    { l: 'Cigarro eletrônico ou vape', m: 'Cigarro eletrônico / vape', d: false }, { l: 'Narguilé', m: 'Narguilé', d: false },
+    { l: 'Charuto ou cachimbo', m: 'Charuto / cachimbo', d: false }, { l: 'Fumo de mascar', m: 'Tabaco mascado', d: false },
+    { l: 'Convive com quem fuma perto', m: 'Fumante passivo', d: false }] },
+  { t: 'single', id: 'alcool', q: 'Bebida alcoólica:', opts: [['Não bebo', { alcool: 'Não bebe' }], ['Só de vez em quando', { alcool: 'Social / ocasional' }], ['Toda semana', { alcool: 'Regular' }], ['Todo dia ou quase todo dia', { alcool: 'Regular' }], ['Já bebi muito, mas parei', { alcool: 'Ex-etilista' }]] },
+  { t: 'text', id: 'alcool_tipo', q: 'O que bebe e quanto?', ph: 'ex.: 6 latas de cerveja no fim de semana', f: 'alcool_tipo', when: function(A){ var a = pick(A, 'alcool'); return a && a !== 'Não bebo'; } },
+  { t: 'nums', id: 'alcool_n', q: 'Quantas doses por semana, mais ou menos?', help: '1 dose = 1 lata de cerveja, 1 taça de vinho ou 1 dose de destilado.', when: function(A){ var a = pick(A, 'alcool'); return a && a !== 'Não bebo' && a !== 'Já bebi muito, mas parei'; }, cols: [{ k: 'd', l: 'doses por semana', f: 'alcool_doses' }] },
+  { t: 'single', id: 'alcool_abst', q: 'Já passou mal (tremor, suor, agitação) quando ficou sem beber?', inline: 1, when: function(A){ var a = pick(A, 'alcool'); return a && a !== 'Não bebo' && a !== 'Só de vez em quando'; }, opts: [[NO], [YES]] },
+  { t: 'checks', id: 'drogas', q: 'Usa ou já usou alguma destas substâncias?', none: 'Nenhuma', items: [
+    { k: 'd_maconha', l: 'Maconha', d: 'com que frequência? última vez?' },
+    { k: 'd_cocaina', l: 'Cocaína ou crack', d: 'última vez?' },
+    { k: 'd_anfet', l: 'Ecstasy, anfetamina ou outros estimulantes', d: 'última vez?' },
+    { k: 'd_opioides', l: 'Remédio forte para dor sem receita', d: 'qual?' },
+    { k: 'd_bzd', l: 'Calmante sem receita', d: 'qual?' },
+    { k: 'd_anabol', l: 'Anabolizante ou hormônio sem receita', d: 'qual?' },
+    { k: 'd_inj', l: 'Droga injetável' },
+    { txt: 'Outras substâncias', l: 'Outras (loló, lança-perfume, LSD, ketamina)', d: 'qual?' }] },
+  { t: 'text', id: 'cafeina', q: 'Quantas xícaras de café por dia?', f: 'cafeina', mode: 'numeric', opt: 1 },
+  { t: 'single', id: 'ativ_faz', q: 'Faz atividade física?', inline: 1, opts: [[NO], [YES]] },
+  { t: 'rows', id: 'ativ', q: 'Quais atividades?', add: 'Adicionar outra atividade', f: 'atividades', min: 1, when: function(A){ return pick(A, 'ativ_faz') === YES; },
+    cols: [{ k: 'a', l: 'Atividade', ph: 'caminhada' }, { k: 'v', l: 'Quantas vezes', ph: '3', mode: 'numeric' }, { k: 'p', l: 'Por', opts: ['semana', 'mês'] }, { k: 'm', l: 'Duração (minutos)', ph: '40', mode: 'numeric' }],
+    /* Colunas do Prontuário: Atividade | Vezes | Por (semana/mês) | Duração (min) */
+    row: function(r){ return [clean(r.a), clean(r.v).replace(/\D/g, ''), r.p || '', clean(r.m).replace(/\D/g, '')]; } }
+]},
+
+{ id: 'disposicao', title: 'Seu corpo e sua disposição', intro: 'Estas perguntas mostram como o coração e os pulmões aguentam esforço, o que ajuda a planejar a anestesia.', qs: [
+  { t: 'nums', id: 'medidas', q: 'Peso e altura', help: 'Aproximados, se não souber exato.', cols: [{ k: 'peso', l: 'peso em kg', f: 'peso' }, { k: 'altura', l: 'altura em cm', f: 'altura', ph: '165' }] },
+  { t: 'dasi', id: 'dasi', q: 'Hoje, o paciente consegue…', items: [
+    ['dasi1', 'Cuidar de si: comer, vestir-se, tomar banho e usar o banheiro'],
+    ['dasi2', 'Andar dentro de casa'],
+    ['dasi3', 'Andar 1 ou 2 quarteirões no plano'],
+    ['dasi4', 'Subir um lance de escada ou uma ladeira'],
+    ['dasi5', 'Correr uma distância curta'],
+    ['dasi6', 'Fazer serviço leve de casa (tirar pó, lavar louça)'],
+    ['dasi7', 'Fazer serviço moderado de casa (varrer, passar pano, carregar compras)'],
+    ['dasi8', 'Fazer serviço pesado de casa (esfregar o chão, arrastar móveis)'],
+    ['dasi9', 'Trabalhar no quintal ou no jardim (juntar folhas, cortar grama)'],
+    ['dasi10', 'Ter relações sexuais'],
+    ['dasi11', 'Atividades moderadas de lazer (dançar, jogar em dupla)'],
+    ['dasi12', 'Esportes pesados (nadar, jogar futebol ou tênis)']] },
+  { t: 'single', id: 'escada', q: 'Consegue subir 2 andares de escada sem parar?', opts: [
+    ['Sim, subo sem parar', { mets_subj: 'Sim' }],
+    ['Não, preciso parar por cansaço, falta de ar ou dor no peito', { mets_subj: 'Não', limitacao_func: 'Cardiorrespiratório' }],
+    ['Não consigo por outro motivo (joelho, coluna, equilíbrio…)', { mets_subj: 'Não avaliável (limitação não cardíaca)' }]] },
+  { t: 'single', id: 'limitacao', q: 'Qual é o motivo?', when: function(A){ return pick(A, 'escada').indexOf('outro motivo') > -1; }, opts: [['Dor ou problema nos ossos, nas articulações ou na coluna', { limitacao_func: 'Ortopédico' }], ['Outro motivo', { limitacao_func: 'Outro' }]] },
+  { t: 'text', id: 'limitacao_outro', q: 'Qual?', ph: 'ex.: tontura, equilíbrio', f: 'limitacao_func_outro', when: function(A){ return pick(A, 'limitacao') === 'Outro motivo'; } },
+  { t: 'checks', id: 'geriatria', q: 'Alguma destas situações?', help: 'Pergunta feita para pessoas com 65 anos ou mais.', mf: 'geriatria', none: 'Nenhuma', when: function(A){ var a = age(A); return a !== null && a >= 65; }, items: [
+    { l: 'Caiu alguma vez no último ano', m: 'Quedas no último ano', d: false },
+    { l: 'Perdeu peso sem querer', m: 'Perda de peso não intencional', d: false },
+    { l: 'Esquecimento ou dificuldade de memória', m: 'Déficit cognitivo / demência', d: false },
+    { l: 'Precisa de ajuda para tomar banho, vestir-se ou comer', m: 'Dependência para atividades diárias', d: false },
+    { l: 'Enxerga ou ouve mal', m: 'Déficit visual ou auditivo', d: false },
+    { l: 'Já ficou confuso(a) em alguma internação', m: 'Delirium prévio', d: false }] }
+]},
+
+{ id: 'dentes', title: 'Dentes, próteses e adornos', qs: [
+  { t: 'checks', id: 'dent', q: 'Como estão os dentes?', help: 'Durante a anestesia pode ser preciso colocar um tubo pela boca. Saber isso protege seus dentes.', mf: 'dent', items: [
+    { l: 'Tenho todos os dentes, sem problemas', m: 'Dentição íntegra', d: false },
+    { l: 'Dentadura em cima', m: 'Prótese total superior', d: false },
+    { l: 'Dentadura embaixo', m: 'Prótese total inferior', d: false },
+    { l: 'Ponte ou prótese que tira para limpar', m: 'Prótese parcial removível', d: false },
+    { l: 'Ponte fixa ou coroa', m: 'Prótese fixa / ponte', d: false },
+    { l: 'Implante dentário', m: 'Implantes dentários', d: false },
+    { l: 'Dente mole', m: 'Dentes com mobilidade', d: false },
+    { l: 'Dente quebrado ou com cárie', m: 'Dentes fraturados / cariados', d: false },
+    { l: 'Não tenho nenhum dente natural', m: 'Edêntulo', d: false },
+    { l: 'Aparelho nos dentes', m: 'Aparelho ortodôntico', d: false },
+    { l: 'Dentes da frente salientes (para fora)', m: 'Incisivos proeminentes', d: false }] },
+  { t: 'checks', id: 'dent_onde', q: 'Onde ficam esses dentes ou próteses?', opt: 1, mf: 'dent_det', items: [
+    { l: 'Em cima', m: 'Superior', d: false }, { l: 'Embaixo', m: 'Inferior', d: false }, { l: 'Dentes da frente', m: 'Incisivos', d: false },
+    { l: 'Presas (caninos)', m: 'Caninos', d: false }, { l: 'Dentes do lado', m: 'Lateral', d: false }, { l: 'Dentes do fundo', m: 'Molares', d: false },
+    { l: 'Outro lugar', m: 'Outro', d: 'onde?' }], when: function(A){ var s = A.dent; return s && s.on && Object.keys(s.on).some(function(k){ return s.on[k] && +k > 0; }); } },
+  { t: 'checks', id: 'disp', q: 'Tem algum destes no corpo?', none: 'Nenhum destes', items: [
+    { k: 'p_mp', l: 'Marca-passo', d: 'quando foi a última revisão?' },
+    { k: 'p_cdi', l: 'Desfibrilador implantado (CDI)', d: 'quando foi a última revisão?' },
+    { k: 'p_valv', l: 'Válvula artificial no coração', d: 'metálica ou biológica?' },
+    { k: 'p_stent', l: 'Stent (molinha) no coração ou em outro vaso', d: 'quando colocou?' },
+    { k: 'p_orto', l: 'Prótese, pinos ou placas nos ossos', d: 'onde?' },
+    { k: 'p_coluna', l: 'Parafusos ou placas na coluna', d: 'em que altura?' },
+    { k: 'p_fistula', l: 'Fístula no braço para hemodiálise', d: 'qual braço?' },
+    { k: 'p_mastect', l: 'Retirada da mama com esvaziamento da axila', d: 'qual lado?' },
+    { k: 'p_cateter', l: 'Cateter para quimioterapia ou soro (port-a-cath)' },
+    { k: 'p_neuro', l: 'Estimulador implantado ou bomba de remédio na coluna' },
+    { k: 'p_dvp', l: 'Válvula na cabeça (derivação)' },
+    { k: 'p_mama', l: 'Prótese de silicone ou outros implantes', d: 'onde?' },
+    { k: 'p_ocular', l: 'Lente de contato ou prótese no olho' },
+    { k: 'p_auditivo', l: 'Aparelho para ouvir ou implante coclear' },
+    { k: 'p_estomia', l: 'Traqueostomia, sonda no estômago ou bolsa de colostomia' },
+    { txt: 'Outros dispositivos', l: 'Bomba de insulina, sensor de glicose ou outro aparelho', d: 'qual?' }] },
+  { t: 'h', id: 'h_adornos', q: 'Piercings, cílios, unhas e barba' },
+  { t: 'single', id: 'piercing', q: 'Usa piercing?', help: 'Joias e piercings precisam ser retirados antes da cirurgia por causa do bisturi elétrico.', inline: 1, opts: [[NO], [YES]] },
+  { t: 'checks', id: 'piercing_onde', q: 'Onde?', when: function(A){ return pick(A, 'piercing') === YES; }, items: [
+    'Língua ou boca', 'Nariz', 'Sobrancelha ou rosto', 'Orelha', 'Umbigo', 'Mamilo', 'Região íntima', 'Outro lugar'].map(function(x){ return { l: x, d: false }; }) },
+  { t: 'single', id: 'cilios', q: 'Usa cílios artificiais (extensão de cílios)?', help: 'Os olhos ficam protegidos e fechados durante a anestesia.', inline: 1, opts: [[NO], [YES]] },
+  { t: 'single', id: 'unhas', q: 'Usa unhas de gel, acrílico ou fibra?', help: 'O aparelho que mede o oxigênio fica no dedo, e essas unhas podem atrapalhar a leitura.', inline: 1, opts: [[NO], [YES]] },
+  { t: 'single', id: 'barba', q: 'Usa barba?', help: 'A barba pode atrapalhar o encaixe da máscara de oxigênio.', inline: 1, when: function(A){ return pick(A, 'sexo') === 'Masculino'; }, opts: [[NO], [YES, { '+va_achados': 'Barba' }]] }
+]},
+
+{ id: 'transfusao', title: 'Transfusão de sangue', qs: [
+  { t: 'single', id: 'transf_prev', q: 'Já recebeu transfusão de sangue?', opts: [['Não', { transf_prev: 'Não' }], ['Sim', { transf_prev: 'Sim' }], ['Não sei', { transf_prev: 'Não sabe' }]] },
+  { t: 'rows', id: 'transf', q: 'Quando e por quê?', add: 'Adicionar outra transfusão', f: 'transf_tab', min: 1, when: function(A){ return pick(A, 'transf_prev') === 'Sim'; },
+    cols: [{ k: 'q', l: 'Quando', ph: '2019' }, { k: 'm', l: 'Motivo', ph: 'parto, cirurgia, anemia…' }, { k: 'r', l: 'Teve alguma reação?', ph: 'deixe em branco se não teve' }],
+    /* Colunas do Prontuário: Data (dd/mm/aaaa) | Hemocomponente | Nº de bolsas | Motivo | Reação transfusional */
+    row: function(r){ var m = clean(r.m); if (clean(r.q)) m += (m ? ' ' : '') + '(' + clean(r.q) + ')'; return ['', '', '', m, clean(r.r)]; } },
+  { t: 'text', id: 'tipo_sang', q: 'Sabe o tipo de sangue?', ph: 'ex.: O+', f: 'tipo_sang', opt: 1 },
+  { t: 'single', id: 'aceita', q: 'Se for necessário durante a cirurgia, aceita receber sangue?', opts: [
+    ['Sim, aceito', { aceita_transf: 'Sim' }], ['Não aceito', { aceita_transf: 'Não (recusa)' }], ['Aceito apenas alguns tratamentos', { aceita_transf: 'Aceita parcialmente' }], ['Quero conversar com o médico antes', {}]] },
+  { t: 'text', id: 'transf_motivo', q: 'Pode contar o motivo?', help: 'A equipe respeita a sua decisão e vai conversar sobre alternativas.', ph: 'ex.: sou Testemunha de Jeová', f: 'transf_religiao', opt: 1, when: function(A){ var a = pick(A, 'aceita'); return a === 'Não aceito' || a === 'Aceito apenas alguns tratamentos'; } },
+  { t: 'text', id: 'transf_aceita_det', q: 'O que aceita?', ph: 'ex.: albumina, recuperação do próprio sangue', f: 'transf_aceita_det', opt: 1, when: function(A){ return pick(A, 'aceita') === 'Aceito apenas alguns tratamentos'; } }
+]},
+
+{ id: 'final', title: 'Para terminar', qs: [
+  { t: 'single', id: 'risco_card', q: 'Passou por avaliação com cardiologista para esta cirurgia?', inline: 1, opts: [[NO], [YES], ['Ainda vou passar']] },
+  { t: 'text', id: 'rcv_medico', q: 'Nome do cardiologista', f: 'rcv_medico', opt: 1, when: function(A){ return pick(A, 'risco_card') === YES; } },
+  { t: 'date', id: 'rcv_data', q: 'Data da consulta', f: 'rcv_data', opt: 1, when: function(A){ return pick(A, 'risco_card') === YES; } },
+  { t: 'area', id: 'exames_feitos', q: 'Fez exames recentes? Quais e onde?', help: 'Leve os resultados no dia da consulta. Em breve será possível enviar fotos por aqui.', ph: 'ex.: exame de sangue e eletrocardiograma no laboratório X, em setembro', opt: 1 },
+  { t: 'single', id: 'acomp', q: 'Terá um adulto para acompanhar no dia da cirurgia e levar para casa?', inline: 1, opts: [[YES], [NO], ['Ainda não sei']] },
+  { t: 'area', id: 'duvidas', q: 'Tem alguma dúvida ou medo sobre a anestesia?', help: 'O anestesista vai conversar sobre isso com você.', opt: 1 },
+  { t: 'area', id: 'algo_mais', q: 'Quer contar mais alguma coisa para a equipe?', opt: 1 }
+]}
+];
+
+var QI = {};
+STEPS.forEach(function(s){ s.qs.forEach(function(q){ QI[q.id] = q; q.step = s; if (q.t === 'checks' && q.items) q.items.forEach(function(it, i){ it.i = i; }); }); });
+
+/* ---------- Estado ---------- */
+var KEY = 'pa-paciente-rascunho-v1';
+var DEMO_TXT = document.getElementById('demo').textContent;
+var A = {}, cur = 0, consent = false, consentAt = '', termoLido = false, termoLidoEm = '', phase = 'form', isDemo = false;
+function load(){ try { var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch (e){ return null; } }
+var saveT;
+function save(){
+  if (isDemo) return;
+  if (!consent && !Object.keys(A).length) return;
+  clearTimeout(saveT);
+  saveT = setTimeout(function(){
+    try { localStorage.setItem(KEY, JSON.stringify({ A: A, cur: cur, consent: consent, consentAt: consentAt, termoLido: termoLido, termoLidoEm: termoLidoEm, t: Date.now() })); $('saved').textContent = 'Respostas guardadas neste aparelho'; } catch (e){ $('saved').textContent = ''; }
+  }, 300);
+}
+function wipe(){ try { localStorage.removeItem(KEY); } catch (e){} }
+
+/* ---------- Convite enviado pela equipe (link pessoal do WhatsApp) ---------- */
+var SBQ_CFG = { url: 'https://jpqetogjtnimcrwymarl.supabase.co', chave: 'sb_publishable_fV5KUV6ynUMQER5XR4UypA_k84e-kp_' };
+var CONV = (function(){ var m = /[#&]t=([A-Za-z0-9_.\-]{20,100})/.exec(location.hash || ''); return m ? { token: m[1] } : null; })();
+var SBQ = null, srvT = null;
+if (CONV){ KEY = KEY + ':' + CONV.token.slice(0, 12); try { history.replaceState(null, '', location.pathname + location.search + '#t=' + CONV.token); } catch (e){} }
+function estadoAtual(){ return { A: A, cur: cur, consent: consent, consentAt: consentAt, termoLido: termoLido, termoLidoEm: termoLidoEm }; }
+function salvarServidor(final){
+  if (!CONV || !SBQ || isDemo) return Promise.resolve({ ok: true });
+  var dados = { estado: estadoAtual() };
+  if (final) dados.pacote = build();
+  return SBQ.rpc('questionario_salvar', { p_token: CONV.token, p_dados: dados, p_finalizar: !!final }).then(function(r){ if (r.error) throw r.error; return r.data || {}; });
+}
+var MSG_CONV = {
+  link_invalido: ['Este link não é válido', 'Ele pode ter sido substituído por um link mais novo. Peça um novo link à equipe que enviou a mensagem.'],
+  expirado: ['Este link expirou', 'Peça um novo link à equipe que enviou a mensagem.'],
+  ja_enviado: ['Questionário já enviado', 'Suas respostas já chegaram à equipe. Obrigado! Se precisar corrigir alguma coisa, avise a equipe ou conte ao anestesista na consulta.'],
+  dados_invalidos: ['Não foi possível enviar', 'Houve um problema com as respostas. Tente de novo ou avise a equipe.'],
+  rede: ['Sem conexão', 'Não conseguimos falar com o sistema. Verifique a internet e tente de novo.']
+};
+function telaConv(cod, retry){
+  var m = MSG_CONV[cod] || MSG_CONV.rede, main = $('main'); main.innerHTML = '';
+  main.appendChild(h('div', { 'class': 'step-h' }));
+  main.appendChild(h('div', { 'class': 'done' }, h('h1', { style: 'margin:0' }, m[0]), h('p', { style: 'margin:0' }, m[1]),
+    retry ? h('button', { type: 'button', 'class': 'btn primary', onclick: retry }, 'Tentar de novo') : null));
+  $('nav').hidden = true;
+}
+save = (function(orig){ return function(){
+  orig();
+  if (CONV && SBQ && !isDemo && consent && phase !== 'done'){ clearTimeout(srvT); srvT = setTimeout(function(){ salvarServidor(false).catch(function(){}); }, 4000); }
+}; })(save);
+
+/* ---------- Utilidades ---------- */
+function $(id){ return document.getElementById(id); }
+function h(tag, attrs){
+  var e = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function(k){
+    var v = attrs[k]; if (v === null || v === undefined || v === false) return;
+    if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v;
+    else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
+  });
+  for (var i = 2; i < arguments.length; i++){ var c = arguments[i]; if (c === null || c === undefined || c === false) continue; if (Array.isArray(c)) c.forEach(function(x){ if (x) e.appendChild(typeof x === 'string' ? document.createTextNode(x) : x); }); else e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); }
+  return e;
+}
+function dBR(v){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (v || ''); }
+function visSteps(){ return STEPS.filter(function(s){ return !s.when || s.when(A); }); }
+function qVisible(q){ return (!q.step.when || q.step.when(A)) && (!q.when || q.when(A)); }
+function clean(v){ return String(v === undefined || v === null ? '' : v).trim(); }
+function pad2(n){ return (n < 10 ? '0' : '') + n; }
+var MASK = {
+  tel: function(v){ var d = v.replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); },
+  cep: function(v){ var d = v.replace(/\D/g, '').slice(0, 8); return d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d; }
+};
+/* Busca do CEP (ViaCEP). Dentro do artifact a rede externa é bloqueada; no site hospedado funciona. Falhas são silenciosas. */
+var lastCep = '';
+function lookupCep(fv, box){
+  var d = (fv.cep || '').replace(/\D/g, '');
+  if (d.length !== 8 || d === lastCep) return;
+  lastCep = d;
+  try {
+    fetch('https://viacep.com.br/ws/' + d + '/json/').then(function(r){ return r.json(); }).then(function(j){
+      if (!j || j.erro) return;
+      [['rua', j.logradouro], ['bairro', j.bairro], ['cidade', j.localidade], ['uf', j.uf]].forEach(function(x){
+        if (x[1] && !clean(fv[x[0]])){ fv[x[0]] = x[1]; var el = box.querySelector('#in-end-' + x[0]); if (el) el.value = x[1]; }
+      });
+      save(); var n = box.querySelector('#in-end-num'); if (n) n.focus();
+    }).catch(function(){});
+  } catch (e){}
+}
+
+/* ---------- Renderização das perguntas ---------- */
+function qTitle(q, tag){ return h(tag || 'span', { 'class': 'qt' }, q.q, q.opt ? h('span', { 'class': 'opt-tag' }, ' (opcional)') : null); }
+function qHelp(q){ return q.help ? h('span', { 'class': 'help' }, q.help) : null; }
+
+function renderQ(q){
+  var box = h('div', { 'class': 'q', 'data-q': q.id });
+  if (q.t === 'h'){ return h('h2', { 'class': 'subh', 'data-q': q.id }, q.q); }
+  if (q.t === 'text' || q.t === 'tel' || q.t === 'date'){
+    var inp = h('input', { id: 'in-' + q.id, type: q.t === 'date' ? 'date' : (q.t === 'tel' ? 'tel' : 'text'), value: A[q.id] || '', placeholder: q.ph || null, autocomplete: q.ac || (q.t === 'tel' ? 'tel' : 'off'), inputmode: q.mode || (q.mask ? 'numeric' : null),
+      oninput: function(e){ if (q.mask){ var m = MASK[q.mask](e.target.value); if (m !== e.target.value) e.target.value = m; } A[q.id] = e.target.value; box.classList.remove('err'); save(); refresh(); } });
+    box.appendChild(h('label', { 'for': 'in-' + q.id }, qTitle(q), qHelp(q)));
+    box.appendChild(inp);
+    if (q.alt){
+      if (A[q.id + '_alt']) inp.disabled = true;
+      var ab = h('button', { type: 'button', 'class': 'chipb', style: 'margin-top:10px', 'aria-pressed': A[q.id + '_alt'] ? 'true' : 'false', onclick: function(){
+        A[q.id + '_alt'] = !A[q.id + '_alt']; ab.setAttribute('aria-pressed', A[q.id + '_alt'] ? 'true' : 'false');
+        inp.disabled = !!A[q.id + '_alt']; if (A[q.id + '_alt']){ inp.value = ''; A[q.id] = ''; } save(); } }, q.alt);
+      box.appendChild(ab);
+    }
+  } else if (q.t === 'dob'){
+    var p = A.dn_p = A.dn_p || (function(){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(A.dn || ''); return m ? { d: m[3], m: m[2], y: m[1] } : {}; })();
+    var dout = h('p', { 'class': 'dobout', 'aria-live': 'polite' });
+    var parts = [['d', 'Dia', 'DD', 2], ['m', 'Mês', 'MM', 2], ['y', 'Ano', 'AAAA', 4]];
+    var showDob = function(){
+      if (A.dn){ var a = age(A); dout.textContent = dBR(A.dn) + ' · ' + a + (a === 1 ? ' ano' : ' anos'); dout.className = 'dobout ok'; }
+      else if (p.d && p.m && p.y && p.y.length === 4){ dout.textContent = 'Data inválida. Confira o dia, o mês e o ano.'; dout.className = 'dobout bad'; }
+      else { dout.textContent = ''; dout.className = 'dobout'; }
+    };
+    var calcDob = function(){
+      var d = +p.d, mo = +p.m, y = +p.y; A.dn = '';
+      if (p.y && p.y.length === 4 && d && mo){ var dt = new Date(y, mo - 1, d); if (dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d && dt <= new Date() && y > 1900) A.dn = y + '-' + pad2(mo) + '-' + pad2(d); }
+      if (A.dn) box.classList.remove('err');
+      showDob(); save(); refresh();
+    };
+    box.appendChild(h('div', null, qTitle(q), h('span', { 'class': 'help' }, 'Digite dia, mês e ano com números. Ex.: 14 03 1958')));
+    box.appendChild(h('div', { 'class': 'dob' }, parts.map(function(c, ix){
+      return h('label', { 'class': 'dobc' + (c[0] === 'y' ? ' y' : ''), 'for': 'in-dn-' + c[0] }, h('span', { 'class': 'flbl' }, c[1]),
+        h('input', { id: 'in-dn-' + c[0], type: 'text', inputmode: 'numeric', maxlength: String(c[3]), placeholder: c[2], value: p[c[0]] || '', autocomplete: ['bday-day', 'bday-month', 'bday-year'][ix],
+          oninput: function(e){ var v = e.target.value.replace(/\D/g, '').slice(0, c[3]); e.target.value = v; p[c[0]] = v; calcDob(); if (v.length === c[3] && ix < 2) $('in-dn-' + parts[ix + 1][0]).focus(); } }));
+    })));
+    box.appendChild(dout); showDob();
+  } else if (q.t === 'fields'){
+    var fv = A[q.id] = A[q.id] || {};
+    box.appendChild(h('div', null, qTitle(q), qHelp(q)));
+    var grid = h('div', { 'class': 'fgrid' });
+    q.cols.forEach(function(c){
+      var id = 'in-' + q.id + '-' + c.k;
+      if (c.opts){
+        var grp = h('div', { 'class': 'chips', role: 'group', 'aria-label': c.l });
+        c.opts.forEach(function(o){
+          grp.appendChild(h('button', { type: 'button', 'class': 'chipb', 'aria-pressed': fv[c.k] === o ? 'true' : 'false', onclick: function(){
+            fv[c.k] = fv[c.k] === o ? '' : o;
+            grp.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', x.textContent === fv[c.k] ? 'true' : 'false'); });
+            save(); } }, o));
+        });
+        grid.appendChild(h('div', { 'class': 'fcell' }, h('span', { 'class': 'flbl' }, c.l), grp));
+      } else {
+        grid.appendChild(h('label', { 'class': 'fcell' + (c.w ? ' w' + c.w : ''), 'for': id }, h('span', { 'class': 'flbl' }, c.l),
+          h('input', { id: id, type: c.mask === 'tel' ? 'tel' : 'text', inputmode: c.mode || (c.mask ? 'numeric' : null), autocomplete: c.ac || (c.mask === 'tel' ? 'tel' : 'off'), placeholder: c.ph || null, value: fv[c.k] || '',
+            oninput: function(e){
+              if (c.mask){ var m = MASK[c.mask](e.target.value); if (m !== e.target.value) e.target.value = m; }
+              fv[c.k] = e.target.value; box.classList.remove('err'); save();
+              if (q.cep && c.k === 'cep') lookupCep(fv, box);
+            } })));
+      }
+    });
+    box.appendChild(grid);
+  } else if (q.t === 'area'){
+    box.appendChild(h('label', { 'for': 'in-' + q.id }, qTitle(q), qHelp(q)));
+    box.appendChild(h('textarea', { id: 'in-' + q.id, placeholder: q.ph || null, oninput: function(e){ A[q.id] = e.target.value; save(); } }, A[q.id] || ''));
+  } else if (q.t === 'nums'){
+    var st = A[q.id] = A[q.id] || {};
+    box.appendChild(h('div', null, qTitle(q), qHelp(q)));
+    box.appendChild(h('div', { 'class': 'pair' }, q.cols.map(function(c){
+      return h('label', { 'for': 'in-' + q.id + '-' + c.k }, h('input', { id: 'in-' + q.id + '-' + c.k, type: 'text', inputmode: 'decimal', value: st[c.k] || '', placeholder: c.ph || null, oninput: function(e){ st[c.k] = e.target.value; save(); } }), c.l);
+    })));
+  } else if (q.t === 'single'){
+    var fs = h('fieldset', null, h('legend', null, qTitle(q, 'span')), qHelp(q));
+    var grp = h('div', { 'class': 'opts' + (q.inline ? ' inline' : ''), role: 'radiogroup' });
+    q.opts.forEach(function(o, i){
+      var id = 'in-' + q.id + '-' + i;
+      var r = h('input', { type: 'radio', name: 'r-' + q.id, id: id, value: String(i), checked: A[q.id] === i,
+        onchange: function(){ A[q.id] = i; box.classList.remove('err'); save(); refresh(); } });
+      /* tocar de novo desmarca */
+      r.addEventListener('click', function(){ if (r.dataset.was === '1'){ r.checked = false; delete A[q.id]; save(); refresh(); } r.dataset.was = r.checked ? '1' : ''; grp.querySelectorAll('input').forEach(function(x){ if (x !== r) x.dataset.was = ''; }); });
+      r.dataset.was = A[q.id] === i ? '1' : '';
+      grp.appendChild(h('div', { 'class': 'opt' }, h('label', { 'for': id }, r, h('span', null, o[0]))));
+    });
+    fs.appendChild(grp); box.appendChild(fs);
+  } else if (q.t === 'checks'){
+    var s = A[q.id] = A[q.id] || { on: {}, det: {}, none: false };
+    var fs2 = h('fieldset', null, h('legend', null, qTitle(q, 'span')), qHelp(q));
+    var list = h('div', { 'class': 'opts' });
+    var noneInp;
+    q.items.forEach(function(it, i){
+      var id = 'in-' + q.id + '-' + i;
+      var det = null;
+      if (it.d !== false){
+        det = h('div', { 'class': 'det', hidden: !s.on[i] }, h('input', { type: 'text', id: id + '-det', 'aria-label': 'Detalhes: ' + it.l, placeholder: it.d || 'Se quiser, conte mais', value: s.det[i] || '', oninput: function(e){ s.det[i] = e.target.value; save(); } }));
+      }
+      var cb = h('input', { type: 'checkbox', id: id, checked: !!s.on[i], onchange: function(e){
+        s.on[i] = e.target.checked; if (e.target.checked){ s.none = false; if (noneInp) noneInp.checked = false; }
+        if (det){ det.hidden = !e.target.checked; if (e.target.checked) det.querySelector('input').focus({ preventScroll: true }); }
+        save(); refresh(); } });
+      list.appendChild(h('div', { 'class': 'opt' }, h('label', { 'for': id }, cb, h('span', null, it.l)), det));
+    });
+    if (q.none){
+      var nid = 'in-' + q.id + '-none';
+      noneInp = h('input', { type: 'checkbox', id: nid, checked: !!s.none, onchange: function(e){
+        s.none = e.target.checked;
+        if (s.none){ s.on = {}; list.querySelectorAll('.opt:not(.none) input[type=checkbox]').forEach(function(x){ x.checked = false; }); list.querySelectorAll('.det').forEach(function(d){ d.hidden = true; }); }
+        save(); refresh(); } });
+      list.appendChild(h('div', { 'class': 'opt none' }, h('label', { 'for': nid }, noneInp, h('span', null, q.none))));
+    }
+    fs2.appendChild(list); box.appendChild(fs2);
+  } else if (q.t === 'rows'){
+    var arr = A[q.id] = A[q.id] || [];
+    if (q.min && !arr.length) arr.push({});
+    box.appendChild(h('div', null, qTitle(q), qHelp(q)));
+    var wrap = h('div', { 'class': 'rows' });
+    var draw = function(){
+      wrap.innerHTML = '';
+      arr.forEach(function(r, ri){
+        var card = h('div', { 'class': 'rowcard' }, h('div', { 'class': 'rowcard-h' }, h('span', null, '#' + (ri + 1)),
+          h('button', { type: 'button', 'class': 'linkbtn', onclick: function(){ arr.splice(ri, 1); save(); draw(); } }, 'Remover')));
+        q.cols.forEach(function(c){
+          if (c.when && !c.when(r)) return;
+          var id = 'in-' + q.id + '-' + ri + '-' + c.k, ctl;
+          if (c.opts){
+            var grp = h('div', { 'class': 'chips', role: 'group', 'aria-label': c.l });
+            c.opts.forEach(function(o){ grp.appendChild(h('button', { type: 'button', 'class': 'chipb', 'aria-pressed': r[c.k] === o ? 'true' : 'false', onclick: function(){ r[c.k] = r[c.k] === o ? '' : o; save(); draw(); } }, o)); });
+            card.appendChild(h('div', { 'class': 'fcell' }, h('span', { 'class': 'flbl' }, c.l), grp));
+            return;
+          }
+          ctl = h('input', { id: id, type: 'text', inputmode: c.mode || null, value: r[c.k] || '', placeholder: c.ph || null, disabled: c.alt && r[c.k + '_alt'] ? true : null, oninput: function(e){ r[c.k] = e.target.value; save(); } });
+          var lab = h('label', { 'for': id }, c.l, ctl);
+          if (c.alt){
+            lab = h('div', { 'class': 'fcell' }, lab, h('div', { 'class': 'chips' }, h('button', { type: 'button', 'class': 'chipb sm', 'aria-pressed': r[c.k + '_alt'] ? 'true' : 'false', onclick: function(){ r[c.k + '_alt'] = !r[c.k + '_alt']; if (r[c.k + '_alt']) r[c.k] = ''; save(); draw(); } }, c.alt)));
+          }
+          card.appendChild(lab);
+        });
+        wrap.appendChild(card);
+      });
+      wrap.appendChild(h('button', { type: 'button', 'class': 'addbtn', onclick: function(){ arr.push({}); save(); draw(); var ins = wrap.querySelectorAll('.rowcard'); var last = ins[ins.length - 1]; if (last) last.querySelector('input,select').focus(); } }, '+ ' + q.add));
+    };
+    draw(); box.appendChild(wrap);
+  } else if (q.t === 'dasi'){
+    var d = A[q.id] = A[q.id] || {};
+    box.appendChild(h('div', null, qTitle(q), h('span', { 'class': 'help' }, 'Responda pelo que consegue fazer hoje, mesmo que não costume fazer.')));
+    box.appendChild(h('div', { 'class': 'yn' }, q.items.map(function(it){
+      var seg = h('div', { 'class': 'seg', role: 'group', 'aria-label': it[1] });
+      [YES, NO].forEach(function(v){
+        var b = h('button', { type: 'button', 'aria-pressed': d[it[0]] === v ? 'true' : 'false', onclick: function(){
+          d[it[0]] = d[it[0]] === v ? undefined : v;
+          seg.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', x.textContent === d[it[0]] ? 'true' : 'false'); });
+          save(); } }, v);
+        seg.appendChild(b);
+      });
+      return h('div', { 'class': 'yn-row' }, h('span', null, it[1]), seg);
+    })));
+  }
+  return box;
+}
+
+function refresh(){
+  document.querySelectorAll('#main [data-q]').forEach(function(b){ var q = QI[b.getAttribute('data-q')]; if (q) b.hidden = !!(q.when && !q.when(A)); });
+  progress();
+}
+function progress(){
+  var vs = visSteps(), i = vs.indexOf(STEPS[cur]);
+  var total = vs.length + 1;
+  var pos = phase === 'review' ? total : phase === 'done' ? total : i + 1;
+  $('stepno').textContent = phase === 'done' ? 'Concluído' : 'Etapa ' + pos + ' de ' + total;
+  $('bar').style.width = (phase === 'done' ? 100 : Math.round((pos - 1) / total * 100)) + '%';
+}
+
+/* ---------- Telas ---------- */
+function showStep(i){
+  phase = 'form'; cur = i;
+  var s = STEPS[i], main = $('main');
+  main.innerHTML = '';
+  var head = h('div', { 'class': 'step-h' }, h('div', { 'class': 'kicker' }, s.id === 'inicio' ? 'Bem-vindo(a)' : 'Etapa ' + (visSteps().indexOf(s) + 1)), h('h1', null, s.title), s.intro ? h('p', { 'class': 'intro' }, s.intro) : null);
+  main.appendChild(head);
+  var qs = h('div', { 'class': 'qs' });
+  if (s.kind === 'welcome') qs.appendChild(welcomeBlock());
+  s.qs.forEach(function(q){ qs.appendChild(renderQ(q)); });
+  if (s.kind === 'welcome') qs.appendChild(consentBlock());
+  main.appendChild(qs);
+  $('btn-back').hidden = i === 0;
+  $('btn-next').textContent = nextVisible(i) === -1 ? 'Revisar respostas' : 'Continuar';
+  $('nav').hidden = false;
+  refresh(); save();
+  window.scrollTo(0, 0);
+}
+function welcomeBlock(){
+  var w = h('div', { 'class': 'welcome' },
+    h('p', { style: 'margin:0' }, 'Estas perguntas adiantam a sua consulta com o anestesista. Com elas, a equipe se prepara melhor e a consulta fica mais curta.'),
+    h('ul', null, h('li', null, 'Leva de 10 a 15 minutos.'), h('li', null, 'Use palavras simples. Não precisa saber termos médicos.'), h('li', null, 'Se não souber uma resposta, pode pular.'), h('li', null, 'Pode parar e continuar depois neste mesmo aparelho.')),
+    h('p', { style: 'margin:0;color:var(--muted);font-size:15px' }, 'Nada disto substitui a consulta: o anestesista vai conferir tudo com você.'));
+  var saved = load();
+  if (saved && saved.A && Object.keys(saved.A).length && !isDemo && !Object.keys(A).length){
+    var rs = h('div', { 'class': 'resume' }, h('b', null, 'Você já começou este questionário.'),
+      h('div', { 'class': 'btns' },
+        h('button', { type: 'button', 'class': 'btn primary', onclick: function(){ A = saved.A; consent = !!saved.consent && !!saved.termoLido; consentAt = consent ? (saved.consentAt || '') : ''; termoLido = !!saved.termoLido; termoLidoEm = saved.termoLidoEm || ''; showStep(saved.cur || 0); } }, 'Continuar de onde parei'),
+        h('button', { type: 'button', 'class': 'btn', onclick: function(){ wipe(); rs.remove(); } }, 'Começar de novo')));
+    w.insertBefore(rs, w.firstChild);
+  }
+  w.appendChild(h('button', { type: 'button', 'class': 'demo-link', onclick: loadDemo }, 'Ver com respostas de exemplo (para a equipe testar)'));
+  return w;
+}
+/* Termo de uso dos dados — versão registrada junto com o aceite */
+var TERMO = { versao: 'TERMO-QP-2.0', contato: '[e-mail da SASB]' };
+function consentBlock(){
+  var P = function(t, b){ return h('p', null, h('b', null, t + ' '), b); };
+  var hint = h('p', { 'class': 'termo-hint', id: 'termo-hint', 'aria-live': 'polite' });
+  var cb = h('input', { type: 'checkbox', id: 'in-consent', checked: consent, disabled: !termoLido, 'aria-describedby': 'termo-hint',
+    onchange: function(e){ consent = e.target.checked; consentAt = consent ? new Date().toISOString() : ''; e.target.closest('.q').classList.remove('err'); save(); } });
+  var lbl = h('label', { 'class': 'consent' + (termoLido ? '' : ' locked'), 'for': 'in-consent' }, cb,
+    h('span', null, 'Li e autorizo o uso destas informações para preparar a minha avaliação pré-anestésica, com sigilo médico.'));
+  var end = h('p', { 'class': 'termo-end', id: 'termo-end' }, 'Fim do termo · versão ' + TERMO.versao);
+  var box = h('div', { 'class': 'termo-box', id: 'termo-box', tabindex: '0', role: 'region', 'aria-label': 'Termo de uso dos dados. Role até o fim para liberar a autorização.' },
+    P('Quem é o responsável.', 'SASB – Serviço de Anestesiologia Sul Bahia Ltda., equipe de anestesiologistas responsável pela sua anestesia.'),
+    P('Para que servem.', 'Para o anestesista conhecer a sua saúde antes da consulta e planejar uma anestesia mais segura. As respostas não substituem a consulta: o anestesista vai conferir tudo com você.'),
+    P('Quem tem acesso.', 'O anestesista vê todas as respostas. A secretária vê apenas os dados de cadastro e agendamento. O hospital ou a clínica só envia dados da cirurgia e exames, sem ver as suas respostas de saúde. Todos guardam sigilo, e cada acesso fica registrado.'),
+    P('Onde ficam guardadas.', 'Em sistema seguro e, depois da consulta, no prontuário eletrônico da SASB, pelo prazo mínimo de 20 anos que a lei exige para prontuários médicos (Lei nº 13.787/2018). Não vendemos nem compartilhamos os seus dados para outros fins.'),
+    P('Inteligência artificial.', 'Se você enviar fotos de exames ou receitas, um sistema de inteligência artificial pode ajudar a ler os valores. Nenhuma decisão é tomada por ele: o médico confere tudo.'),
+    P('Termo de consentimento da anestesia.', 'Este aceite não é o termo de consentimento da anestesia. Esse termo será explicado e assinado na consulta, com o anestesista.'),
+    P('Seus direitos.', 'Pela Lei Geral de Proteção de Dados (LGPD), você pode pedir a qualquer momento: confirmar quais dados temos, ter acesso a eles, corrigir o que estiver errado, saber com quem foram compartilhados e retirar esta autorização. Dados que já fazem parte do prontuário precisam ser guardados pelo prazo legal.'),
+    P('Como pedir.', 'Escreva para ' + TERMO.contato + ' ou fale com a equipe no dia da consulta.'),
+    P('Neste aparelho.', 'Enquanto você responde, as respostas ficam guardadas aqui para você poder continuar depois. Ao enviar, elas são apagadas deste aparelho. Se o celular for de outra pessoa, envie tudo de uma vez.'),
+    end);
+  var unlock = function(){
+    if (termoLido) return;
+    termoLido = true; termoLidoEm = new Date().toISOString();
+    cb.disabled = false; lbl.classList.remove('locked');
+    hint.textContent = 'Você leu o termo até o fim. Agora pode marcar a autorização.'; hint.className = 'termo-hint ok';
+    save();
+  };
+  var check = function(){ if (box.scrollTop + box.clientHeight >= box.scrollHeight - 8) unlock(); };
+  box.addEventListener('scroll', check, { passive: true });
+  if (window.IntersectionObserver){
+    var io = new IntersectionObserver(function(en){ en.forEach(function(x){ if (x.isIntersecting){ unlock(); io.disconnect(); } }); }, { root: box, threshold: 1 });
+    setTimeout(function(){ io.observe(end); }, 0);
+  } else setTimeout(check, 0);
+  /* Tocar na caixa ainda bloqueada explica o motivo e leva ao texto */
+  lbl.addEventListener('click', function(e){
+    if (!cb.disabled) return;
+    e.preventDefault();
+    hint.textContent = 'Para autorizar, leia o termo inteiro: role o texto acima até o fim.'; hint.className = 'termo-hint warn';
+    box.focus({ preventScroll: true }); box.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+  if (termoLido){ hint.textContent = 'Você leu o termo até o fim.'; hint.className = 'termo-hint ok'; }
+  else hint.textContent = 'Role o texto até o fim para liberar a autorização.';
+  return h('div', { 'class': 'q', 'data-q': '_consent' },
+    h('div', null, h('span', { 'class': 'qt' }, 'Como usamos os seus dados'), h('span', { 'class': 'help' }, 'Leia com atenção. A autorização só é liberada depois que você chegar ao fim do texto.')),
+    box, hint, lbl);
+}
+function nextVisible(i){ for (var j = i + 1; j < STEPS.length; j++) if (!STEPS[j].when || STEPS[j].when(A)) return j; return -1; }
+function prevVisible(i){ for (var j = i - 1; j >= 0; j--) if (!STEPS[j].when || STEPS[j].when(A)) return j; return -1; }
+
+function validate(){
+  var s = STEPS[cur], first = null;
+  s.qs.forEach(function(q){
+    if (!q.req || !qVisible(q)) return;
+    var v = A[q.id], ok = q.t === 'single' ? (v !== undefined && v !== null) : !!clean(v);
+    var b = document.querySelector('[data-q="' + q.id + '"]');
+    if (!b) return;
+    var old = b.querySelector('.errmsg'); if (old) old.remove();
+    if (!ok){ b.classList.add('err'); b.appendChild(h('p', { 'class': 'errmsg' }, q.t === 'single' ? 'Escolha uma opção para continuar.' : q.t === 'dob' ? 'Informe dia, mês e ano de nascimento.' : 'Preencha este campo para continuar.')); first = first || b; }
+  });
+  if (s.kind === 'welcome'){
+    var cb = document.querySelector('[data-q="_consent"]'), o = cb.querySelector('.errmsg'); if (o) o.remove();
+    if (!consent || !termoLido){ cb.classList.add('err'); cb.appendChild(h('p', { 'class': 'errmsg' }, termoLido ? 'Marque a autorização para continuar.' : 'Leia o termo até o fim e marque a autorização para continuar.')); first = first || cb; }
+  }
+  if (s.id === 'dados' && A.dn){
+    var a = age(A), b2 = document.querySelector('[data-q="dn"]');
+    if (a === null){ b2.classList.add('err'); b2.appendChild(h('p', { 'class': 'errmsg' }, 'Confira a data de nascimento.')); first = first || b2; }
+  }
+  if (first){ first.scrollIntoView({ block: 'center' }); var f = first.querySelector('input,textarea,select'); if (f) f.focus({ preventScroll: true }); }
+  return !first;
+}
+
+/* ---------- Texto das respostas (para revisão e relato) ---------- */
+function ansText(q){
+  var v = A[q.id];
+  if (q.t === 'text' || q.t === 'tel' || q.t === 'area') return clean(v);
+  if (q.alt && A[q.id + '_alt']) return q.alt;
+  if (q.t === 'date' || q.t === 'dob') return dBR(v);
+  if (q.t === 'fields'){ if (!v) return ''; return q.cols.filter(function(c){ return clean(v[c.k]); }).map(function(c){ return c.l + ': ' + clean(v[c.k]); }).join('; '); }
+  if (q.t === 'single') return (v !== undefined && v !== null && q.opts[v]) ? q.opts[v][0] : '';
+  if (q.t === 'nums'){ if (!v) return ''; return q.cols.filter(function(c){ return clean(v[c.k]); }).map(function(c){ return clean(v[c.k]) + ' ' + c.l; }).join(' · '); }
+  if (q.t === 'checks'){
+    if (!v) return '';
+    if (v.none) return q.none;
+    return q.items.filter(function(it, i){ return v.on[i]; }).map(function(it){ var d = clean(v.det[it.i]); return it.l + (d ? ' (' + d + ')' : ''); }).join('; ');
+  }
+  if (q.t === 'rows'){
+    if (!v) return '';
+    var cell = function(r, c){
+      if (c.when && !c.when(r)) return '';
+      if (c.alt && r[c.k + '_alt']) return c.l.toLowerCase() + ': ' + c.alt.toLowerCase();
+      var x = clean(r[c.k]); if (!x || x === 'Não sei') return '';
+      return c.opts ? (c.rl || c.l) + ': ' + x.toLowerCase() : x;
+    };
+    return v.map(function(r){ return q.cols.map(function(c){ return cell(r, c); }).filter(Boolean).join(', '); }).filter(Boolean).join(' | ');
+  }
+  if (q.t === 'dasi'){
+    if (!v) return '';
+    var y = [], n = [];
+    q.items.forEach(function(it){ if (v[it[0]] === YES) y.push(it[1]); else if (v[it[0]] === NO) n.push(it[1]); });
+    return (y.length ? 'Consegue: ' + y.join('; ') + '.' : '') + (n.length ? (y.length ? ' ' : '') + 'Não consegue: ' + n.join('; ') + '.' : '');
+  }
+  return '';
+}
+
+function showReview(){
+  phase = 'review';
+  var main = $('main'); main.innerHTML = '';
+  main.appendChild(h('div', { 'class': 'step-h' }, h('div', { 'class': 'kicker' }, 'Revisão'), h('h1', null, 'Confira suas respostas'), h('p', { 'class': 'intro' }, 'Toque em "Corrigir" para mudar algo. Quando estiver tudo certo, envie.')));
+  var qs = h('div', { 'class': 'qs' });
+  visSteps().forEach(function(s){
+    if (s.kind === 'welcome') return;
+    var dl = h('dl');
+    s.qs.forEach(function(q){ if (!qVisible(q)) return; var t = ansText(q); if (!t) return; dl.appendChild(h('dt', null, q.q)); dl.appendChild(h('dd', null, t)); });
+    var idx = STEPS.indexOf(s);
+    qs.appendChild(h('section', { 'class': 'rev-sec' }, h('h2', null, s.title, h('button', { type: 'button', onclick: function(){ showStep(idx); } }, 'Corrigir')),
+      dl.children.length ? dl : h('p', { 'class': 'rev-empty' }, 'Nada respondido nesta etapa.')));
+  });
+  main.appendChild(qs);
+  $('btn-back').hidden = false;
+  $('btn-next').textContent = 'Enviar respostas';
+  progress(); window.scrollTo(0, 0);
+}
+
+function showDone(){
+  phase = 'done';
+  var pkg = build();
+  var main = $('main'); main.innerHTML = '';
+  var nome = clean(A.nome).split(' ')[0];
+  main.appendChild(h('div', { 'class': 'step-h' }));
+  main.appendChild(h('div', { 'class': 'done' },
+    h('div', { 'class': 'check', 'aria-hidden': 'true' }, '✓'),
+    h('h1', { style: 'margin:0' }, 'Obrigado' + (nome ? ', ' + nome : '') + '!'),
+    h('p', { style: 'margin:0' }, isDemo ? 'Estas são respostas de exemplo. Nada foi enviado.' : 'Suas respostas foram registradas. Na consulta, o anestesista vai conferir tudo com você.'),
+    h('p', { style: 'margin:0;color:var(--muted);font-size:15px' }, 'Leve os exames, as receitas ou as caixas dos remédios e, se tiver, relatórios de outros médicos. Se tiver febre, gripe ou qualquer mudança na saúde antes da cirurgia, avise a equipe.'),
+    h('p', { style: 'margin:0;color:var(--muted);font-size:15px' }, 'Na consulta, o anestesista vai explicar como será a sua anestesia, os riscos e as alternativas. Só depois disso você assina o termo de consentimento, se concordar.')));
+  var json = JSON.stringify(pkg, null, 2);
+  var nCampos = Object.keys(pkg.campos).length;
+  var copied = h('span', { 'class': 'copied', hidden: true }, 'Copiado');
+  var pre = h('pre', { 'class': 'json', tabindex: '0' }, json);
+  main.appendChild(h('details', { 'class': 'team' }, h('summary', null, 'Para a equipe: dados gerados para o prontuário'),
+    h('div', { 'class': 'team-body' },
+      h('p', null, 'Os campos usam os mesmos nomes do Formulário Padrão, prontos para importar. O relato traz as respostas com as palavras do paciente, para conferir o que a tradução técnica não captou.'),
+      h('div', { 'class': 'stats' }, h('span', { 'class': 'stat' }, nCampos + ' campos preenchidos'), h('span', { 'class': 'stat' }, pkg.relato.length + ' respostas no relato'), h('span', { 'class': 'stat' }, (pkg.alertas.length) + ' pontos de atenção')),
+      pkg.alertas.length ? h('div', { 'class': 'note' }, h('b', null, 'Pontos de atenção: '), pkg.alertas.join(' · ')) : null,
+      pre,
+      h('div', { 'class': 'copyrow' },
+        h('button', { type: 'button', 'class': 'btn', onclick: function(){
+          var ok = function(){ copied.hidden = false; setTimeout(function(){ copied.hidden = true; }, 1800); };
+          try { navigator.clipboard.writeText(json).then(ok, selectPre); } catch (e){ selectPre(); }
+        } }, 'Copiar dados'), copied))));
+  function selectPre(){ var r = document.createRange(); r.selectNodeContents(pre); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+  main.appendChild(h('button', { type: 'button', 'class': 'btn ghost', style: 'margin-top:14px', onclick: function(){ isDemo = false; A = {}; consent = false; consentAt = ''; termoLido = false; termoLidoEm = ''; wipe(); $('demo').textContent = DEMO_TXT; showStep(0); } }, isDemo ? 'Sair do exemplo' : 'Responder por outro paciente'));
+  $('nav').hidden = true;
+  if (!isDemo) wipe();
+  progress(); window.scrollTo(0, 0);
+}
+
+showDone = (function(orig){ return function(){
+  if (!CONV || isDemo) return orig();
+  clearTimeout(srvT);
+  var main = $('main'); main.innerHTML = '';
+  main.appendChild(h('div', { 'class': 'done' }, h('h1', { style: 'margin:0' }, 'Enviando suas respostas…'), h('p', { style: 'margin:0;color:var(--muted)' }, 'Não feche esta página.')));
+  $('nav').hidden = true;
+  salvarServidor(true).then(function(r){
+    if (r && r.erro && r.erro !== 'ja_enviado'){ telaConv(r.erro, r.erro === 'dados_invalidos' ? function(){ showDone(); } : null); return; }
+    orig();
+    var t = main.querySelector('details.team'); if (t) t.remove();
+    [].forEach.call(main.querySelectorAll('button.ghost'), function(b){ b.remove(); });
+    var p = main.querySelector('.done p'); if (p) p.textContent = 'Suas respostas foram enviadas à equipe de anestesia. Na consulta, o anestesista vai conferir tudo com você.';
+  }, function(){ telaConv('rede', function(){ showDone(); }); $('nav').hidden = true; });
+}; })(showDone);
+welcomeBlock = (function(orig){ return function(){ var w = orig(); if (CONV){ var d = w.querySelector('.demo-link'); if (d) d.remove(); } return w; }; })(welcomeBlock);
+
+/* ---------- Pacote de dados para o Formulário Padrão ---------- */
+function build(){
+  var out = {}, relato = [], sys = {}, alertas = [], obs = [];
+  function put(f, v){ if (v === undefined || v === null || v === '') return; if (typeof v === 'string' && typeof out[f] === 'string' && out[f] && out[f] !== v) out[f] += '; ' + v; else out[f] = v; }
+  function addM(f, v){ if (!v) return; out[f] = out[f] || []; if (out[f].indexOf(v) < 0) out[f].push(v); }
+  function setK(k, det){ out[k] = true; if (det) put(k + '_det', det); }
+  function applySet(s){ if (!s) return; Object.keys(s).forEach(function(k){ if (k[0] === '+') addM(k.slice(1), s[k]); else if (s[k] === true) out[k] = true; else put(k, s[k]); }); }
+
+  STEPS.forEach(function(s){
+    s.qs.forEach(function(q){
+      if (!qVisible(q)) return;
+      var v = A[q.id], t = ansText(q);
+      if (t) relato.push({ etapa: s.title, pergunta: q.q, resposta: t });
+      if (q.t === 'text' || q.t === 'tel' || q.t === 'area' || q.t === 'date' || q.t === 'dob'){
+        if (q.f && clean(v)) put(q.f, q.fmt === 'br' ? dBR(v) : clean(v));
+      } else if (q.t === 'fields'){
+        if (v && q.build) q.build(v, put, out);
+      } else if (q.t === 'single'){
+        if (v === undefined || v === null || !q.opts[v]) return;
+        var o = q.opts[v];
+        if (o[1]) applySet(o[1]); else if (q.f) put(q.f, o[0]);
+      } else if (q.t === 'nums'){
+        q.cols.forEach(function(c){ if (c.f && v && clean(v[c.k])) put(c.f, clean(v[c.k]).replace(',', '.')); });
+      } else if (q.t === 'checks'){
+        if (!v) return;
+        if (q.sys){ sys[q.sys] = sys[q.sys] || { lists: 0, none: 0, any: false }; sys[q.sys].lists++; if (v.none) sys[q.sys].none++; }
+        var parts = [];
+        q.items.forEach(function(it, i){
+          if (!v.on[i]) return;
+          var det = it.d === false ? '' : clean(v.det[i]);
+          var kdet = it.dp ? it.dp + (det ? ': ' + det : '') : det;
+          if (it.k){ setK(it.k, kdet); if (q.sys && !it.nosys) sys[q.sys].any = true; }
+          if (it.m && q.mf){ addM(q.mf, it.m); if (it.m === 'Outro' && det) put(q.mf + '_outro', det); }
+          if (it.txt) obs.push(it.txt + ': ' + (det || it.l));
+          if (it.s) applySet(it.s);
+          if (q.to) parts.push(it.v + (det ? ' (' + det + ')' : ''));
+          if (q.rowsTo && det && it.a){ out[q.rowsTo] = out[q.rowsTo] || []; out[q.rowsTo].push([it.a, '', '', det, '']); }
+          if (q.id === 'alerg_esp'){ out.alergia_tab = out.alergia_tab || []; out.alergia_tab.push([it.a, det, '', '']); }
+        });
+        if (q.to && parts.length) put(q.to, parts.join('; '));
+      } else if (q.t === 'rows'){
+        if (!v || !q.f) return;
+        var rows = v.map(q.row).filter(function(r){ return r.some(function(x){ return clean(x); }); });
+        if (rows.length){ out[q.f] = (rows).concat(out[q.f] || []); }
+      } else if (q.t === 'dasi'){
+        if (!v) return;
+        q.items.forEach(function(it){ if (v[it[0]] === YES) out[it[0]] = true; });
+      }
+    });
+  });
+
+  /* Quem respondeu: nome e parentesco completam o "Informante"; o responsável legal preenche os campos do responsável */
+  var rq = A.resp_quem;
+  if (qVisible(QI.resp_quem) && rq && (clean(rq.nome) || rq.par)){
+    out.informante = (out.informante || '') + ' — ' + [clean(rq.nome), rq.par ? rq.par.toLowerCase() : ''].filter(Boolean).join(', ');
+    if (A.quem === 2){ if (clean(rq.nome)) out.responsavel = clean(rq.nome); if (rq.par) out.responsavel_parent = rq.par; }
+  }
+  /* Adornos (piercing, cílios, unhas): vão para "Outros dispositivos" e, se na boca ou rosto, para a condição dentária */
+  var ador = [];
+  if (pick(A, 'piercing') === YES){
+    var po = A.piercing_onde, locs = [];
+    if (po && po.on) QI.piercing_onde.items.forEach(function(it, i){ if (po.on[i]) locs.push(it.l.toLowerCase()); });
+    ador.push('piercing' + (locs.length ? ' (' + locs.join(', ') + ')' : ''));
+    if (po && po.on && (po.on[0] || po.on[1] || po.on[2])) addM('dent', 'Piercing oral ou facial');
+  }
+  if (pick(A, 'cilios') === YES) ador.push('cílios artificiais');
+  if (pick(A, 'unhas') === YES) ador.push('unhas de gel / acrílico');
+  if (ador.length){ obs.push('Adornos: ' + ador.join('; ')); alertas.push('Adornos a retirar ou proteger: ' + ador.join(', ')); }
+  /* Comunicação: o Prontuário aceita uma opção; com mais de uma (ou com detalhe), vai como "Outro" com a descrição */
+  var cq = A.comunic;
+  if (qVisible(QI.comunic) && cq && cq.on && !cq.none){
+    var cSel = QI.comunic.items.filter(function(it, i){ return cq.on[i]; });
+    if (cSel.length === 1 && cSel[0].cm !== 'Outro' && !clean(cq.det[QI.comunic.items.indexOf(cSel[0])])) out.comunicacao = cSel[0].cm;
+    else if (cSel.length){
+      out.comunicacao = 'Outro';
+      out.comunicacao_outro = cSel.map(function(it){ var d = clean(cq.det[QI.comunic.items.indexOf(it)]); return it.v + (d ? ' (' + d + ')' : ''); }).join('; ');
+    }
+  }
+  /* Plano de saúde fora da lista e carteirinha */
+  if (qVisible(QI.carteirinha)){
+    var mat = [];
+    if (pick(A, 'plano_nome') === 'Outro plano' && clean(A.plano_outro)) mat.push('Plano ' + clean(A.plano_outro));
+    if (clean(A.carteirinha)) mat.push(clean(A.carteirinha));
+    if (mat.length) out.convenio_mat = mat.join(' — nº ');
+  }
+  /* Tabagismo: "Parou há" no formato do Prontuário (anos e meses) */
+  var tp = A.tab_parou;
+  if (qVisible(QI.tab_parou) && tp && (clean(tp.a) || clean(tp.m))){ var ym = ymTexto(clean(tp.a) || 0, clean(tp.m) || 0); if (ym) out.tab_parou = ym; }
+  /* Abstinência alcoólica: registrada junto ao tipo de bebida */
+  if (qVisible(QI.alcool_abst) && pick(A, 'alcool_abst') === YES) put('alcool_tipo', 'relata mal-estar (tremor, suor, agitação) ao ficar sem beber');
+  /* "Nega" do sistema: só quando todas as listas daquele sistema foram respondidas com "nenhum" */
+  Object.keys(sys).forEach(function(k){ var x = sys[k]; if (!x.any && x.none === x.lists) out[k + '_nega'] = true; });
+  /* Alergias marcadas implicam status "Sim" */
+  if (out.alergia_tab && out.alergia_tab.length) out.alergia_status = 'Sim';
+  /* Remédios informados implicam uso */
+  if (out.meds_tab && out.meds_tab.length && !out.meds_status) out.meds_status = 'Sim';
+  var nMeds = (A.meds || []).filter(function(r){ return clean(r.n); }).length;
+  if (nMeds >= 5 && age(A) !== null && age(A) >= 65) addM('geriatria', 'Polifarmácia (≥ 5 medicamentos)');
+  /* Tabagismo: "Parou há" */
+  /* Gestações */
+  var g = A.gpa_n;
+  if (qVisible(QI.gpa_n) && g && (clean(g.g) || clean(g.pn) || clean(g.pc) || clean(g.ab))){
+    var n = function(x){ return parseInt(clean(x), 10) || 0; };
+    var pc = n(g.pc);
+    out.gpa = 'G' + n(g.g) + ' P' + (n(g.pn) + pc) + (pc ? ' (' + pc + ' cesárea' + (pc > 1 ? 's' : '') + ')' : '') + ' A' + n(g.ab);
+    if (pc){ out.cesarea = true; out.cesarea_det = String(pc); }
+    if (n(g.g)) put('sensibilizacao', n(g.g) + ' gestação(ões)');
+  }
+  if (clean(A.menop_idade) && out.menopausa) put('menopausa_det', 'aos ' + clean(A.menop_idade).replace(/\D+$/, '') + ' anos');
+  /* Texto livre do paciente vai para "Outras doenças e observações" */
+  var extras = obs.slice();
+  if (clean(A.exames_feitos)) extras.push('Exames informados pelo paciente: ' + clean(A.exames_feitos));
+  if (qVisible(QI.acomp) && A.acomp !== undefined) extras.push('Acompanhante adulto no dia: ' + QI.acomp.opts[A.acomp][0]);
+  if (clean(A.duvidas)) extras.push('Dúvidas ou medos sobre a anestesia: ' + clean(A.duvidas));
+  if (clean(A.algo_mais)) extras.push('Relato do paciente: ' + clean(A.algo_mais));
+  if (extras.length) put('outras_doencas', extras.join('\n'));
+  if (pick(A, 'risco_card') === 'Ainda vou passar') put('pendencias', 'Avaliação cardiológica (paciente informa que ainda vai passar)');
+
+  /* Pontos de atenção para a triagem (não substituem os alertas do Formulário Padrão) */
+  var M = out.meds_classes || [];
+  if (M.some(function(x){ return /GLP-1/.test(x); })) alertas.push('Agonista GLP-1 / tirzepatida');
+  if (M.some(function(x){ return /Varfarina|Anticoagulante|Heparina|Clopidogrel/.test(x); })) alertas.push('Anticoagulante ou antiagregante');
+  if (M.some(function(x){ return /iSGLT2/.test(x); })) alertas.push('iSGLT2');
+  if (out.c_hm || out.f_hm) alertas.push('Suspeita de hipertermia maligna');
+  if (out.c_vad) alertas.push('Via aérea difícil prévia');
+  if (out.a_latex) alertas.push('Alergia ao látex');
+  if (out.alergia_status === 'Sim') alertas.push('Alergias informadas');
+  if (out.p_mp || out.p_cdi) alertas.push('Marca-passo / CDI');
+  if (out.gestante || out.poss_gest) alertas.push('Gestação atual ou possível');
+  if (out.ivas || out.sindr_gripal || out.inf_ativa) alertas.push('Infecção respiratória ou febre recente');
+  if (out.dor_tor) alertas.push('Dor no peito');
+  if (out.aceita_transf && out.aceita_transf !== 'Sim') alertas.push('Restrição a transfusão');
+  if (out.dialise) alertas.push('Diálise');
+
+  return {
+    formato: 'prontuario-pre-anestesico/questionario-paciente@1',
+    gerado_em: new Date().toISOString(),
+    exemplo: isDemo || undefined,
+    informante: out.informante || '',
+    consentimento: { aceito: !!(consent && termoLido), versao: TERMO.versao, aceito_em: consentAt || null, termo_lido_ate_o_fim: !!termoLido, termo_lido_em: termoLidoEm || null, controlador: 'SASB – Serviço de Anestesiologia Sul Bahia Ltda.' },
+    campos: out,
+    alertas: alertas,
+    relato: relato
+  };
+}
+
+/* ---------- Exemplo para a equipe testar ---------- */
+function loadDemo(){
+  isDemo = true; consent = true; termoLido = true; termoLidoEm = consentAt = new Date().toISOString();
+  $('demo').textContent = 'Exemplo para a equipe testar. As respostas são fictícias e nada é guardado nem enviado.';
+  var ck = function(q, idx, det){ var o = { on: {}, det: {}, none: false }; idx.forEach(function(i, j){ o.on[i] = true; if (det && det[j]) o.det[i] = det[j]; }); return o; };
+  var none = { on: {}, det: {}, none: true };
+  A = {
+    quem: 0, nome: 'Maria Aparecida Souza (EXEMPLO)', usa_ns: 0, dn: '1958-03-14', sexo: 0, telefone: '(73) 90000-0000', emerg: { nome: 'Ana', par: 'Filho(a)', tel: '(73) 90000-0001' }, estado_civil: 1, profissao: 'Professora aposentada', escolaridade: 5, cor: 2, religiao: 0,
+    end: { cep: '45650-000', rua: 'Rua das Flores', num: '120', compl: 'casa', bairro: 'Centro', cidade: 'Ilhéus', uf: 'BA' }, pagto: 1, plano_nome: 0, carteirinha: '0123456789',
+    comunic: none, cirurgia: 'Tirar a vesícula por vídeo', lado: 3, cirurgiao: 'Dr. João (cirurgião geral)', hospital: 0, data_cir_alt: true,
+    anest_previa: 1, cirurgias: [{ mes_alt: true, ano: '1992', proc: 'Cesárea', tipo: 'Tomou nas costas e as pernas ficaram dormentes', teve: NO }, { mes: '3', ano: '2009', proc: 'Retirada do útero', tipo: 'Dormiu totalmente', teve: YES, prob: 'vomitou muito' }],
+    compl_pos: 1, compl_anest_pos: ck(QI.compl_anest_pos, [0]), compl_intra: 0, cinetose: 0, fam_tri: 0,
+    alergia: 1, alerg_esp: ck(QI.alerg_esp, [0], ['dipirona: manchas vermelhas e coceira']), latex_risco: none,
+    meds_usa: 1, meds: [{ n: 'Losartana', d: '50 mg', p: '1 de manhã e 1 à noite', i: 'pressão' }, { n: 'Metformina', d: '850 mg', p: 'após almoço e jantar', i: 'diabetes' }, { n: 'Omeprazol', d: '20 mg', p: 'em jejum', i: 'estômago' }],
+    meds_classes: ck(QI.meds_classes, [0, 8, 9], ['Ozempic 0,5 mg, aplico no domingo']), supl_usa: 1, supl: ck(QI.supl, [0]), supl_rows: [{ n: 'Ômega-3', d: '1 cápsula', h: 'no almoço', u: 'ontem', t: '2 anos' }],
+    cv_doencas: ck(QI.cv_doencas, [0, 13], ['há 15 anos, controlada']), cv_sint: none,
+    resp_doencas: none, resp_sint: none, sono: ck(QI.sono, [0, 2]),
+    neuro_d: none, psiq_d: ck(QI.psiq_d, [0]),
+    endo_d: ck(QI.endo_d, [0, 7], ['há 8 anos; glicada 7,4']), renal_d: none, gi_d: ck(QI.gi_d, [0, 6], ['quase todo dia depois do almoço']),
+    hemato_d: none, imuno_d: none, onco_d: none, infec_d: none, musc_d: ck(QI.musc_d, [4], ['joelhos']), orl_d: none,
+    gravidez: 0, menstr: 1, menop_idade: '51', amament: 0, gpa_n: { g: '2', pn: '1', pc: '1', ab: '0' }, gine_d: none,
+    tab: 0, tab_outros: none, alcool: 1, alcool_tipo: 'uma taça de vinho em festas', drogas: none, cafeina: '2', ativ_faz: 1, ativ: [{ a: 'Caminhada', v: '2', p: 'semana', m: '40' }],
+    medidas: { peso: '82', altura: '158' }, dasi: { dasi1: YES, dasi2: YES, dasi3: YES, dasi4: YES, dasi5: NO, dasi6: YES, dasi7: YES, dasi8: NO, dasi9: NO, dasi10: YES, dasi11: NO, dasi12: NO },
+    escada: 2, limitacao: 0, geriatria: none,
+    dent: ck(QI.dent, [4]), dent_onde: ck(QI.dent_onde, [0, 2]), disp: none, piercing: 1, piercing_onde: ck(QI.piercing_onde, [3]), cilios: 0, unhas: 1,
+    transf_prev: 0, aceita: 0, risco_card: 1, rcv_medico: 'Dra. Paula', exames_feitos: 'exame de sangue e eletrocardiograma em agosto', acomp: 0, duvidas: 'tenho medo de vomitar de novo'
+  };
+  showReview();
+}
+
+/* ---------- Navegação ---------- */
+$('btn-next').addEventListener('click', function(){
+  if (phase === 'review'){ showDone(); return; }
+  if (!validate()) return;
+  var n = nextVisible(cur);
+  if (n === -1) showReview(); else showStep(n);
+});
+$('btn-back').addEventListener('click', function(){
+  if (phase === 'review'){ var last = -1; for (var j = STEPS.length - 1; j >= 0; j--) if (!STEPS[j].when || STEPS[j].when(A)){ last = j; break; } showStep(last); return; }
+  var p = prevVisible(cur); if (p > -1) showStep(p);
+});
+
+function iniciarConvite(){
+  if (!window.supabase){ telaConv('rede', function(){ location.reload(); }); return; }
+  SBQ = window.supabase.createClient(SBQ_CFG.url, SBQ_CFG.chave, { auth: { persistSession: false, autoRefreshToken: false } });
+  $('main').innerHTML = ''; $('main').appendChild(h('div', { 'class': 'done' }, h('p', { style: 'margin:0' }, 'Carregando o questionário…')));
+  SBQ.rpc('questionario_abrir', { p_token: CONV.token }).then(function(r){
+    var d = r && r.data;
+    if (r.error || !d){ telaConv('rede', iniciarConvite); return; }
+    if (d.erro){ telaConv(d.erro); return; }
+    CONV.info = d;
+    if (d.estado && d.estado.A && !load()){ try { localStorage.setItem(KEY, JSON.stringify(Object.assign({}, d.estado, { t: Date.now() }))); } catch (e){} }
+    var ctx = [d.instituicao ? 'no ' + d.instituicao : '', d.data_cirurgia ? 'em ' + dBR(d.data_cirurgia) : ''].filter(Boolean).join(' ');
+    $('demo').textContent = (d.primeiro_nome ? 'Olá, ' + d.primeiro_nome + '! ' : '') + 'Questionário pré-anestésico' + (ctx ? ' para a sua cirurgia ' + ctx : '') + '. As respostas vão direto para a equipe de anestesia' + (d.expira_em ? ' (link válido até ' + new Date(d.expira_em).toLocaleDateString('pt-BR') + ')' : '') + '.';
+    $('nav').hidden = false;
+    SBQ.rpc('dados_publicos').then(function(x){ var p = x && x.data; if (p && p.contato) TERMO.contato = p.contato; }, function(){}).then(function(){ showStep(0); });
+  }, function(){ telaConv('rede', iniciarConvite); });
+}
+if (CONV) iniciarConvite(); else showStep(0);
+})();
+</script>
+
+</body></html>

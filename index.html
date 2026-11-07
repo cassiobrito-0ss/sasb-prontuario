@@ -167,6 +167,23 @@ tr.aval td.nome small.orig{display:block;color:var(--muted)}
 .reuso-op small{color:var(--muted)}
 .reuso-op .rec{font-size:11px;font-weight:700;color:var(--ok);background:var(--ok-soft);padding:1px 7px;border-radius:999px;margin-left:6px}
 .ant-banner{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 12px;border:1px solid var(--info, #1D5A94);border-radius:10px;background:var(--surface-2);font-size:13.5px;margin-bottom:12px}
+.qp-badge{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.qp-badge.on{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.qp-status{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:13.5px}
+.qp-status.novo{border-color:var(--ok);background:var(--ok-soft)}
+.qp-status.warn{border-color:var(--warn);background:var(--warn-soft)}
+.qp-row{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+@media (max-width:560px){.qp-row{grid-template-columns:1fr}}
+#qp-texto{min-height:150px;font-size:13.5px}
+.qp-linkbox{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px dashed var(--line-strong);border-radius:10px;font-size:13px;overflow-wrap:anywhere}
+.qp-linkbox p{margin:0}
+.qp-relato{margin:8px 0 0;max-height:320px;overflow:auto;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.qp-relato dt{font-weight:600;margin-top:6px}
+.qp-relato dd{margin:0 0 4px;color:var(--muted)}
+.qp-alertas{padding:8px 10px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-weight:600;font-size:13px;margin-top:8px}
+.qp-ok{padding:8px 10px;border-radius:8px;background:var(--ok-soft);color:var(--ok);font-size:13.5px;margin-top:8px}
+.qp-conf{margin-top:8px;font-size:13.5px}
+.qp-conf p{margin:0 0 6px}
 .imp-box{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
 .imp-tx{display:flex;flex-direction:column;gap:2px;flex:1 1 260px;min-width:0;font-size:13px}
 .imp-tx span{color:var(--muted);font-size:12.5px}
@@ -458,6 +475,7 @@ body.patient-mode .pm-only{display:flex}
       <button type="button" class="btn" id="btn-limpar">Nova avaliação</button>
       <button type="button" class="btn ext-btn" id="btn-extrator" hidden title="Extrator de exames (PDF padrão do laboratório): ler os laudos e preencher os campos" aria-label="Extrator de exames"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3"/><path d="M7.2 15h9.6"/></svg><span>Extrator de exames</span></button>
       <a class="btn ext-btn" id="lnk-extrator" hidden href="https://claude.ai/artifact/1JPuNQGjiFLLiFvjYx9YEF" target="_blank" rel="noopener" title="Abre o EXTRATOR DE PDF Padrão no claude.ai, em outra aba (entre com sua conta do Claude)" style="text-decoration:none"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Extrator PDF Padrão (claude.ai)</span></a>
+      <button type="button" class="btn ext-btn" id="btn-whats" hidden title="Enviar o Questionário do Paciente por WhatsApp e importar as respostas"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.4-4.1A8 8 0 1 1 20 11.5z"/><path d="M9 9.5h6M9 13h4"/></svg><span>Questionário do paciente (WhatsApp)</span><span class="qp-badge" id="qp-badge" hidden></span></button>
       <a class="btn primary" href="#sec-resumo" style="text-decoration:none">Ir para o resumo</a>
     </div>
   </div>
@@ -1891,6 +1909,71 @@ function pdfProntuario(){
 
 
 
+
+/* ---------- Questionário do paciente: aplicar as respostas no prontuário ---------- */
+function qpSemAc(x){ return String(x == null ? '' : x).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+function qpAlvo(k){
+  var e = $(k), g = document.querySelectorAll('#form input[name="' + k + '"]');
+  if (g.length) return { tipo: g[0].type === 'radio' ? 'radio' : 'grupo', g: g, sec: g[0].closest('.sec') };
+  if (!e || !e.closest('#form')) return null;
+  if (e.tagName === 'TABLE') return { tipo: 'tabela', e: e, sec: e.closest('.sec') };
+  if (e.type === 'checkbox') return { tipo: 'check', e: e, sec: e.closest('.sec') };
+  if (e.type === 'hidden' && $(k + '_txt')) return { tipo: 'data', e: e, sec: e.closest('.sec') };
+  if (e.type === 'hidden') return null;
+  return { tipo: 'texto', e: e, sec: e.closest('.sec') };
+}
+function qpOpcao(g, v){ var n = qpSemAc(v), achou = null; g.forEach(function(i){ if (!achou && qpSemAc(i.value) === n) achou = i.value; }); return achou; }
+function qpAtual(t){
+  if (t.tipo === 'radio'){ var c = [].find.call(t.g, function(i){ return i.checked; }); return c ? c.value : ''; }
+  if (t.tipo === 'grupo') return [].filter.call(t.g, function(i){ return i.checked; }).map(function(i){ return i.value; });
+  if (t.tipo === 'tabela') return [].map.call(t.e.tBodies[0].rows, function(r){ return [].map.call(r.querySelectorAll('input, select'), function(i){ return i.type === 'checkbox' ? '' : String(i.value || '').trim(); }); }).filter(function(r){ return r.some(Boolean); });
+  if (t.tipo === 'check') return t.e.checked;
+  return String(t.e.value || '').trim();
+}
+function qpVazio(v){ return v === '' || v === false || v == null || (Array.isArray(v) && !v.length); }
+function qpTexto(v){ if (v === true) return 'sim'; if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) return dBR(v); if (Array.isArray(v)) return v.map(function(x){ return Array.isArray(x) ? x.filter(Boolean).join(' / ') : x; }).join('; '); return String(v); }
+function rotulo(k){
+  var base = k.replace(/_(det|outro|txt)$/, ''), achou = '';
+  SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){
+    if (achou) return;
+    if (f.id === k || f.id === base) achou = f.label || f.title || '';
+    if (!achou && Array.isArray(f.items)) f.items.forEach(function(it){ if (!achou && Array.isArray(it) && (it[0] === k || it[0] === base)) achou = (f.label ? f.label + ': ' : '') + it[1]; });
+  }); });
+  return (achou || k) + (base !== k && achou ? ' (detalhe)' : '');
+}
+function qpPreparar(pkg){
+  if (!pkg || !pkg.campos || typeof pkg.campos !== 'object') throw new Error('As respostas do paciente não estão no formato esperado.');
+  var mud = [], ign = [], bloq = [];
+  Object.keys(pkg.campos).forEach(function(k){
+    var v = pkg.campos[k], t = qpAlvo(k);
+    if (!t || !t.sec){ ign.push(k); return; }
+    var secId = t.sec.id.slice(4);
+    if (!(window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel(secId) === 'editar')){ bloq.push(k); return; }
+    var nv;
+    if (t.tipo === 'radio'){ nv = qpOpcao(t.g, Array.isArray(v) ? v[0] : v); if (!nv){ ign.push(k); return; } }
+    else if (t.tipo === 'grupo'){ var arr = (Array.isArray(v) ? v : [v]).map(function(x){ return qpOpcao(t.g, x); }).filter(Boolean); if (!arr.length){ ign.push(k); return; } nv = qpAtual(t).concat(arr.filter(function(x){ return qpAtual(t).indexOf(x) < 0; })); }
+    else if (t.tipo === 'tabela'){ if (!Array.isArray(v) || !v.length){ ign.push(k); return; } nv = v.map(function(r){ return (Array.isArray(r) ? r : [r]).map(function(x){ return x == null ? '' : String(x); }); }); }
+    else if (t.tipo === 'check'){ nv = !!v; if (!nv) return; }
+    else if (t.tipo === 'data'){ var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v)) || null; if (m) nv = m[1] + '-' + m[2] + '-' + m[3]; else { m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(String(v)); if (!m){ ign.push(k); return; } nv = m[3] + '-' + m[2] + '-' + m[1]; } }
+    else nv = Array.isArray(v) ? v.join('; ') : String(v);
+    var cur = qpAtual(t);
+    if (JSON.stringify(cur) === JSON.stringify(nv)) return;
+    mud.push({ k: k, t: t, sec: secId, de: cur, para: nv, conflito: !qpVazio(cur) && t.tipo !== 'grupo' });
+  });
+  return { pkg: pkg, mud: mud, conf: mud.filter(function(m){ return m.conflito; }), ign: ign, bloq: bloq };
+}
+function qpAplicar(P, soVazios){
+  var secs = {}, n = 0;
+  P.mud.forEach(function(m){
+    if (soVazios && m.conflito) return;
+    if (m.t.tipo === 'texto' || m.t.tipo === 'data') m.t.e.value = m.para; else setVal(m.k, m.para);
+    secs[m.sec] = 1; n++;
+  });
+  syncDatas(); syncDmy();
+  Object.keys(secs).forEach(function(sid){ if (window.ACESSO && window.ACESSO.sujo) window.ACESSO.sujo(sid); });
+  update();
+  return { n: n, secs: Object.keys(secs) };
+}
 /* ---------- Avaliação baseada em avaliação anterior ---------- */
 var REUSO_SECS = ['ident','hist','habitos','alergias','capfunc','transf','proteses','sistemas','meds','suplementos','exfis','va','exames','risco'];
 var REUSO_Q = [['at_meds', 'at_meds_txt'], ['at_proc', 'at_proc_txt'], ['at_comorb', 'at_comorb_txt'], ['at_clin', null], ['at_outros', 'at_outros_txt'], ['at_importante', 'at_importante_txt']];
@@ -2797,6 +2880,7 @@ function update(){
     computeBase(); applyAuto(); computeScores(); vadRefresh(); extRefsRender(); reusoRender();
     var b = $('btn-extrator'); if (b) b.hidden = !extPodeUsar();
     var lk = $('lnk-extrator'); if (lk) lk.hidden = !extPodeUsar();
+    var bw = $('btn-whats'); if (bw) bw.hidden = !(document.body.classList.contains('com-pront') && !ENC && window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel('ident') === 'editar');
     var A = alerts(); renderAlerts(A); renderStrip(); renderPanelScores(); renderUI();
     LAST_ALERTS = A;
     tcleRefresh();
@@ -3534,7 +3618,7 @@ SCHEMA.forEach(function(sec){ sec.fields.forEach(function(f){
   if (sec.id === 'sistemas' && f.t === 'conds'){ f.quando = true; if (['cv', 'infec'].indexOf(f.id) < 0) f.outro = true; }
 }); });
 render(); bind(); loadExample();
-window.PRONT = { reusoAtivo: function(){ return !!reusoInfo(); }, imprimir: impImprimir, pdfA4: impPdf, clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
+window.PRONT = { num: function(id){ return NUMS[id] || id; }, rotulo: rotulo, qpPreparar: qpPreparar, qpAplicar: qpAplicar, qpTexto: qpTexto, reusoAtivo: function(){ return !!reusoInfo(); }, imprimir: impImprimir, pdfA4: impPdf, clearAll: clearAll, update: update, schema: SCHEMA, setVal: setVal, encerrado: function(){ return !!ENC; },
   coletarSecao: coletarSecao, aplicarSecao: aplicarSecao, setAssinado: setAssinado, syncDmy: syncDmy };
 })();
 </script>
@@ -3748,6 +3832,30 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
     <div class="adm-msg" id="dlg-novo-msg" role="alert"></div>
     <div class="dlg-acts"><button class="btn" type="button" id="dlg-novo-cancelar">Cancelar</button><button class="btn primary" type="submit" id="dlg-novo-ok">Criar e abrir</button></div>
   </form>
+</div>
+
+<div class="dlg" id="dlg-qp" hidden role="dialog" aria-modal="true" aria-labelledby="dlg-qp-t">
+  <div class="dlg-card" style="max-width:640px">
+    <h2 id="dlg-qp-t">Questionário do paciente</h2>
+    <p class="note" id="qp-pac" style="margin:0"></p>
+    <div class="qp-status" id="qp-status" aria-live="polite"></div>
+    <div id="qp-resp" hidden></div>
+    <form id="qp-form" novalidate style="display:flex;flex-direction:column;gap:12px">
+      <div class="qp-row">
+        <label>WhatsApp do paciente (com DDD)<input id="qp-tel" inputmode="tel" autocomplete="off" placeholder="(73) 99999-9999"></label>
+        <label>Link válido por<select id="qp-dias"><option value="3">3 dias</option><option value="7" selected>7 dias</option><option value="14">14 dias</option><option value="30">30 dias</option></select></label>
+      </div>
+      <label>Mensagem<textarea id="qp-texto" rows="7"></textarea></label>
+      <p class="note" style="margin:0">O link é gerado na hora e entra no lugar de {link}. Ao gerar um link novo, o anterior (ainda não respondido) deixa de funcionar.</p>
+      <div class="adm-msg" id="qp-msg" role="alert"></div>
+      <div class="dlg-acts" style="flex-wrap:wrap">
+        <button class="btn" type="button" id="qp-fechar">Fechar</button>
+        <button class="btn" type="button" id="qp-copiar">Gerar e copiar o link</button>
+        <button class="btn primary" type="submit" id="qp-enviar">Gerar link e abrir o WhatsApp</button>
+      </div>
+      <div id="qp-link" hidden></div>
+    </form>
+  </div>
 </div>
 
 <div class="dlg" id="dlg-reuso" hidden role="dialog" aria-modal="true" aria-labelledby="dlg-reuso-t">
@@ -4502,6 +4610,146 @@ window.ACESSO.abrirOutro = async function(id){
   if (ATUAL && Object.keys(SUJO).length){ if (!await salvar()) return; }
   await abrirProntuario(id);
 };
+
+/* ---------- Questionário do paciente por WhatsApp ---------- */
+var QP = null;
+function qpUrl(tok){ var base = String(location.href).split('#')[0].split('?')[0].replace(/[^\/]*$/, ''); return base + 'questionario.html#t=' + tok; }
+function qpDigitos(t){ var d = String(t || '').replace(/\D/g, ''); if (d.length === 10 || d.length === 11) d = '55' + d; return d; }
+function qpModelo(){
+  var nome = (campo('nome') || (ATUAL && ATUAL.paciente_nome) || '').split(' ')[0];
+  var dc = campo('data_cir') || (ATUAL && ATUAL.data_cirurgia) || '', inst = ATUAL ? nomeInst(ATUAL.instituicao_id) : '';
+  return 'Olá' + (nome ? ', ' + nome : '') + '! Aqui é a equipe de anestesia da ' + ((EMPRESA.nome || 'SASB').split(/\s[–-]\s/)[0]) + '.\n\n' +
+    'Antes da sua cirurgia' + (inst && inst !== '—' ? ' no ' + inst : '') + (dc ? ' (' + dataBR(dc) + ')' : '') + ', pedimos que responda o questionário pré-anestésico pelo link abaixo. Leva de 10 a 15 minutos e as respostas vão direto para o anestesista.\n\n{link}\n\n' +
+    'O link é pessoal e vale até {validade}. Se tiver dúvidas, responda esta mensagem.';
+}
+async function qpCarregar(){
+  QP = null;
+  var bd = $('qp-badge'); if (bd){ bd.hidden = true; bd.textContent = ''; }
+  if (!ATUAL) return null;
+  var r;
+  try { r = await sb.from('convites_paciente').select('id, criado_em, expira_em, revogado, aberto_em, respondido_em, atualizado_em, importado_em, telefone').eq('avaliacao_id', ATUAL.id).order('criado_em', { ascending: false }).limit(1); } catch (e){ return null; }
+  QP = r && r.data && r.data[0] || null;
+  if (bd && QP){
+    var st = QP.respondido_em ? (QP.importado_em ? '' : 'respondido') : (!QP.revogado && new Date(QP.expira_em) > new Date() ? (QP.aberto_em ? 'em preenchimento' : 'enviado') : '');
+    bd.textContent = st; bd.hidden = !st; bd.className = 'qp-badge' + (st === 'respondido' ? ' on' : '');
+  }
+  return QP;
+}
+function qpStatusTexto(c){
+  if (!c) return ['Ainda não enviado para este prontuário.', ''];
+  if (c.respondido_em) return ['Respondido pelo paciente em ' + dataHora(c.respondido_em) + (c.importado_em ? ' · respostas já importadas em ' + dataHora(c.importado_em) : ' · respostas ainda não importadas') + '.', c.importado_em ? 'ok' : 'novo'];
+  if (c.revogado) return ['O último link foi substituído e não está mais valendo.', ''];
+  if (new Date(c.expira_em) < new Date()) return ['Link enviado em ' + dataHora(c.criado_em) + ' expirou em ' + dataHora(c.expira_em) + ' sem resposta. Gere um novo link.', 'warn'];
+  if (c.aberto_em) return ['Enviado em ' + dataHora(c.criado_em) + '. O paciente abriu em ' + dataHora(c.aberto_em) + (c.atualizado_em ? ' e salvou respostas parciais em ' + dataHora(c.atualizado_em) : '') + ', mas ainda não concluiu. Válido até ' + dataHora(c.expira_em) + '.', 'warn'];
+  return ['Enviado em ' + dataHora(c.criado_em) + ', ainda não aberto pelo paciente. Válido até ' + dataHora(c.expira_em) + '.', ''];
+}
+function qpRender(){
+  var s = qpStatusTexto(QP), st = $('qp-status');
+  st.textContent = s[0]; st.className = 'qp-status ' + s[1];
+  var box = $('qp-resp'); box.innerHTML = ''; box.hidden = !(QP && QP.respondido_em);
+  if (!box.hidden){
+    var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'btn primary'; b1.textContent = QP.importado_em ? 'Importar de novo' : 'Importar as respostas para o prontuário';
+    b1.addEventListener('click', qpImportar);
+    var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'btn'; b2.textContent = 'Ver as respostas do paciente';
+    b2.addEventListener('click', qpVerRespostas);
+    var acts = document.createElement('div'); acts.className = 'dlg-acts'; acts.style.justifyContent = 'flex-start'; acts.appendChild(b1); acts.appendChild(b2);
+    box.appendChild(acts);
+    var out = document.createElement('div'); out.id = 'qp-out'; box.appendChild(out);
+  }
+}
+async function qpRespostas(){
+  var r = await sb.from('convites_paciente').select('respostas').eq('id', QP.id).maybeSingle();
+  if (r.error || !r.data || !r.data.respostas || !r.data.respostas.pacote) throw new Error('Não foi possível ler as respostas do paciente.');
+  return r.data.respostas.pacote;
+}
+async function qpVerRespostas(){
+  var out = $('qp-out'); out.innerHTML = 'Carregando…';
+  try {
+    var pkg = await qpRespostas(); out.innerHTML = '';
+    if (pkg.alertas && pkg.alertas.length){ var al = document.createElement('div'); al.className = 'qp-alertas'; al.textContent = 'Pontos de atenção: ' + pkg.alertas.join(' · '); out.appendChild(al); }
+    var dl = document.createElement('dl'); dl.className = 'qp-relato';
+    (pkg.relato || []).forEach(function(x){ var dt = document.createElement('dt'); dt.textContent = x.pergunta; var dd = document.createElement('dd'); dd.textContent = x.resposta; dl.appendChild(dt); dl.appendChild(dd); });
+    out.appendChild(dl);
+    if (pkg.consentimento){ var c = document.createElement('p'); c.className = 'note'; c.textContent = 'Termo de uso dos dados: ' + (pkg.consentimento.aceito ? 'aceito em ' + dataHora(pkg.consentimento.aceito_em) + ' (versão ' + pkg.consentimento.versao + ')' : 'não aceito') + (pkg.informante ? ' · respondido por: ' + pkg.informante : '') + '.'; out.appendChild(c); }
+  } catch (e){ out.textContent = e.message; }
+}
+async function qpImportar(){
+  var out = $('qp-out'); out.innerHTML = 'Lendo as respostas…';
+  var P;
+  try { P = window.PRONT.qpPreparar(await qpRespostas()); } catch (e){ out.textContent = e.message; return; }
+  out.innerHTML = '';
+  async function concluir(so){
+    var r = window.PRONT.qpAplicar(P, so);
+    try { await sb.rpc('convite_importado', { p_convite: QP.id }); } catch (e){}
+    await qpCarregar(); qpRender();
+    var o2 = $('qp-out'); o2.innerHTML = '';
+    var ok = document.createElement('div'); ok.className = 'qp-ok';
+    ok.textContent = r.n + ' campo(s) preenchido(s) com as respostas do paciente' + (r.secs.length ? ' nas abas ' + r.secs.map(function(id){ return window.PRONT.num(id); }).sort().join(', ') : '') + '.' + (P.bloq.length ? ' ' + P.bloq.length + ' campo(s) ficaram de fora porque sua função não edita aquelas abas.' : '') + ' Confira tudo com o paciente na consulta.';
+    o2.appendChild(ok);
+  }
+  if (!P.mud.length){ out.textContent = 'As respostas do paciente já estão no prontuário. Nada a alterar.'; return; }
+  if (!P.conf.length){ concluir(false); return; }
+  var w = document.createElement('div'); w.className = 'qp-conf';
+  var t = document.createElement('p'); t.innerHTML = '<b>' + P.conf.length + ' campo(s) já têm resposta diferente no prontuário.</b> ' + (P.mud.length - P.conf.length) + ' campo(s) vazios serão preenchidos.'; w.appendChild(t);
+  var tb = document.createElement('table'); tb.className = 'ext-conf'; tb.innerHTML = '<thead><tr><th>Campo</th><th>No prontuário</th><th>Resposta do paciente</th></tr></thead>';
+  var bd = document.createElement('tbody');
+  P.conf.forEach(function(m){ var tr = document.createElement('tr'); [window.PRONT.rotulo(m.k), window.PRONT.qpTexto(m.de), window.PRONT.qpTexto(m.para)].forEach(function(x){ var td = document.createElement('td'); td.textContent = x; tr.appendChild(td); }); bd.appendChild(tr); });
+  tb.appendChild(bd); w.appendChild(tb);
+  var a = document.createElement('div'); a.className = 'dlg-acts'; a.style.justifyContent = 'flex-start';
+  [['Preencher só os campos vazios', true, 'btn primary'], ['Substituir também os que já têm resposta', false, 'btn']].forEach(function(x){ var b = document.createElement('button'); b.type = 'button'; b.className = x[2]; b.textContent = x[0]; b.addEventListener('click', function(){ concluir(x[1]); }); a.appendChild(b); });
+  w.appendChild(a); out.appendChild(w);
+}
+async function qpGerar(){
+  var m = $('qp-msg');
+  if (!ATUAL) return null;
+  var r = await sb.rpc('convite_criar', { p_avaliacao: ATUAL.id, p_dias: parseInt($('qp-dias').value, 10) || 7, p_telefone: $('qp-tel').value });
+  if (r.error || !r.data || !r.data.token) throw new Error('Não foi possível gerar o link' + (r.error ? ': ' + r.error.message : '.'));
+  var link = qpUrl(r.data.token), val = new Date(r.data.expira_em).toLocaleDateString('pt-BR');
+  var texto = $('qp-texto').value.indexOf('{link}') > -1 ? $('qp-texto').value : $('qp-texto').value + '\n\n{link}';
+  texto = texto.split('{link}').join(link).split('{validade}').join(val);
+  await qpCarregar(); qpRender();
+  return { link: link, texto: texto };
+}
+function qpMostrarLink(x, wa){
+  var d = $('qp-link'); d.innerHTML = ''; d.hidden = false; d.className = 'qp-linkbox';
+  var p = document.createElement('p'); p.textContent = 'Link gerado: '; var a = document.createElement('a'); a.href = x.link; a.target = '_blank'; a.rel = 'noopener'; a.textContent = x.link; p.appendChild(a); d.appendChild(p);
+  if (wa){ var b = document.createElement('a'); b.className = 'btn primary'; b.href = wa; b.target = '_blank'; b.rel = 'noopener'; b.textContent = 'Abrir o WhatsApp com a mensagem'; b.style.textDecoration = 'none'; d.appendChild(b); }
+}
+$('btn-whats').addEventListener('click', async function(){
+  if (!ATUAL) return;
+  $('qp-pac').textContent = (campo('nome') || ATUAL.paciente_nome || 'Paciente') + (campo('dn') ? ' · nasc. ' + dataBR(campo('dn')) : '');
+  $('qp-tel').value = campo('telefone') || (QP && QP.telefone) || '';
+  $('qp-texto').value = qpModelo();
+  msg($('qp-msg'), ''); $('qp-link').hidden = true;
+  $('qp-status').textContent = 'Consultando…'; $('qp-resp').hidden = true;
+  $('dlg-qp').hidden = false;
+  await qpCarregar(); qpRender();
+});
+$('qp-fechar').addEventListener('click', function(){ $('dlg-qp').hidden = true; });
+$('qp-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var m = $('qp-msg'), dig = qpDigitos($('qp-tel').value);
+  if (dig && dig.length < 12) return msg(m, 'Confira o número: informe o DDD e o número do celular.', 'err');
+  var win = null; try { win = window.open('', '_blank'); } catch (x){}
+  $('qp-enviar').disabled = true; msg(m, 'Gerando o link…');
+  try {
+    var x = await qpGerar();
+    var wa = 'https://wa.me/' + (dig || '') + '?text=' + encodeURIComponent(x.texto);
+    if (win && !win.closed){ try { win.opener = null; win.location.href = wa; } catch (y){ win = null; } }
+    msg(m, win ? 'WhatsApp aberto em outra aba. Confira a mensagem e toque em enviar.' : 'Link gerado. Clique em "Abrir o WhatsApp com a mensagem".');
+    qpMostrarLink(x, wa);
+  } catch (err){ if (win) try { win.close(); } catch (y){} msg(m, /fetch|network|Failed/i.test(err.message) ? SEM_REDE : err.message, 'err'); }
+  finally { $('qp-enviar').disabled = false; }
+});
+$('qp-copiar').addEventListener('click', async function(){
+  var m = $('qp-msg'); this.disabled = true; msg(m, 'Gerando o link…');
+  try {
+    var x = await qpGerar();
+    try { await navigator.clipboard.writeText(x.texto); msg(m, 'Mensagem com o link copiada. Cole no WhatsApp do paciente.'); } catch (y){ msg(m, 'Link gerado. Copie a mensagem abaixo.'); }
+    qpMostrarLink(x, null);
+  } catch (err){ msg(m, err.message, 'err'); }
+  finally { this.disabled = false; }
+});
 /* Aviso no prontuário novo quando o paciente já tem avaliações anteriores */
 var tAnt = null;
 async function checarAnteriores(){
@@ -4617,6 +4865,7 @@ async function abrirProntuario(id, novo){
   window.scrollTo(0, 0);
   try { sb.rpc('registrar_leitura', { p_id: id }); } catch (e){}
   checarAnteriores();
+  qpCarregar();
 }
 function renderPbar(){
   var h = $('pbar-host'); h.innerHTML = '';

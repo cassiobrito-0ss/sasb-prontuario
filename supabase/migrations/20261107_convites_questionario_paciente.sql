@@ -1,0 +1,3 @@
+-- Convites do Questionário do Paciente (link pessoal enviado por WhatsApp)
+-- Tabela convites_paciente (RLS: leitura pela equipe da instituição), funções convite_criar e convite_importado (equipe)
+-- e questionario_abrir / questionario_salvar (paciente, sem login, pelo token do link). Aplicada no projeto em 07/11/2026.
