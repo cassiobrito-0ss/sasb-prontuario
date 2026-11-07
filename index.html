@@ -1952,6 +1952,21 @@ function extMsg(conteudo, tipo){
 }
 function extRotulo(k){ var f = extDefs()[k]; return f ? f.label : k; }
 function extReceber(d){
+  var pp = d && d.paciente_prontuario;
+  if (pp && !d._idok){
+    var nascP = txt('dn'), nomeP = txt('nome');
+    if (pp.nascimento && nascP && pp.nascimento !== nascP){
+      extMsg(h('div', null, h('b', null, 'Este código é de outro paciente.'), ' Foi gerado para ' + (pp.nome || '—') + ' (nasc. ' + dBR(pp.nascimento) + '), mas este prontuário é de ' + (nomeP || '—') + ' (nasc. ' + dBR(nascP) + '). Copie o código certo em Extrações Múltiplas.'), 'err');
+      return;
+    }
+    if ((pp.nome && nomeP && extSemAc(pp.nome) !== extSemAc(nomeP)) || (pp.nascimento && !nascP)){
+      extMsg(h('div', null, h('b', null, 'Confira o paciente antes de aplicar.'), ' Código: ' + (pp.nome || '—') + (pp.nascimento ? ' (nasc. ' + dBR(pp.nascimento) + ')' : '') + ' · Prontuário: ' + (nomeP || 'sem nome') + (nascP ? ' (nasc. ' + dBR(nascP) + ')' : ' (sem data de nascimento)') + '.',
+        h('div', { 'class': 'ext-acts' },
+          h('button', { type: 'button', 'class': 'btn primary', onclick: function(){ d._idok = true; extReceber(d); } }, 'É o mesmo paciente: aplicar'),
+          h('button', { type: 'button', 'class': 'btn', onclick: function(){ extMsg(null); } }, 'Cancelar'))), 'warn');
+      return;
+    }
+  }
   var P;
   try { P = extPreparar(d); } catch (e){ extMsg(h('span', null, e.message), 'err'); return; }
   function concluir(so_vazios){
@@ -2036,6 +2051,7 @@ function extAbrir(){
         h('div', { 'data-pane': 'colar', 'class': 'ext-pane-colar', hidden: true },
           h('p', null, 'Use quando ler os exames no EXTRATOR DE PDF Padrão aberto no claude.ai: lá, clique em "Copiar para o sistema" e cole aqui. Somente PDFs originais do laboratório (com texto); fotos e PDFs escaneados não são lidos.'),
           h('p', null, h('a', { href: 'https://claude.ai/artifact/1JPuNQGjiFLLiFvjYx9YEF', target: '_blank', rel: 'noopener' }, 'Abrir o EXTRATOR DE PDF Padrão no claude.ai ↗'), ' (abre em outra aba; o prontuário continua aberto aqui).'),
+          h('p', null, h('a', { href: 'https://claude.ai/artifact/QSJMAg6TKJH4Ky84BbZXJp', target: '_blank', rel: 'noopener' }, 'Abrir Extrações Múltiplas (PDF Padrão) ↗'), ': procure o paciente em "Extrações salvas" e clique em "Copiar código".'),
           h('textarea', { id: 'ext-cod', rows: 8, placeholder: 'Cole aqui o código copiado do Extrator de exames', 'aria-label': 'Código do Extrator de exames' }),
           h('div', { 'class': 'ext-acts' }, h('button', { type: 'button', 'class': 'btn primary', onclick: function(){
             var t = $('ext-cod').value.trim(), dd;
