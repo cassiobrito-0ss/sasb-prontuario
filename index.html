@@ -4014,6 +4014,8 @@ var CFG = {
   url: 'https://jpqetogjtnimcrwymarl.supabase.co',
   chave: 'sb_publishable_fV5KUV6ynUMQER5XR4UypA_k84e-kp_',
   dominio: 'usuarios.prontuario.invalid',
+  // endereço público do questionário (GitHub Pages); o link enviado ao paciente sempre usa este endereço
+  questionarioUrl: 'https://cassiobrito-0ss.github.io/sasb-prontuario/questionario.html',
   inatividadeMin: 15
 };
 var $ = function(id){ return document.getElementById(id); };
@@ -4613,7 +4615,7 @@ window.ACESSO.abrirOutro = async function(id){
 
 /* ---------- Questionário do paciente por WhatsApp ---------- */
 var QP = null;
-function qpUrl(tok){ var base = String(location.href).split('#')[0].split('?')[0].replace(/[^\/]*$/, ''); return base + 'questionario.html#t=' + tok; }
+function qpUrl(tok){ return CFG.questionarioUrl + '#t=' + tok; }
 function qpDigitos(t){ var d = String(t || '').replace(/\D/g, ''); if (d.length === 10 || d.length === 11) d = '55' + d; return d; }
 function qpModelo(){
   var nome = (campo('nome') || (ATUAL && ATUAL.paciente_nome) || '').split(' ')[0];
