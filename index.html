@@ -147,6 +147,8 @@ body.ext-aberto{overflow:hidden}
 .imp-box .pdfmsg{flex-basis:100%}
 .imp-box .pdfmsg:empty{display:none}
 .vl-acs{display:flex;gap:6px}
+.vl-atalhos{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+.vl-atalhos .btn{white-space:nowrap}
 .btn.mini{min-height:30px;padding:4px 10px;font-size:12.5px}
 .lista-tbl td.acs{white-space:nowrap}
 body.imp-lista .vlista{display:block!important}
@@ -3557,6 +3559,9 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
   <div class="vl-in">
     <div class="vl-top">
       <div><div class="eyebrow" id="vl-empresa">Prontuário Pré-Anestésico</div><h1>Prontuários</h1></div>
+      <div class="vl-atalhos">
+        <a class="btn ext-btn" id="lnk-multiplas" href="https://claude.ai/artifact/QSJMAg6TKJH4Ky84BbZXJp" target="_blank" rel="noopener" title="Abre Extrações Múltiplas (PDF Padrão) no claude.ai, em outra aba (entre com sua conta do Claude)" style="text-decoration:none"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5" opacity=".55"/></svg><span>Extrações Múltiplas (PDF Padrão)</span></a>
+      </div>
       <div class="userbox" id="userbox-l"></div>
     </div>
     <form class="filtros" id="vl-filtros" role="search" onsubmit="return false">
