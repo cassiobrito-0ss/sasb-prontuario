@@ -1259,7 +1259,9 @@ var SCHEMA = [
   { t: 'multi', id: 'tecnica', label: 'Técnica anestésica proposta', options: ['Geral balanceada', 'Venosa total (TIVA/TCI)', 'Geral + bloqueio', 'Raquianestesia', 'Peridural', 'Combinada raqui-peridural', 'Bloqueio de nervo periférico', 'Sedação', 'Local + sedação', 'Bloqueio endovenoso de Bier'], outro: true, span: 12 },
   { t: 'text', id: 'tec_bloqueio', label: 'Especificar bloqueio', ph: 'ex.: interescalênico, plexo braquial infraclavicular, femoral, TAP, ESP, bloqueio do quadrado lombar…', span: 12 },
   { t: 'multi', id: 'va_plano', label: 'Manejo da via aérea', options: ['Intubação orotraqueal', 'Máscara laríngea', 'Videolaringoscopia', 'Broncofibroscópio', 'Ventilação monopulmonar', 'Intubação acordado (fibroscopia)', 'Sequência rápida', 'Material de via aérea difícil em sala'], outro: true, span: 12 },
-  { t: 'multi', id: 'monit', label: 'Monitorização', options: ['Padrão (ECG, PNI, SpO₂, EtCO₂)', 'Temperatura', 'TOF (bloqueio neuromuscular)', 'BIS / entropia', 'Pressão arterial invasiva', 'Acesso venoso central', 'Sonda vesical (débito urinário)', 'Débito cardíaco / VPP', 'Ecocardiograma transesofágico', 'Ecocardiograma transtorácico', 'Ultrassonografia (POCUS)', 'Glicemia seriada', 'NIRS'], outro: true, span: 12 },
+  { t: 'multi', id: 'equip', label: 'Equipamentos necessários', options: ['Laringoscópio articulado', 'Laringoscópio articulado cabo curto', 'Vídeolaringoscópio', 'Fibrocópio', 'Ultrassonografia', 'Kit cricotireoidostomia', 'Bombas de infusão'], outro: true, span: 12,
+    textos: [{ op: 'Bombas de infusão', id: 'equip_bombas_txt', ph: 'Quantas / para quê (ex.: 2 bombas — remifentanil e propofol)' }] },
+  { t: 'multi', id: 'monit', label: 'Monitorização', options: ['Padrão (ECG, PNI, SpO₂)', 'Analisador de gases (EtCO₂/halogenado)', 'Temperatura', 'TOF (bloqueio neuromuscular)', 'BIS / entropia', 'Pressão arterial invasiva', 'Acesso venoso central', 'Sonda vesical (débito urinário)', 'Débito cardíaco / VPP', 'Ecocardiograma transesofágico', 'Ecocardiograma transtorácico', 'Ultrassonografia (POCUS)', 'Glicemia seriada', 'NIRS'], outro: true, span: 12 },
   { t: 'text', id: 'acessos', label: 'Acessos venosos planejados', span: 12 },
   { t: 'multi', id: 'profilaxias', outro: true, label: 'Profilaxias', options: ['NVPO (conforme Apfel)', 'Tromboprofilaxia mecânica', 'Tromboprofilaxia farmacológica', 'Antibioticoprofilaxia (até 60 min antes da incisão)', 'Corticoide de estresse', 'Broncoaspiração', 'Broncodilatador antes da indução'], span: 12 },
   { t: 'multi', id: 'precaucoes', outro: true, label: 'Precauções especiais', options: ['Sala livre de látex', 'Técnica livre de gatilhos (HM), dantrolene disponível', 'Isolamento de contato', 'Reprogramar marcapasso / desativar CDI (ímã disponível)', 'Membro restrito para acesso e PA', 'Sem transfusão (recusa)', 'Aquecimento ativo', 'Proteção especial no posicionamento', 'Acompanhante na indução (TEA, demência, criança)'], span: 12 },
@@ -1395,7 +1397,8 @@ function renderField(f){
         h('div', { 'class': 'chipset' }, f.options.concat(f.outro ? ['Outro'] : []).map(function(o){
           return h('label', { 'class': 'chip' }, h('input', { type: type, name: f.id, value: o }), h('span', null, o));
         })),
-        f.outro ? h('input', { type: 'text', id: f.id + '_outro', 'class': 'outro-in', 'data-outro-for': f.id, placeholder: 'Qual? Descreva', 'aria-label': f.label + ': outro', autocomplete: 'off', hidden: true }) : null);
+        f.outro ? h('input', { type: 'text', id: f.id + '_outro', 'class': 'outro-in', 'data-outro-for': f.id, placeholder: 'Qual? Descreva', 'aria-label': f.label + ': outro', autocomplete: 'off', hidden: true }) : null,
+        (f.textos || []).map(function(t){ return h('input', { type: 'text', id: t.id, 'class': 'outro-in', 'data-outro-for': f.id, 'data-outro-val': t.op, placeholder: t.ph || 'Descreva', 'aria-label': f.label + ': ' + t.op, autocomplete: 'off', hidden: true }); }));
       if (f.only) fs.setAttribute('data-only', f.only);
       return fs;
     case 'sub': return h('h3', { 'class': 'sub' }, f.label);
@@ -1674,6 +1677,7 @@ var DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 var DIAS_LONGO = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 function fmtLim(d){ return DIAS[d.getDay()] + ' ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' às ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
 function comOutro(id, v){ if (v !== 'Outro') return v; var o = txt(id + '_outro'); return o || v; }
+function comTextoOpcao(f, v){ var t = f.textos && f.textos.filter(function(x){ return x.op === v; })[0]; if (!t) return v; var tv = txt(t.id); return tv ? v + ': ' + tv : v; }
 function cellEl(c, v){
   if (c[2] === 'multi'){
     var sel = String(v || '').split(/;\s*/);
@@ -2913,14 +2917,15 @@ function update(){
       });
     }
     document.querySelectorAll('[data-outro-for]').forEach(function(i){
-      var fid = i.getAttribute('data-outro-for'), el = $(fid);
-      var on = el && el.tagName === 'SELECT' ? el.value === 'Outro' : !!document.querySelector('input[name="' + fid + '"][value="Outro"]:checked');
+      var fid = i.getAttribute('data-outro-for'), el = $(fid), val = i.getAttribute('data-outro-val') || 'Outro';
+      var on = el && el.tagName === 'SELECT' ? el.value === val : !!document.querySelector('input[name="' + fid + '"][value="' + val + '"]:checked');
       i.hidden = !on;
     });
     computeBase(); applyAuto(); computeScores(); vadRefresh(); extRefsRender(); reusoRender();
     var b = $('btn-extrator'); if (b) b.hidden = !extPodeUsar();
     var lk = $('lnk-extrator'); if (lk) lk.hidden = !extPodeUsar();
     var bw = $('btn-whats'); if (bw) bw.hidden = !(document.body.classList.contains('com-pront') && !ENC && window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel('ident') === 'editar');
+    var btw = $('btn-tcle-whats'); if (btw) btw.hidden = !(document.body.classList.contains('com-pront') && !ENC && window.ACESSO && window.ACESSO.nivel && window.ACESSO.nivel('tcle') === 'editar');
     var A = alerts(); renderAlerts(A); renderStrip(); renderPanelScores(); renderUI();
     LAST_ALERTS = A;
     tcleRefresh();
@@ -2959,7 +2964,7 @@ function linhasSecao(sec, skip){
         case 'hm': v = txt(f.id); if (v) L.push(f.label + ': ' + fmtHm(v)); break;
         case 'ym': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
         case 'cid': case 'tuss': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
-        case 'multi': v = multi(f.id).map(function(x){ return comOutro(f.id, x); }); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
+        case 'multi': v = multi(f.id).map(function(x){ return comTextoOpcao(f, comOutro(f.id, x)); }); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
         case 'table':
           var rows = tableRows(f.id);
           if (rows.length){ L.push(f.label + ':'); rows.forEach(function(r){ L.push('  - ' + r.map(function(c, i){ return c ? f.cols[i][0] + ': ' + c : ''; }).filter(Boolean).join('; ')); }); }
@@ -3148,7 +3153,9 @@ function tcleRender(){
   var root = h('div', { 'class': 'tcle', id: 'tcle' });
   root.appendChild(h('div', { 'class': 'tcle-bar doc-only' },
     h('p', null, 'Os dados do paciente, o procedimento e a técnica são preenchidos a partir das seções anteriores. Entregue o aparelho ao paciente para ler, marcar as declarações e assinar; depois assine como anestesiologista e baixe o PDF.'),
-    h('button', { type: 'button', 'class': 'btn primary', id: 'btn-pm-on' }, 'Entregar ao paciente')));
+    h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' },
+      h('button', { type: 'button', 'class': 'btn primary', id: 'btn-pm-on' }, 'Entregar ao paciente'),
+      h('button', { type: 'button', 'class': 'btn', id: 'btn-tcle-whats' }, 'Enviar TCLE por WhatsApp (leitura antecipada)'))));
   root.appendChild(h('div', { 'class': 'tcle-bar pm-only' },
     h('p', null, h('b', null, 'Termo de Consentimento Livre e Esclarecido para Anestesia. '), 'Leia com calma, marque cada declaração e assine no final. Pergunte ao anestesiologista se tiver qualquer dúvida.'),
     h('button', { type: 'button', 'class': 'btn', id: 'btn-pm-off' }, 'Devolver ao médico')));
@@ -3900,6 +3907,31 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
   </div>
 </div>
 
+<div class="dlg" id="dlg-tcle" hidden role="dialog" aria-modal="true" aria-labelledby="dlg-tcle-t">
+  <div class="dlg-card" style="max-width:640px">
+    <h2 id="dlg-tcle-t">Termo de consentimento (TCLE) — leitura antecipada</h2>
+    <p class="note" id="tcle-whats-pac" style="margin:0"></p>
+    <p class="note" style="margin:0">O paciente só lê o termo e marca que entendeu cada declaração pelo celular. A autorização de transfusão e a assinatura (do paciente e do anestesiologista) continuam sendo feitas presencialmente.</p>
+    <div class="qp-status" id="tcle-whats-status" aria-live="polite"></div>
+    <div id="tcle-whats-resp" hidden></div>
+    <form id="tcle-whats-form" novalidate style="display:flex;flex-direction:column;gap:12px">
+      <div class="qp-row">
+        <label>WhatsApp do paciente (com DDD)<input id="tcle-whats-tel" inputmode="tel" autocomplete="off" placeholder="(73) 99999-9999"></label>
+        <label>Link válido por<select id="tcle-whats-dias"><option value="3">3 dias</option><option value="7" selected>7 dias</option><option value="14">14 dias</option><option value="30">30 dias</option></select></label>
+      </div>
+      <label>Mensagem<textarea id="tcle-whats-texto" rows="7"></textarea></label>
+      <p class="note" style="margin:0">O link é gerado na hora e entra no lugar de {link}. Ao gerar um link novo, o anterior (ainda não respondido) deixa de funcionar.</p>
+      <div class="adm-msg" id="tcle-whats-msg" role="alert"></div>
+      <div class="dlg-acts" style="flex-wrap:wrap">
+        <button class="btn" type="button" id="tcle-whats-fechar">Fechar</button>
+        <button class="btn" type="button" id="tcle-whats-copiar">Gerar e copiar o link</button>
+        <button class="btn primary" type="submit" id="tcle-whats-enviar">Gerar link e abrir o WhatsApp</button>
+      </div>
+      <div id="tcle-whats-link" hidden></div>
+    </form>
+  </div>
+</div>
+
 <div class="dlg" id="dlg-reuso" hidden role="dialog" aria-modal="true" aria-labelledby="dlg-reuso-t">
   <form class="dlg-card" id="dlg-reuso-form" style="max-width:600px" novalidate>
     <h2 id="dlg-reuso-t">Nova avaliação do paciente</h2>
@@ -4058,6 +4090,8 @@ var CFG = {
   dominio: 'usuarios.prontuario.invalid',
   // endereço público do questionário (GitHub Pages); o link enviado ao paciente sempre usa este endereço
   questionarioUrl: 'https://cassiobrito-0ss.github.io/sasb-prontuario/questionario.html',
+  // endereço público da leitura antecipada do TCLE (GitHub Pages)
+  tcleUrl: 'https://cassiobrito-0ss.github.io/sasb-prontuario/tcle.html',
   inatividadeMin: 15
 };
 var $ = function(id){ return document.getElementById(id); };
@@ -4818,6 +4852,120 @@ $('qp-copiar').addEventListener('click', async function(){
   } catch (err){ msg(m, err.message, 'err'); }
   finally { this.disabled = false; }
 });
+
+/* TCLE — leitura antecipada por WhatsApp (o paciente só lê e marca; assina presencialmente) */
+var TC = null;
+function tcUrl(tok){ return CFG.tcleUrl + '#t=' + tok; }
+function tcModelo(){
+  var nome = (campo('nome') || (ATUAL && ATUAL.paciente_nome) || '').split(' ')[0];
+  var dc = campo('data_cir') || (ATUAL && ATUAL.data_cirurgia) || '', inst = ATUAL ? nomeInst(ATUAL.instituicao_id) : '';
+  return 'Olá' + (nome ? ', ' + nome : '') + '! Aqui é a equipe de anestesia da ' + ((EMPRESA.nome || 'SASB').split(/\s[–-]\s/)[0]) + '.\n\n' +
+    'Antes da sua cirurgia' + (inst && inst !== '—' ? ' no ' + inst : '') + (dc ? ' (' + dataBR(dc) + ')' : '') + ', pedimos que leia com calma, pelo link abaixo, o Termo de Consentimento (TCLE) e marque o que já entendeu. A assinatura (sua e do anestesiologista) será feita presencialmente, na consulta.\n\n{link}\n\n' +
+    'O link é pessoal e vale até {validade}. Se tiver dúvidas, responda esta mensagem ou escreva no próprio formulário.';
+}
+async function tcCarregar(){
+  TC = null;
+  if (!ATUAL) return null;
+  var r;
+  try { r = await sb.from('convites_tcle').select('id, criado_em, expira_em, revogado, aberto_em, respondido_em, atualizado_em, importado_em, telefone').eq('avaliacao_id', ATUAL.id).order('criado_em', { ascending: false }).limit(1); } catch (e){ return null; }
+  TC = r && r.data && r.data[0] || null;
+  return TC;
+}
+/* mapeia o índice (0-based) de cada declaração mostrada no tcle.html para o id tcle_d{N} usado aqui
+   (pula o índice 4, '@AUTORIZO', que não entra na leitura remota — a autorização de transfusão é presencial) */
+var TCLE_DECL_MAP = [0, 1, 2, 3, 5, 6];
+async function tcRespostas(){
+  var r = await sb.from('convites_tcle').select('respostas').eq('id', TC.id).maybeSingle();
+  if (r.error || !r.data || !r.data.respostas || !r.data.respostas.estado) throw new Error('Não foi possível ler as marcações do paciente.');
+  return r.data.respostas.estado;
+}
+function tcRender(){
+  var s = qpStatusTexto(TC), st = $('tcle-whats-status');
+  st.textContent = s[0]; st.className = 'qp-status ' + s[1];
+  var box = $('tcle-whats-resp'); box.innerHTML = ''; box.hidden = !(TC && TC.respondido_em);
+  if (!box.hidden){
+    var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'btn primary'; b1.textContent = TC.importado_em ? 'Importar de novo' : 'Importar as marcações para o termo';
+    b1.addEventListener('click', tcImportar);
+    var acts = document.createElement('div'); acts.className = 'dlg-acts'; acts.style.justifyContent = 'flex-start'; acts.appendChild(b1);
+    box.appendChild(acts);
+    var out = document.createElement('div'); out.id = 'tcle-whats-out'; box.appendChild(out);
+  }
+}
+async function tcImportar(){
+  var out = $('tcle-whats-out'); if (!out) return;
+  out.innerHTML = 'Lendo as marcações…';
+  var estado;
+  try { estado = await tcRespostas(); } catch (e){ out.textContent = e.message; return; }
+  var n = 0;
+  TCLE_DECL_MAP.forEach(function(destIdx, localIdx){
+    if (estado.marcadas && estado.marcadas['d' + localIdx]){
+      var cb = $('tcle_d' + destIdx);
+      if (cb && !cb.checked){ cb.checked = true; n++; }
+    }
+  });
+  if (n) update();
+  try { await sb.rpc('tcle_convite_importado', { p_convite: TC.id }); } catch (e){}
+  await tcCarregar(); tcRender();
+  var o2 = $('tcle-whats-out'); if (!o2) return;
+  o2.innerHTML = '';
+  var ok = document.createElement('div'); ok.className = 'qp-ok';
+  ok.textContent = n + ' declaração(ões) marcada(s) a partir da leitura do paciente.' + (estado.duvidas ? ' O paciente deixou uma dúvida — confira abaixo.' : '') + ' Confira tudo com o paciente na consulta antes de assinar.';
+  o2.appendChild(ok);
+  if (estado.duvidas){ var dv = document.createElement('p'); dv.className = 'note'; dv.innerHTML = '<b>Dúvida do paciente: </b>' + String(estado.duvidas).replace(/</g, '&lt;'); o2.appendChild(dv); }
+  if (window.ACESSO && window.ACESSO.sujo) window.ACESSO.sujo('tcle');
+}
+async function tcGerar(){
+  var m = $('tcle-whats-msg');
+  if (!ATUAL) return null;
+  var r = await sb.rpc('tcle_convite_criar', { p_avaliacao: ATUAL.id, p_dias: parseInt($('tcle-whats-dias').value, 10) || 7, p_telefone: $('tcle-whats-tel').value });
+  if (r.error || !r.data || !r.data.token) throw new Error('Não foi possível gerar o link' + (r.error ? ': ' + r.error.message : '.'));
+  var link = tcUrl(r.data.token), val = new Date(r.data.expira_em).toLocaleDateString('pt-BR');
+  var texto = $('tcle-whats-texto').value.indexOf('{link}') > -1 ? $('tcle-whats-texto').value : $('tcle-whats-texto').value + '\n\n{link}';
+  texto = texto.split('{link}').join(link).split('{validade}').join(val);
+  await tcCarregar(); tcRender();
+  return { link: link, texto: texto };
+}
+function tcMostrarLink(x, wa){
+  var d = $('tcle-whats-link'); d.innerHTML = ''; d.hidden = false; d.className = 'qp-linkbox';
+  var p = document.createElement('p'); p.textContent = 'Link gerado: '; var a = document.createElement('a'); a.href = x.link; a.target = '_blank'; a.rel = 'noopener'; a.textContent = x.link; p.appendChild(a); d.appendChild(p);
+  if (wa){ var b = document.createElement('a'); b.className = 'btn primary'; b.href = wa; b.target = '_blank'; b.rel = 'noopener'; b.textContent = 'Abrir o WhatsApp com a mensagem'; b.style.textDecoration = 'none'; d.appendChild(b); }
+}
+$('btn-tcle-whats').addEventListener('click', async function(){
+  if (!ATUAL) return;
+  $('tcle-whats-pac').textContent = (campo('nome') || ATUAL.paciente_nome || 'Paciente') + (campo('dn') ? ' · nasc. ' + dataBR(campo('dn')) : '');
+  $('tcle-whats-tel').value = campo('telefone') || (TC && TC.telefone) || '';
+  $('tcle-whats-texto').value = tcModelo();
+  msg($('tcle-whats-msg'), ''); $('tcle-whats-link').hidden = true;
+  $('tcle-whats-status').textContent = 'Consultando…'; $('tcle-whats-resp').hidden = true;
+  $('dlg-tcle').hidden = false;
+  await tcCarregar(); tcRender();
+});
+$('tcle-whats-fechar').addEventListener('click', function(){ $('dlg-tcle').hidden = true; });
+$('tcle-whats-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var m = $('tcle-whats-msg'), dig = qpDigitos($('tcle-whats-tel').value);
+  if (dig && dig.length < 12) return msg(m, 'Confira o número: informe o DDD e o número do celular.', 'err');
+  var win = null; try { win = window.open('', '_blank'); } catch (x){}
+  $('tcle-whats-enviar').disabled = true; msg(m, 'Gerando o link…');
+  try {
+    var x = await tcGerar();
+    var wa = 'https://wa.me/' + (dig || '') + '?text=' + encodeURIComponent(x.texto);
+    if (win && !win.closed){ try { win.opener = null; win.location.href = wa; } catch (y){ win = null; } }
+    msg(m, win ? 'WhatsApp aberto em outra aba. Confira a mensagem e toque em enviar.' : 'Link gerado. Clique em "Abrir o WhatsApp com a mensagem".');
+    tcMostrarLink(x, wa);
+  } catch (err){ if (win) try { win.close(); } catch (y){} msg(m, /fetch|network|Failed/i.test(err.message) ? SEM_REDE : err.message, 'err'); }
+  finally { $('tcle-whats-enviar').disabled = false; }
+});
+$('tcle-whats-copiar').addEventListener('click', async function(){
+  var m = $('tcle-whats-msg'); this.disabled = true; msg(m, 'Gerando o link…');
+  try {
+    var x = await tcGerar();
+    try { await navigator.clipboard.writeText(x.texto); msg(m, 'Mensagem com o link copiada. Cole no WhatsApp do paciente.'); } catch (y){ msg(m, 'Link gerado. Copie a mensagem abaixo.'); }
+    tcMostrarLink(x, null);
+  } catch (err){ msg(m, err.message, 'err'); }
+  finally { this.disabled = false; }
+});
+
 /* Aviso no prontuário novo quando o paciente já tem avaliações anteriores */
 var tAnt = null;
 async function checarAnteriores(){

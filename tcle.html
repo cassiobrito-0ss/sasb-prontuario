@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Termo de Consentimento — Leitura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --surface-2:#F6F8F7; --ink:#14201C; --muted:#56655F; --line:#D5DDD9; --line-strong:#B9C6C0;
+  --accent:#0D6B53; --accent-ink:#FFFFFF; --accent-soft:#DDEFE8;
+  --crit:#B42318; --crit-soft:#FCE9E7; --warn:#8A5300; --warn-soft:#FFF1D9; --info:#1D5A94; --info-soft:#E6EFF9; --ok:#1E6B3A; --ok-soft:#E3F3E8;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1412; --surface:#151D1A; --surface-2:#1A2420; --ink:#E4ECE8; --muted:#98A9A2; --line:#2A3632; --line-strong:#3A4A44;
+    --accent:#4FC49F; --accent-ink:#0B1A15; --accent-soft:#17332A;
+    --crit:#FF8B7B; --crit-soft:#3A1B17; --warn:#F0B55C; --warn-soft:#33260F; --info:#8DB9EE; --info-soft:#172536; --ok:#7CD39B; --ok-soft:#16301F;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{max-width:660px;margin:0 auto;padding:16px 16px 48px}
+.top{padding-block:10px 4px}
+.brand{font-family:var(--cond);font-weight:600;font-size:15px;letter-spacing:.01em}
+.brand small{display:block;font-family:var(--sans);font-weight:400;font-size:12.5px;color:var(--muted)}
+h1{font-family:var(--cond);font-weight:600;font-size:clamp(25px,6vw,31px);line-height:1.15;margin:10px 0 6px;text-wrap:balance}
+h2{font-family:var(--cond);font-weight:600;font-size:19px;margin:26px 0 8px}
+p{margin:0 0 10px;max-width:68ch}
+ul{margin:0 0 10px;padding-left:22px}
+li{margin-bottom:6px}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin:14px 0}
+.info-grid{display:grid;gap:8px}
+.info-grid div{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+.info-grid span:first-child{color:var(--muted)}
+.info-grid span:last-child{font-weight:600;text-align:right}
+.note{font-size:14.5px;padding:12px 14px;border-radius:10px;background:var(--info-soft);color:var(--ink);margin:14px 0}
+.note b{color:var(--info)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600}
+.decl{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);margin-bottom:8px;cursor:pointer}
+.decl input{width:22px;height:22px;flex:0 0 auto;margin-top:2px;accent-color:var(--accent)}
+.decl:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:10px;padding:11px 12px;min-height:90px;resize:vertical}
+textarea:focus{border-color:var(--accent);background:var(--surface);outline:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;padding:14px 18px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);width:100%}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.foot{margin-top:18px;font-size:13px;color:var(--muted)}
+.done{padding:40px 0;text-align:center}
+.done h1{margin-bottom:12px}
+.progress{font-family:var(--mono);font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="top"><div class="brand">SASB · Serviço de Anestesiologia Sul Bahia<small>Termo de Consentimento — leitura antecipada</small></div></div>
+  <div id="main">Carregando…</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+function $(id){ return document.getElementById(id); }
+function h(tag, attrs){
+  var e = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function(k){
+    var v = attrs[k]; if (v === null || v === undefined || v === false) return;
+    if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v;
+    else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
+  });
+  for (var i = 2; i < arguments.length; i++){ var c = arguments[i]; if (c === null || c === undefined || c === false) continue; if (Array.isArray(c)) c.forEach(function(x){ if (x) e.appendChild(typeof x === 'string' ? document.createTextNode(x) : x); }); else e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); }
+  return e;
+}
+function dBR(v){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (v || ''); }
+
+/* ---------- Conteúdo (mesmos textos do TCLE no prontuário; itens 2–10 e declarações) ---------- */
+var TX = {
+  intro: 'Este termo registra que você recebeu, em linguagem clara, as informações sobre a anestesia proposta, conforme a Resolução CFM nº 2.174/2017 e as orientações da Sociedade Brasileira de Anestesiologia (SBA). Leia com calma antes da cirurgia. Esta leitura antecipada não substitui a consulta pré-anestésica: suas dúvidas serão respondidas e a assinatura (sua e do anestesiologista) será feita presencialmente.',
+  secs: [
+    { n: '2', h: 'O que é a anestesia', p: ['A anestesia usa medicamentos para permitir que cirurgias, exames e procedimentos sejam feitos sem dor e com segurança. Dependendo da técnica, ela pode causar redução ou perda da consciência, alívio da dor, relaxamento dos músculos e controle das reações do organismo ao estresse da cirurgia (como aumento da pressão e dos batimentos cardíacos).'] },
+    { n: '3', h: 'Como é feita', p: ['A anestesia é realizada por médico anestesiologista, que permanece ao seu lado durante todo o procedimento e o acompanha também no transporte até a sala de recuperação. Durante todo o tempo você ficará monitorizado: pressão arterial, eletrocardiograma contínuo, oxigenação do sangue (oxímetro) e, quando indicado, gás carbônico expirado (capnografia) e temperatura.'],
+      ul: [['Sedação:', 'medicamentos pela veia deixam você relaxado ou sonolento. Pode ser mínima (acordado e tranquilo), moderada (sonolento, responde quando chamado) ou profunda (dormindo, desperta apenas com estímulos mais fortes). A respiração pode ficar mais fraca e precisar de apoio.'],
+        ['Anestesia geral:', 'você fica inconsciente e não sente dor. Os medicamentos são dados pela veia e/ou por gases inalados. Geralmente é necessário um dispositivo na boca ou na garganta (máscara laríngea ou tubo) para ajudar a respiração.'],
+        ['Raquianestesia e peridural:', 'uma injeção nas costas, na região da coluna, anestesia a parte inferior do corpo. Pode ser deixado um cateter fino para reforçar a anestesia ou tratar a dor depois.'],
+        ['Bloqueios de nervos periféricos:', 'o anestésico local é aplicado perto de nervos para anestesiar apenas um braço, uma perna ou outra região, muitas vezes guiado por ultrassom.'],
+        ['Procedimentos associados:', 'quando necessário, podem ser feitos acesso venoso central, cateter na artéria para medir a pressão, sonda gástrica ou vesical.']],
+      p2: ['A técnica é escolhida pelo anestesiologista com você, considerando sua saúde, o procedimento e suas preferências. Mais de uma técnica pode ser combinada.'] },
+    { n: '4', h: 'Indicações do procedimento', p: ['A anestesia pode ser realizada em qualquer procedimento cirúrgico, invasivo ou diagnóstico em que haja dor ou incômodo para o paciente, desde que os benefícios superem os riscos.'] },
+    { n: '5', h: 'Benefícios', p: ['A anestesia torna possível a realização da maioria das cirurgias e procedimentos invasivos sem dor, inclusive em pacientes graves. Também permite controlar a dor no pós-operatório e manter suas funções vitais vigiadas e protegidas durante todo o procedimento.'] },
+    { n: '6', h: 'Riscos e complicações', p: ['A anestesia moderna é muito segura, mas nenhum procedimento médico é isento de riscos. O risco individual depende principalmente do seu estado de saúde, da idade e do tipo e duração da cirurgia. Nos países desenvolvidos, a morte causada exclusivamente pela anestesia ocorre em cerca de 3 a 4 casos a cada 100.000 anestesias gerais.',
+        'Para facilitar a compreensão, a frequência de cada evento é descrita assim: muito comum (1 em 10 ou mais), comum (1 em 10 a 1 em 100), incomum (1 em 100 a 1 em 1.000), raro (1 em 1.000 a 1 em 10.000) e muito raro (menos de 1 em 10.000).'],
+      risk: true,
+      p2: ['O risco é maior em pacientes com doenças cardíacas, pulmonares, renais, neurológicas, obesidade, apneia do sono, idade avançada, tabagismo, e em cirurgias de urgência, longas ou com grande perda de sangue. Seus riscos específicos serão discutidos e anotados na consulta pré-anestésica.'] },
+    { n: '7', h: 'Alternativas e o que acontece se eu recusar', p: ['Alguns procedimentos menores podem ser feitos apenas com anestesia local ou sem anestesia. As técnicas alternativas possíveis no seu caso, com suas vantagens e desvantagens, serão explicadas pelo anestesiologista. Você pode recusar a anestesia ou uma técnica específica; na maioria dos casos, recusar a anestesia significa que o procedimento não poderá ser realizado.'] },
+    { n: '8', h: 'Recuperação após a anestesia', p: ['Após o procedimento, você será levado à Sala de Recuperação Pós-Anestésica (SRPA), onde ficará monitorizado até se recuperar da anestesia. É comum sentir sonolência, frio, tremores, náuseas, coceira, dor ou dificuldade temporária para mover as pernas ou o membro bloqueado. Pacientes de maior risco ou após cirurgias de grande porte podem ser encaminhados à Unidade Semi-Intensiva ou UTI.'] },
+    { n: '9', h: 'O que você precisa fazer', ul: [
+        ['Jejum:', 'siga exatamente o horário informado pelo anestesiologista. Como referência: 8 horas para refeições comuns ou gordurosas; 6 horas para refeição leve, leite não humano e fórmula infantil; 4 horas para leite materno; 2 horas para líquidos claros (água, chá, suco sem polpa). O jejum incompleto aumenta o risco de aspiração e pode levar ao adiamento do procedimento.'],
+        ['Informe ao anestesiologista:', 'todas as doenças, alergias, cirurgias e anestesias anteriores (e complicações), medicamentos em uso (inclusive anticoagulantes, antiagregantes, remédios para diabetes, emagrecimento, fitoterápicos e suplementos), uso de álcool, cigarro ou outras substâncias, possibilidade de gravidez, dentes moles, próteses e implantes.'],
+        ['Medicamentos:', 'tome ou suspenda cada medicamento conforme a orientação recebida na consulta.'],
+        ['Procedimentos ambulatoriais com sedação ou anestesia:', 'é obrigatório sair acompanhado por um adulto responsável. Nas 24 horas seguintes, não dirija, não opere máquinas, não ingira bebida alcoólica e não tome decisões importantes ou assine documentos.']] },
+    { n: '10', h: 'Situações especiais', ul: [
+        ['Crianças, adolescentes e pessoas sem capacidade de decidir:', 'o consentimento é dado pelo responsável legal. Sempre que possível, o paciente também recebe explicações adequadas à sua compreensão e manifesta sua concordância (assentimento).'],
+        ['Pacientes que não sabem ou não podem assinar:', 'o termo é lido em voz alta e assinado por uma testemunha, com impressão digital do paciente quando possível.'],
+        ['Urgência e emergência:', 'quando não houver tempo ou condições para obter o consentimento, o anestesiologista fará o necessário para preservar sua vida, registrando o fato no prontuário.']] }
+  ],
+  risk: [
+    ['Muito comum / comum', 'Náuseas e vômitos; dor de garganta e rouquidão; frio e tremores; sonolência; dor ou hematoma no local da punção venosa; pequenas lesões em lábios ou língua; confusão mental passageira (mais frequente em idosos)', 'Queda da pressão arterial; coceira; dificuldade temporária para urinar; dormência ou formigamento que dura algumas horas ou dias; anestesia incompleta, podendo exigir sedação ou anestesia geral'],
+    ['Incomum', 'Lesão dentária (maior risco com dentes frágeis, próteses ou implantes); piora de doença pulmonar ou broncoespasmo', 'Dor de cabeça após a punção da coluna, que pode exigir tratamento específico; dor nas costas no local da punção'],
+    ['Raro', 'Reação alérgica grave (anafilaxia); aspiração de conteúdo do estômago para o pulmão; despertar ou lembrança durante a anestesia geral; dificuldade para manter a respiração que exija manobras de emergência; arritmias cardíacas', 'Intoxicação pelo anestésico local (convulsões, arritmias); lesão de nervo com sintomas prolongados após bloqueio periférico'],
+    ['Muito raro', 'Infarto, AVC, perda da visão, lesão de nervo por posicionamento, sequela neurológica permanente, parada cardíaca e morte', 'Lesão permanente de nervo ou da medula, paralisia, hematoma ou infecção na coluna, meningite, parada cardíaca e morte']
+  ],
+  /* Mesmas 7 declarações do termo no prontuário (TX.decl); o índice 4 ('@AUTORIZO', autorização de
+     transfusão) fica de fora da leitura remota e é tratado presencialmente — ver nota abaixo. */
+  decl: [
+    'Li este termo (ou ele foi lido para mim) e recebi do anestesiologista explicações claras sobre a técnica anestésica proposta, seus benefícios, riscos, complicações possíveis e alternativas.',
+    'Tive oportunidade e tempo para fazer perguntas, e todas foram respondidas de forma satisfatória.',
+    'Prestei informações verdadeiras e completas sobre minha saúde e entendo que omitir informações pode aumentar os riscos.',
+    'Entendo que a medicina não é uma ciência exata e que não há garantia absoluta de resultados.',
+    'Estou ciente de que posso revogar este consentimento a qualquer momento antes do início do procedimento, sem qualquer prejuízo ao meu atendimento.',
+    'Recebi uma cópia deste termo.'
+  ],
+  /* índice (0-based) de cada item acima dentro do array completo de 7 declarações do prontuário */
+  declIdx: [0, 1, 2, 3, 5, 6]
+};
+var TECH_MAP = {
+  'Geral balanceada': 'Anestesia geral (venosa e inalatória)',
+  'Venosa total (TIVA/TCI)': 'Anestesia geral venosa total',
+  'Bloqueio endovenoso de Bier': 'Anestesia regional intravenosa (bloqueio de Bier)',
+  'Raquianestesia': 'Raquianestesia',
+  'Peridural': 'Anestesia peridural',
+  'Combinada raqui-peridural': 'Bloqueio combinado raqui-peridural',
+  'Bloqueio de nervo periférico': 'Bloqueio de nervo periférico / plexo',
+  'Sedação': 'Sedação',
+  'Local + sedação': 'Anestesia local com sedação e acompanhamento do anestesiologista',
+  'Geral + bloqueio': 'Técnica combinada: anestesia geral + bloqueio'
+};
+
+/* ---------- Convite (link pessoal do WhatsApp) ---------- */
+var SBQ_CFG = { url: 'https://jpqetogjtnimcrwymarl.supabase.co', chave: 'sb_publishable_fV5KUV6ynUMQER5XR4UypA_k84e-kp_' };
+var CONV = (function(){ var m = /[#&]t=([A-Za-z0-9_.\-]{20,100})/.exec(location.hash || ''); return m ? { token: m[1] } : null; })();
+var SBQ = null, srvT = null, INFO = null;
+var MARCADAS = {}, DUVIDAS = '';
+
+var MSG_ERRO = {
+  sem_token: ['Este link não é válido', 'Peça um novo link ao anestesiologista.'],
+  link_invalido: ['Este link não é válido', 'Ele pode ter sido substituído por um link mais novo. Peça um novo link à equipe.'],
+  expirado: ['Este link expirou', 'Peça um novo link à equipe que enviou a mensagem.'],
+  ja_enviado: ['Você já enviou suas respostas', 'Obrigado! Se precisar corrigir algo, avise a equipe ou conte ao anestesiologista na consulta.'],
+  dados_invalidos: ['Não foi possível enviar', 'Houve um problema ao enviar. Tente de novo ou avise a equipe.'],
+  rede: ['Sem conexão', 'Não conseguimos falar com o sistema. Verifique a internet e tente de novo.']
+};
+function telaErro(cod){
+  var m = MSG_ERRO[cod] || MSG_ERRO.rede;
+  $('main').innerHTML = '';
+  $('main').appendChild(h('div', { 'class': 'done' }, h('h1', null, m[0]), h('p', { 'class': 'muted' }, m[1])));
+}
+
+function secBlock(s){
+  var kids = [h('h2', null, s.n + '. ' + s.h)];
+  (s.p || []).forEach(function(t){ kids.push(h('p', null, t)); });
+  if (s.ul) kids.push(h('ul', null, s.ul.map(function(it){ return h('li', null, h('b', null, it[0] + ' '), it[1]); })));
+  if (s.risk){
+    kids.push(h('div', { style: 'overflow-x:auto' }, h('table', null,
+      h('thead', null, h('tr', null, h('th', null, 'Frequência'), h('th', null, 'Sedação e anestesia geral'), h('th', null, 'Raqui, peridural e bloqueios'))),
+      h('tbody', null, TX.risk.map(function(r){ return h('tr', null, h('td', null, r[0]), h('td', null, r[1]), h('td', null, r[2])); })))));
+  }
+  (s.p2 || []).forEach(function(t){ kids.push(h('p', null, t)); });
+  return kids;
+}
+
+function montarPagina(){
+  var main = $('main'); main.innerHTML = '';
+  var proc = [INFO.cirurgia, INFO.hora_cirurgia ? null : null].filter(Boolean).join(' ');
+  var quando = [INFO.data_cirurgia ? dBR(INFO.data_cirurgia) : '', INFO.hora_cirurgia || ''].filter(Boolean).join(' às ');
+  var tecnicas = (Array.isArray(INFO.tecnica) ? INFO.tecnica : []).map(function(t){ return TECH_MAP[t] || t; });
+
+  main.appendChild(h('h1', null, 'Termo de Consentimento para Anestesia'));
+  main.appendChild(h('p', null, 'Olá' + (INFO.primeiro_nome ? ', ' + INFO.primeiro_nome : '') + '. Antes da sua cirurgia, leia este termo com calma. Marque cada declaração que você entendeu — a leitura final e a assinatura (sua e do anestesiologista) serão feitas presencialmente.'));
+
+  var info = [];
+  if (INFO.instituicao) info.push(h('div', null, h('span', null, 'Instituição'), h('span', null, INFO.instituicao)));
+  if (INFO.cirurgia) info.push(h('div', null, h('span', null, 'Procedimento'), h('span', null, INFO.cirurgia)));
+  if (quando) info.push(h('div', null, h('span', null, 'Data / horário previstos'), h('span', null, quando)));
+  if (INFO.cirurgiao) info.push(h('div', null, h('span', null, 'Cirurgião'), h('span', null, INFO.cirurgiao)));
+  if (info.length) main.appendChild(h('div', { 'class': 'card info-grid' }, info));
+
+  main.appendChild(h('p', null, TX.intro));
+
+  main.appendChild(h('h2', null, 'Técnica anestésica prevista'));
+  if (tecnicas.length){
+    main.appendChild(h('ul', null, tecnicas.map(function(t){ return h('li', null, t); })));
+    if (INFO.tec_bloqueio) main.appendChild(h('p', { 'class': 'muted' }, 'Bloqueio: ' + INFO.tec_bloqueio));
+  } else {
+    main.appendChild(h('p', { 'class': 'muted' }, 'Ainda será definida pelo anestesiologista na consulta.'));
+  }
+
+  TX.secs.forEach(function(s){ secBlock(s).forEach(function(el){ main.appendChild(el); }); });
+
+  main.appendChild(h('div', { 'class': 'note' }, h('b', null, 'Transfusão de sangue. '), 'Se durante a cirurgia for necessária transfusão de sangue ou hemocomponentes, sua autorização (ou eventual restrição) será conversada e registrada presencialmente com o anestesiologista.'));
+
+  main.appendChild(h('h2', null, 'Declarações'));
+  main.appendChild(h('p', { 'class': 'muted' }, 'Marque cada item que você leu e entendeu. Você ainda vai poder conferir tudo de novo, presencialmente, antes de assinar.'));
+  var declWrap = h('div', { id: 'decl-wrap' });
+  TX.decl.forEach(function(t, i){
+    var cb = h('input', { type: 'checkbox', id: 'd' + i, onchange: function(){ MARCADAS['d' + i] = cb.checked; autosave(); atualizarBotao(); } });
+    if (MARCADAS['d' + i]) cb.checked = true;
+    declWrap.appendChild(h('label', { 'class': 'decl', 'for': 'd' + i }, cb, h('span', null, (i + 1) + '. ' + t)));
+  });
+  main.appendChild(declWrap);
+
+  main.appendChild(h('h2', null, 'Dúvidas para o anestesiologista (opcional)'));
+  var ta = h('textarea', { placeholder: 'Escreva aqui qualquer dúvida ou preocupação para perguntar na consulta', oninput: function(){ DUVIDAS = ta.value; autosave(); } });
+  ta.value = DUVIDAS;
+  main.appendChild(ta);
+
+  var btn = h('button', { type: 'button', 'class': 'btn primary', id: 'btn-enviar', onclick: enviar }, 'Concluir e enviar');
+  var prog = h('p', { 'class': 'progress' });
+  main.appendChild(h('div', { style: 'margin-top:18px' }, btn, prog));
+  main.appendChild(h('p', { 'class': 'foot' }, 'Suas respostas (o que você marcou e eventuais dúvidas) são enviadas apenas para a equipe de anestesia responsável pelo seu atendimento.'));
+
+  function atualizarBotao(){
+    var n = TX.decl.filter(function(_, i){ return MARCADAS['d' + i]; }).length;
+    prog.textContent = n + ' de ' + TX.decl.length + ' declarações marcadas';
+    btn.disabled = n < TX.decl.length;
+  }
+  atualizarBotao();
+}
+
+function estadoAtual(){ return { marcadas: MARCADAS, duvidas: DUVIDAS }; }
+function salvarServidor(final){
+  if (!CONV || !SBQ) return Promise.resolve({ ok: true });
+  return SBQ.rpc('tcle_salvar', { p_token: CONV.token, p_dados: { estado: estadoAtual() }, p_finalizar: !!final }).then(function(r){ if (r.error) throw r.error; return r.data || {}; });
+}
+function autosave(){
+  clearTimeout(srvT);
+  srvT = setTimeout(function(){ salvarServidor(false).catch(function(){}); }, 3000);
+}
+function enviar(){
+  var btn = $('btn-enviar'); if (btn) btn.disabled = true;
+  salvarServidor(true).then(function(r){
+    if (r && r.erro) return telaErro(r.erro);
+    $('main').innerHTML = '';
+    $('main').appendChild(h('div', { 'class': 'done' }, h('h1', null, 'Obrigado!'), h('p', { 'class': 'muted' }, 'Suas respostas foram enviadas ao consultório. A leitura final e a assinatura (sua e do anestesiologista) serão feitas presencialmente, antes do procedimento.')));
+  }, function(){ telaErro('rede'); if (btn) btn.disabled = false; });
+}
+
+function iniciar(){
+  if (!CONV){ telaErro('sem_token'); return; }
+  if (!window.supabase){ telaErro('rede'); return; }
+  SBQ = window.supabase.createClient(SBQ_CFG.url, SBQ_CFG.chave, { auth: { persistSession: false, autoRefreshToken: false } });
+  SBQ.rpc('tcle_abrir', { p_token: CONV.token }).then(function(r){
+    if (r.error) return telaErro('rede');
+    var d = r.data || {};
+    if (d.erro) return telaErro(d.erro);
+    INFO = d;
+    if (d.estado && typeof d.estado === 'object'){ MARCADAS = d.estado.marcadas || {}; DUVIDAS = d.estado.duvidas || ''; }
+    montarPagina();
+  }, function(){ telaErro('rede'); });
+}
+iniciar();
+</script>
+</body></html>
