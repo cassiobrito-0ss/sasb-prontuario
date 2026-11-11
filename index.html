@@ -301,6 +301,13 @@ table.ref li{break-inside:avoid;margin:0 0 3px}
 .cid-lista li b{font-family:var(--mono, ui-monospace, monospace);font-weight:600;margin-right:4px}
 .cid-lista .cid-vazio{color:var(--muted);cursor:default}
 .cid-dica{display:block;font-size:11.5px;color:var(--muted);margin-top:4px}
+.tuss-box{position:relative}
+.tuss-lista{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:280px;overflow:auto}
+.tuss-lista li{padding:7px 9px;border-radius:6px;font-size:13.5px;cursor:pointer;line-height:1.35}
+.tuss-lista li:hover,.tuss-lista li[aria-selected=true]{background:var(--accent-soft)}
+.tuss-lista li b{font-family:var(--mono, ui-monospace, monospace);font-weight:600;margin-right:4px}
+.tuss-lista .tuss-vazio{color:var(--muted);cursor:default}
+.tuss-dica{display:block;font-size:11.5px;color:var(--muted);margin-top:4px}
 .dmy{display:grid;grid-template-columns:1fr 1.2fr 1.3fr;gap:6px}
 input.upper{text-transform:uppercase}
 input[readonly]{background:var(--surface);color:var(--muted);cursor:default}
@@ -575,7 +582,7 @@ var SCHEMA = [
 ]},
 
 { id: 'proc', title: 'Procedimento proposto', fields: [
-  { t: 'text', id: 'cirurgia', label: 'Cirurgia proposta', span: 8 },
+  { t: 'tuss', id: 'cirurgia', label: 'Cirurgia proposta', span: 8, ph: 'digite o nome do procedimento ou o código TUSS' },
   { t: 'chips', id: 'lateralidade', label: 'Lateralidade', options: ['Direita', 'Esquerda', 'Bilateral', 'Não se aplica'], outro: true, span: 4 },
   { t: 'chips', id: 'incisao', label: 'Sítio da incisão', options: ['Periférica', 'Abdominal superior', 'Abdominal inferior / pélvica', 'Intratorácica', 'Cabeça e pescoço', 'Coluna', 'Intracraniana'], span: 12 },
   { t: 'cid', id: 'diagnostico', label: 'Diagnóstico / indicação (CID-10)', span: 6, ph: 'digite o código ou parte do nome' },
@@ -1365,6 +1372,7 @@ function renderField(f){
       h('div', { 'class': 'tbl-wrap' }, h('table', { 'class': 'ref' + (f.lista ? ' lista' : '') }, h('thead', null, h('tr', null, f.head.map(function(x){ return h('th', null, x); }))),
         h('tbody', null, f.rows.map(function(r){ return h('tr', null, r.map(function(x){ return h('td', null, Array.isArray(x) ? h('ul', null, x.map(function(y){ return h('li', null, y); })) : x); })); })))), h('p', null, f.note));
     case 'cid': return renderCid(f);
+    case 'tuss': return renderTuss(f);
     case 'num':
       return wrap(f, [labelEl(f), h('input', { id: f.id, type: 'text', inputmode: 'decimal', 'class': 'numf', autocomplete: 'off' })]);
     case 'calc':
@@ -1469,6 +1477,38 @@ function renderCid(f){
   });
   inp.addEventListener('blur', function(){ setTimeout(fechar, 120); });
   return wrap(f, [labelEl(f), h('div', { 'class': 'cid-box' }, inp, lista), h('span', { 'class': 'cid-dica' }, 'Busca na tabela CID-10 (DATASUS). Também aceita texto livre.')]);
+}
+function renderTuss(f){
+  var inp = h('input', { id: f.id, type: 'text', placeholder: f.ph || null, autocomplete: 'off', role: 'combobox', 'aria-autocomplete': 'list', 'aria-expanded': 'false', 'aria-controls': f.id + '_lista' });
+  var lista = h('ul', { 'class': 'tuss-lista', id: f.id + '_lista', role: 'listbox', hidden: true });
+  var tmr = null, ult = '', itens = [], ativo = -1;
+  function fechar(){ lista.hidden = true; inp.setAttribute('aria-expanded', 'false'); ativo = -1; }
+  function escolher(r){ inp.value = r.nome + ' – TUSS ' + r.codigo; fechar(); inp.dispatchEvent(new Event('input', { bubbles: true })); inp.dispatchEvent(new Event('change', { bubbles: true })); }
+  function marcar(i){ ativo = i; [].forEach.call(lista.children, function(li, k){ li.setAttribute('aria-selected', String(k === i)); if (k === i) li.scrollIntoView({ block: 'nearest' }); }); }
+  function mostrar(rs, q){
+    lista.innerHTML = ''; itens = rs;
+    if (!rs.length){ lista.appendChild(h('li', { 'class': 'tuss-vazio' }, 'Nenhum procedimento TUSS encontrado para "' + q + '". O texto digitado fica como está.')); }
+    rs.forEach(function(r){ lista.appendChild(h('li', { role: 'option', onmousedown: function(e){ e.preventDefault(); escolher(r); } }, h('b', null, r.codigo), ' ' + r.nome)); });
+    lista.hidden = false; inp.setAttribute('aria-expanded', 'true'); ativo = -1;
+  }
+  inp.addEventListener('input', function(e){
+    if (!e.isTrusted) return;
+    var q = inp.value.trim(); clearTimeout(tmr);
+    if (q.length < 2 || !(window.ACESSO && window.ACESSO.buscarTuss)){ fechar(); return; }
+    tmr = setTimeout(function(){
+      ult = q;
+      window.ACESSO.buscarTuss(q).then(function(rs){ if (ult === q && document.activeElement === inp) mostrar(rs || [], q); }, fechar);
+    }, 200);
+  });
+  inp.addEventListener('keydown', function(e){
+    if (lista.hidden || !itens.length) return;
+    if (e.key === 'ArrowDown'){ e.preventDefault(); marcar(Math.min(ativo + 1, itens.length - 1)); }
+    else if (e.key === 'ArrowUp'){ e.preventDefault(); marcar(Math.max(ativo - 1, 0)); }
+    else if (e.key === 'Enter' && ativo > -1){ e.preventDefault(); escolher(itens[ativo]); }
+    else if (e.key === 'Escape') fechar();
+  });
+  inp.addEventListener('blur', function(){ setTimeout(fechar, 120); });
+  return wrap(f, [labelEl(f), h('div', { 'class': 'tuss-box' }, inp, lista), h('span', { 'class': 'tuss-dica' }, 'Busca na tabela TUSS/CBHPM (Tabela 22 da ANS, procedimentos vigentes). Também aceita texto livre.')]);
 }
 function renderYm(f){
   var hid = h('input', { type: 'hidden', id: f.id });
@@ -2918,7 +2958,7 @@ function linhasSecao(sec, skip){
         case 'dmy': v = txt(f.id); if (v) L.push(f.label + ': ' + dBR(v)); break;
         case 'hm': v = txt(f.id); if (v) L.push(f.label + ': ' + fmtHm(v)); break;
         case 'ym': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
-        case 'cid': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
+        case 'cid': case 'tuss': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
         case 'multi': v = multi(f.id).map(function(x){ return comOutro(f.id, x); }); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
         case 'table':
           var rows = tableRows(f.id);
@@ -3829,6 +3869,8 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
     <h2 id="dlg-novo-t">Novo prontuário</h2>
     <label>Instituição onde o paciente será atendido<select id="novo-inst" required></select></label>
     <label>Nome completo do paciente<input id="novo-nome" autocomplete="off"></label>
+    <label>Data de nascimento<input id="novo-dn" type="date"></label>
+    <label>Número de telefone / WhatsApp<input id="novo-tel" type="tel" inputmode="tel" autocomplete="off" placeholder="(73) 99999-9999"></label>
     <div class="adm-msg" id="dlg-novo-msg" role="alert"></div>
     <div class="dlg-acts"><button class="btn" type="button" id="dlg-novo-cancelar">Cancelar</button><button class="btn primary" type="submit" id="dlg-novo-ok">Criar e abrir</button></div>
   </form>
@@ -4449,6 +4491,34 @@ window.ACESSO.buscarCid = async function(q){
   var r = await qq.order('codigo').limit(25);
   return r.error ? [] : (r.data || []);
 };
+/* busca na tabela TUSS/CBHPM (Tabela 22 da ANS) — carregada do arquivo local, sem depender de rede externa */
+var TUSS_CACHE = null, TUSS_CARREGANDO = null;
+function tussSemAcento(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+function tussCarregar(){
+  if (TUSS_CACHE) return Promise.resolve(TUSS_CACHE);
+  if (TUSS_CARREGANDO) return TUSS_CARREGANDO;
+  TUSS_CARREGANDO = fetch('dados/tuss.json').then(function(r){ return r.json(); }).then(function(rows){
+    TUSS_CACHE = rows.map(function(x){ return { codigo: x[0], nome: x[1], busca: tussSemAcento(x[0] + ' ' + x[1]) }; });
+    return TUSS_CACHE;
+  }, function(){ TUSS_CACHE = []; return TUSS_CACHE; });
+  return TUSS_CARREGANDO;
+}
+window.ACESSO.buscarTuss = async function(q){
+  var tab = await tussCarregar();
+  if (!tab.length) return [];
+  var soNum = q.replace(/\D/g, '');
+  var ehCodigo = /^\d[\d.\-\s]*$/.test(q.trim()) && soNum.length >= 3;
+  var ws = tussSemAcento(q).replace(/[%_,()*\\]/g, ' ').split(/\s+/).filter(function(w){ return w.length >= 2; }).slice(0, 5);
+  if (!ehCodigo && !ws.length) return [];
+  var out = [];
+  for (var i = 0; i < tab.length && out.length < 300; i++){
+    var r = tab[i];
+    var ok = ehCodigo ? (r.codigo.indexOf(soNum) === 0 || r.busca.indexOf(soNum) >= 0) : ws.every(function(w){ return r.busca.indexOf(w) >= 0; });
+    if (ok) out.push(r);
+  }
+  if (ehCodigo) out.sort(function(a, b){ return (a.codigo.indexOf(soNum) === 0 ? 0 : 1) - (b.codigo.indexOf(soNum) === 0 ? 0 : 1); });
+  return out.slice(0, 25);
+};
 /* dados públicos exigidos pela LGPD, mostrados já na tela de entrada */
 async function carregarPublicos(){
   try {
@@ -4801,19 +4871,21 @@ $('btn-novo').addEventListener('click', function(){
   if (ok.length !== 1){ var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Selecione…'; s.appendChild(o0); }
   ok.forEach(function(i){ var o = document.createElement('option'); o.value = i.id; o.textContent = i.nome + (i.cidade ? ' – ' + i.cidade : ''); s.appendChild(o); });
   if ($('f-inst').value && ok.some(function(i){ return i.id === $('f-inst').value; })) s.value = $('f-inst').value;
-  $('novo-nome').value = ''; msg($('dlg-novo-msg'), '');
+  $('novo-nome').value = ''; $('novo-dn').value = ''; $('novo-tel').value = ''; msg($('dlg-novo-msg'), '');
   $('dlg-novo').hidden = false;
   setTimeout(function(){ (s.value ? $('novo-nome') : s).focus(); }, 30);
 });
 $('dlg-novo-cancelar').addEventListener('click', function(){ $('dlg-novo').hidden = true; });
 $('dlg-novo-form').addEventListener('submit', async function(e){
   e.preventDefault();
-  var inst = $('novo-inst').value, nome = $('novo-nome').value.trim(), m = $('dlg-novo-msg');
+  var inst = $('novo-inst').value, nome = $('novo-nome').value.trim(), dn = $('novo-dn').value, tel = $('novo-tel').value.trim(), m = $('dlg-novo-msg');
   if (!inst) return msg(m, 'Escolha a instituição.', 'err');
   if (nome.length < 3) return msg(m, 'Informe o nome completo do paciente.', 'err');
+  if (!dn) return msg(m, 'Informe a data de nascimento do paciente.', 'err');
+  if (tel.replace(/\D/g, '').length < 10) return msg(m, 'Informe o número de telefone/WhatsApp com DDD.', 'err');
   $('dlg-novo-ok').disabled = true; msg(m, 'Criando…');
   try {
-    var r = await sb.from('avaliacoes').insert({ instituicao_id: inst, paciente_nome: nome, criado_por: EU.id }).select('id').single();
+    var r = await sb.from('avaliacoes').insert({ instituicao_id: inst, paciente_nome: nome, paciente_nascimento: dn, paciente_telefone: tel, criado_por: EU.id }).select('id').single();
     if (r.error || !r.data) throw new Error('Não foi possível criar o prontuário' + (r.error ? ': ' + r.error.message : '.'));
     $('dlg-novo').hidden = true;
     await abrirProntuario(r.data.id, true);
@@ -4835,7 +4907,7 @@ async function abrirProntuario(id, novo){
   ATUAL = r.data;
   (s.data || []).forEach(function(x){ if ((PERM[x.aba_id] || 'oculto') !== 'oculto') window.PRONT.aplicarSecao(x.aba_id, x.dados); });
   // campos do cabeçalho ainda sem aba gravada (ex.: nome digitado ao criar) vêm da lista
-  [['nome', 'paciente_nome'], ['dn', 'paciente_nascimento'], ['prontuario', 'registro'], ['cirurgia', 'cirurgia'], ['data_cir', 'data_cirurgia']].forEach(function(c){
+  [['nome', 'paciente_nome'], ['dn', 'paciente_nascimento'], ['telefone', 'paciente_telefone'], ['prontuario', 'registro'], ['cirurgia', 'cirurgia'], ['data_cir', 'data_cirurgia']].forEach(function(c){
     var e = $(c[0]); if (!e || e.value || !ATUAL[c[1]]) return;
     if ((PERM[e.closest('.sec').id.slice(4)] || 'oculto') === 'oculto') return;
     e.value = ATUAL[c[1]]; window.ACESSO.sujo(e.closest('.sec').id.slice(4));

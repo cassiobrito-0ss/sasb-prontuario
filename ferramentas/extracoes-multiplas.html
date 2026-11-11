@@ -117,7 +117,7 @@ legend{font-size:12px;color:var(--muted);padding:0 4px}
 footer{font-size:12px;color:var(--muted);max-width:90ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 .note{font-size:12.5px;color:var(--muted);margin:0}
-.addrow{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end}
+.addrow{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end}
 .busca{display:grid;grid-template-columns:2fr 1fr;gap:10px}
 @media (max-width:720px){.addrow,.busca{grid-template-columns:1fr}}
 .lote,.salvos{display:flex;flex-direction:column;gap:8px}
@@ -171,6 +171,7 @@ footer{font-size:12px;color:var(--muted);max-width:90ch}
       <form class="addrow" id="add-form" autocomplete="off">
         <label class="f" for="add-nome">Nome completo do paciente<input id="add-nome" type="text" required placeholder="Como está no prontuário"></label>
         <label class="f" for="add-nasc">Data de nascimento<input id="add-nasc" type="date" required></label>
+        <label class="f" for="add-whats">Número WhatsApp<input id="add-whats" type="tel" inputmode="tel" required placeholder="(73) 99999-9999"></label>
         <label class="f" for="add-pront">Nº do prontuário (opcional)<input id="add-pront" type="text"></label>
         <button class="btn primary" type="submit">Adicionar ao lote</button>
       </form>
@@ -190,6 +191,7 @@ footer{font-size:12px;color:var(--muted);max-width:90ch}
   <section class="ident" aria-label="Paciente em conferência">
     <label class="f" for="pac-nome">Nome do paciente no prontuário<input id="pac-nome" type="text" autocomplete="off" placeholder="Nome completo"></label>
     <label class="f" for="pac-nasc">Data de nascimento<input id="pac-nasc" type="date"></label>
+    <label class="f" for="pac-whats">Número WhatsApp<input id="pac-whats" type="tel" inputmode="tel" autocomplete="off" placeholder="(73) 99999-9999"></label>
     <label class="f" for="pac-pront">Nº do prontuário<input id="pac-pront" type="text" autocomplete="off"></label>
     <label class="f" for="pac-cir">Cirurgia proposta<input id="pac-cir" type="text" autocomplete="off"></label>
   </section>
@@ -1269,7 +1271,7 @@ function ativar(p){
   $('area-ativa').hidden = !ATIVO; $('ativo-vazio').hidden = !!ATIVO;
   if (ATIVO){
     arquivos = p.arquivos; R = p.R;
-    $('pac-nome').value = p.nome; $('pac-nasc').value = p.nasc; $('pac-pront').value = p.pront || ''; $('pac-cir').value = p.cir || '';
+    $('pac-nome').value = p.nome; $('pac-nasc').value = p.nasc; $('pac-whats').value = p.whats || ''; $('pac-pront').value = p.pront || ''; $('pac-cir').value = p.cir || '';
     $('leitura').innerHTML = p.leit || ''; $('leitura').hidden = !p.leitOn;
     $('log-txt').value = p.log || ''; $('log-n').textContent = p.logN || '0';
     setStatus(p.st || '', p.stErr);
@@ -1296,7 +1298,7 @@ function renderLote(){
   PACS.forEach(function(p){
     var e = estado(p);
     box.appendChild(el('div', { cls: 'lp' + (p === ATIVO ? ' on' : '') }, [
-      el('div', { cls: 'q' }, [el('b', { text: p.nome }), el('span', { text: 'Nasc. ' + br(p.nasc) + (idade(p.nasc) ? ' (' + idade(p.nasc) + ')' : '') + (p.pront ? ' · prontuário ' + p.pront : '') + ' · ' + (p.arquivos.length ? p.arquivos.length + ' arquivo(s), ' + paginas(p) + ' página(s)' : 'sem arquivos') })]),
+      el('div', { cls: 'q' }, [el('b', { text: p.nome }), el('span', { text: 'Nasc. ' + br(p.nasc) + (idade(p.nasc) ? ' (' + idade(p.nasc) + ')' : '') + (p.whats ? ' · WhatsApp ' + p.whats : '') + (p.pront ? ' · prontuário ' + p.pront : '') + ' · ' + (p.arquivos.length ? p.arquivos.length + ' arquivo(s), ' + paginas(p) + ' página(s)' : 'sem arquivos') })]),
       el('span', { cls: 'pill ' + e[1], text: e[0] }),
       el('div', { cls: 'acts' }, [
         el('button', { cls: 'btn sm' + (p === ATIVO ? '' : ' primary'), type: 'button', text: p === ATIVO ? 'Aberto' : 'Abrir', disabled: (LOTE || rodando || p === ATIVO) ? 'disabled' : null, onclick: function(){ ativar(p); $('area-ativa').scrollIntoView({ behavior: 'smooth', block: 'start' }); } }),
@@ -1314,18 +1316,19 @@ function renderLote(){
 }
 $('add-form').addEventListener('submit', function(e){
   e.preventDefault();
-  var nome = $('add-nome').value.trim().replace(/\s+/g, ' '), nasc = $('add-nasc').value, pr = $('add-pront').value.trim();
+  var nome = $('add-nome').value.trim().replace(/\s+/g, ' '), nasc = $('add-nasc').value, pr = $('add-pront').value.trim(), wa = $('add-whats').value.trim();
   if (nome.split(' ').length < 2){ $('lote-st').textContent = 'Informe o nome completo do paciente.'; $('lote-st').className = 'status err'; return; }
   if (!nasc){ $('lote-st').textContent = 'Informe a data de nascimento.'; $('lote-st').className = 'status err'; return; }
+  if (wa.replace(/\D/g, '').length < 10){ $('lote-st').textContent = 'Informe o número de WhatsApp com DDD.'; $('lote-st').className = 'status err'; return; }
   if (PACS.some(function(p){ return semAcento(p.nome) === semAcento(nome) && p.nasc === nasc; })){ $('lote-st').textContent = 'Este paciente já está no lote.'; $('lote-st').className = 'status err'; return; }
-  var p = { id: 'p' + Date.now().toString(36), nome: nome, nasc: nasc, pront: pr, cir: '', arquivos: [], R: null };
+  var p = { id: 'p' + Date.now().toString(36), nome: nome, nasc: nasc, whats: wa, pront: pr, cir: '', arquivos: [], R: null };
   PACS.push(p); this.reset(); $('lote-st').textContent = ''; $('lote-st').className = 'status';
   if (!rodando) ativar(p); else renderLote();
   if (!rodando) setStatus('Anexe os PDFs de ' + nome + ' (arraste para cá ou "Escolher PDFs").');
 });
-['pac-nome','pac-nasc','pac-pront','pac-cir'].forEach(function(id){ $(id).addEventListener('input', function(){
+['pac-nome','pac-nasc','pac-whats','pac-pront','pac-cir'].forEach(function(id){ $(id).addEventListener('input', function(){
   if (!ATIVO) return;
-  var k = { 'pac-nome': 'nome', 'pac-nasc': 'nasc', 'pac-pront': 'pront', 'pac-cir': 'cir' }[id];
+  var k = { 'pac-nome': 'nome', 'pac-nasc': 'nasc', 'pac-whats': 'whats', 'pac-pront': 'pront', 'pac-cir': 'cir' }[id];
   ATIVO[k] = this.value; if (ATIVO.salvoId) ATIVO.mudou = true;
   $('ativo-h').textContent = 'Paciente em conferência: ' + ATIVO.nome + (ATIVO.nasc ? ' · nasc. ' + br(ATIVO.nasc) : '');
   renderLote();
@@ -1381,10 +1384,10 @@ $('salvar').addEventListener('click', async function(){
   if (!ATIVO || !liberado()) return;
   if (!db){ $('copied').textContent = 'O armazenamento não está disponível nesta visualização: use "Copiar código".'; $('copied').hidden = false; return; }
   var p = ATIVO;
-  if (!p.nome || !p.nasc){ $('copied').textContent = 'Informe o nome e a data de nascimento do paciente antes de salvar.'; $('copied').hidden = false; return; }
+  if (!p.nome || !p.nasc || !p.whats){ $('copied').textContent = 'Informe o nome, a data de nascimento e o WhatsApp do paciente antes de salvar.'; $('copied').hidden = false; return; }
   var d = exportar(), cod = JSON.stringify(d);
   if (cod.length > 240000){ $('copied').textContent = 'Extração grande demais para guardar. Use "Copiar código".'; $('copied').hidden = false; return; }
-  var doc = { nome: p.nome.trim(), nome_busca: semAcento(p.nome), nasc: p.nasc, registro: p.pront || '', cirurgia: p.cir || '',
+  var doc = { nome: p.nome.trim(), nome_busca: semAcento(p.nome), nasc: p.nasc, whats: p.whats || '', registro: p.pront || '', cirurgia: p.cir || '',
     laboratorio: d.laboratorio || '', coleta: d.data_coleta || '', itens: Object.keys(d.campos).length,
     criticos: d.campos_criticos.map(function(k){ return LABK[k] ? LABK[k].label : k; }),
     conferido_por: $('conf-nome').value.trim(), crm: $('conf-crm').value.trim(),
@@ -1426,7 +1429,7 @@ function renderSalvos(){
     } });
     box.appendChild(el('div', { cls: 'sv' + (an ? ' anexado' : '') }, [
       el('div', { cls: 'q' }, [el('b', { text: x.nome }),
-        el('span', { text: 'Nasc. ' + br(x.nasc) + (idade(x.nasc) ? ' (' + idade(x.nasc) + ')' : '') + (x.registro ? ' · prontuário ' + x.registro : '') }),
+        el('span', { text: 'Nasc. ' + br(x.nasc) + (idade(x.nasc) ? ' (' + idade(x.nasc) + ')' : '') + (x.whats ? ' · WhatsApp ' + x.whats : '') + (x.registro ? ' · prontuário ' + x.registro : '') }),
         el('span', { text: (x.coleta ? 'Coleta ' + br(x.coleta) + ' · ' : '') + (x.laboratorio ? x.laboratorio + ' · ' : '') + (x.itens || 0) + ' campo(s) · salva em ' + new Date(x.criado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) + (x.conferido_por ? ' por ' + x.conferido_por : '') + (an && x.anexado_em ? ' · anexada em ' + new Date(x.anexado_em).toLocaleDateString('pt-BR') : '') }),
         x.criticos && x.criticos.length ? el('span', { cls: 'crit', text: 'Valor crítico: ' + x.criticos.join(', ') }) : null]),
       el('span', { cls: 'pill ' + (an ? 'ok' : 'warn'), text: an ? 'anexada' : 'não anexada' }),
