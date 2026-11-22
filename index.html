@@ -319,7 +319,7 @@ input.invalido{border-color:var(--crit)!important}
 .chip input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
 .multi .chip input:checked+span{background:var(--accent-soft);color:var(--ink);border-color:var(--accent)}
 .multi .chip input:checked+span::before{content:"✓ ";color:var(--accent);font-weight:700}
-h3.sub{grid-column:1/-1;margin:6px 0 -4px;font-family:var(--cond);font-size:15px;font-weight:600;color:var(--ink);border-top:1px dashed var(--line);padding-top:12px}
+h3.sub{grid-column:1/-1;margin:6px 0 -4px;font-family:var(--cond);font-size:15px;font-weight:600;color:var(--ink);border-top:1px dashed var(--line);padding-top:12px;display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
 h3.sub:first-child{border-top:0;padding-top:0}
 p.note{grid-column:1/-1;margin:0;padding:10px 12px;border-radius:8px;background:var(--surface-2);color:var(--muted);font-size:13px;max-width:none}
 
@@ -338,6 +338,9 @@ table.edit td.x{width:34px;text-align:center}
 .xbtn{border:0;background:none;color:var(--muted);font-size:16px;line-height:1;padding:4px 6px;border-radius:6px}
 .xbtn:hover{color:var(--crit);background:var(--crit-soft)}
 .addrow{align-self:flex-start;border:1px dashed var(--line-strong);background:none;color:var(--accent);border-radius:7px;padding:5px 10px;font-size:12.5px;font-weight:500}
+.procx-lista{display:flex;flex-direction:column;gap:8px}
+.procx-row{display:flex;gap:8px;align-items:flex-start}
+.procx-row .tuss-box{flex:1}
 
 /* Condições por sistema */
 .conds{grid-column:1/-1;border:1px solid var(--line);border-radius:9px;overflow:hidden}
@@ -584,6 +587,7 @@ var SCHEMA = [
 { id: 'proc', title: 'Procedimento proposto', fields: [
   { t: 'tuss', id: 'cirurgia', label: 'Cirurgia proposta', span: 8, ph: 'digite o nome do procedimento ou o código TUSS' },
   { t: 'chips', id: 'lateralidade', label: 'Lateralidade', options: ['Direita', 'Esquerda', 'Bilateral', 'Não se aplica'], outro: true, span: 4 },
+  { t: 'procs', id: 'procedimentos_extra', label: 'Procedimentos adicionais (combinados na mesma cirurgia)', span: 12 },
   { t: 'chips', id: 'incisao', label: 'Sítio da incisão', options: ['Periférica', 'Abdominal superior', 'Abdominal inferior / pélvica', 'Intratorácica', 'Cabeça e pescoço', 'Coluna', 'Intracraniana'], span: 12 },
   { t: 'cid', id: 'diagnostico', label: 'Diagnóstico / indicação (CID-10)', span: 6, ph: 'digite o código ou parte do nome' },
   { t: 'text', id: 'cirurgiao', label: 'Cirurgião / especialidade', span: 6 },
@@ -609,9 +613,9 @@ var SCHEMA = [
   { t: 'multi', id: 'cir_especial', label: 'Particularidades do procedimento', options: ['Videolaparoscopia (pneumoperitônio)', 'Fonte de luz', 'Cirurgia robótica', 'Eletrocautério unipolar', 'Eletrocautério bipolar', 'Laser ou eletrocautério em via aérea', 'Uso de radioscopia', 'Arco cirúrgico (RX)', 'Garrote pneumático', 'Cimento ósseo', 'TOF (monitorização neuromuscular)', 'BIS (neuromonitorização)', 'Mesa de tração – membro inferior', 'Mesa de tração – membro superior', 'Bota pneumática', 'Manta térmica'], outro: true, span: 12 }
 ]},
 
-{ id: 'hist', title: 'Histórico cirúrgico e anestésico', fields: [
+{ id: 'hist', title: 'Histórico de procedimentos e anestesias', fields: [
   { t: 'chips', id: 'anest_previa', label: 'Já foi anestesiado(a)?', options: ['Não', 'Sim'], span: 12 },
-  { t: 'table', id: 'cirurgias', label: 'Cirurgias e anestesias anteriores', cols: [['Data (mês/ano)', 2, 'mesano'], ['Procedimento', 4], ['Tipo de anestesia', 5, 'multi', ['Raquianestesia', 'Peridural', 'Geral', 'Bloqueio', 'Local', 'Sedação']], ['Hospital', 2], ['Intercorrências', 3]], rows: 4 },
+  { t: 'table', id: 'cirurgias', label: 'Procedimentos e anestesias anteriores', cols: [['Mês', 1, 'mes'], ['Ano', 1, 'ano'], ['Procedimento', 4], ['Tipo de anestesia', 5, 'multi', ['Raquianestesia', 'Peridural', 'Geral', 'Bloqueio', 'Local', 'Sedação']], ['Hospital', 2], ['Intercorrências', 3]], rows: 4 },
   { t: 'conds', id: 'compl_anest', title: 'Complicações anestésicas prévias do paciente', items: [
     ['c_vad', 'Intubação ou ventilação difícil', 'Cormack-Lehane, dispositivo usado, carta de VAD'],
     ['c_hm', 'Hipertermia maligna (suspeita ou confirmada)', 'ano, desfecho, investigação'],
@@ -670,8 +674,7 @@ var SCHEMA = [
     ['d_inj', 'Drogas injetáveis', 'acesso venoso, infecções'],
     ['d_anabol', 'Anabolizantes / hormônios sem prescrição', '']
   ], outro: true },
-  { t: 'text', id: 'cafeina', label: 'Cafeína (xícaras por dia)', span: 4 },
-  { t: 'table', id: 'atividades', label: 'Atividade física regular', cols: [['Atividade', 4], ['Vezes', 1, 'num'], ['Por', 2, 'select', ['semana', 'mês']], ['Duração (min)', 2, 'num']], rows: 3 }
+  { t: 'text', id: 'cafeina', label: 'Cafeína (xícaras por dia)', span: 4 }
 ]},
 
 { id: 'alergias', title: 'Alergias', fields: [
@@ -693,6 +696,7 @@ var SCHEMA = [
 ]},
 
 { id: 'capfunc', title: 'Capacidade funcional e fragilidade', fields: [
+  { t: 'table', id: 'atividades', label: 'Atividade física regular', cols: [['Atividade', 4], ['Vezes', 1, 'num'], ['Por', 2, 'select', ['semana', 'mês']], ['Duração (min)', 2, 'num']], rows: 3 },
   { t: 'score', id: 'dasi', kind: 'dasi', title: 'Duke Activity Status Index (DASI): o paciente consegue…', items: [
     ['dasi1', 'Cuidar de si: comer, vestir-se, tomar banho, usar o banheiro', 2.75],
     ['dasi2', 'Caminhar dentro de casa', 1.75],
@@ -1027,7 +1031,7 @@ var SCHEMA = [
     ['II', 'Os incisivos inferiores alcançam o lábio superior, mas não ultrapassam a borda do vermelhão', 'Intermediário'],
     ['III', 'Os incisivos inferiores não alcançam o lábio superior', 'Maior risco de intubação difícil']],
     note: 'Upper Lip Bite Test (Khan, 2003). Classe III tem boa especificidade para laringoscopia difícil.' },
-  { t: 'sub', label: 'Mobilidade cervical' },
+  { t: 'sub', label: 'Mobilidade cervical', action: { label: 'Marcar normal para todos', fn: marcarCervNormal } },
   { t: 'chips', id: 'mob_flex', label: 'Flexão cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
   { t: 'chips', id: 'mob_ext', label: 'Extensão cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
   { t: 'chips', id: 'mob_rot', label: 'Rotação cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
@@ -1375,6 +1379,7 @@ function renderField(f){
         h('tbody', null, f.rows.map(function(r){ return h('tr', null, r.map(function(x){ return h('td', null, Array.isArray(x) ? h('ul', null, x.map(function(y){ return h('li', null, y); })) : x); })); })))), h('p', null, f.note));
     case 'cid': return renderCid(f);
     case 'tuss': return renderTuss(f);
+    case 'procs': return renderProcs(f);
     case 'num':
       return wrap(f, [labelEl(f), h('input', { id: f.id, type: 'text', inputmode: 'decimal', 'class': 'numf', autocomplete: 'off' })]);
     case 'calc':
@@ -1401,7 +1406,7 @@ function renderField(f){
         (f.textos || []).map(function(t){ return h('input', { type: 'text', id: t.id, 'class': 'outro-in', 'data-outro-for': f.id, 'data-outro-val': t.op, placeholder: t.ph || 'Descreva', 'aria-label': f.label + ': ' + t.op, autocomplete: 'off', hidden: true }); }));
       if (f.only) fs.setAttribute('data-only', f.only);
       return fs;
-    case 'sub': return h('h3', { 'class': 'sub' }, f.label);
+    case 'sub': return h('h3', { 'class': 'sub' }, f.label, f.action ? h('button', { type: 'button', 'class': 'btn small', onclick: f.action.fn }, f.action.label) : null);
     case 'note': return h('p', { 'class': 'note' }, f.text);
     case 'hidden': return h('input', { type: 'hidden', id: f.id });
     case 'reusoinfo': return h('div', { 'class': 'f full' }, h('div', { 'class': 'reuso-box', id: f.id }));
@@ -1513,6 +1518,47 @@ function renderTuss(f){
   inp.addEventListener('blur', function(){ setTimeout(fechar, 120); });
   return wrap(f, [labelEl(f), h('div', { 'class': 'tuss-box' }, inp, lista), h('span', { 'class': 'tuss-dica' }, 'Busca na tabela TUSS/CBHPM (Tabela 22 da ANS, procedimentos vigentes). Também aceita texto livre.')]);
 }
+function renderProcs(f){
+  var hid = h('input', { type: 'hidden', id: f.id });
+  var lista = h('div', { 'class': 'procx-lista' });
+  function valores(){ return [].slice.call(lista.querySelectorAll('[data-procx]')).map(function(i){ return i.value.trim(); }).filter(Boolean); }
+  function sync(){ hid.value = JSON.stringify(valores()); update(); }
+  function addLinha(val){
+    var inp = h('input', { type: 'text', 'data-procx': true, value: val || '', placeholder: 'digite o nome do procedimento ou o código TUSS', autocomplete: 'off', role: 'combobox', 'aria-autocomplete': 'list', 'aria-expanded': 'false' });
+    var ul = h('ul', { 'class': 'tuss-lista', role: 'listbox', hidden: true });
+    var tmr = null, ult = '', itens = [], ativo = -1;
+    function fechar(){ ul.hidden = true; ativo = -1; }
+    function marcar(){ [].forEach.call(ul.children, function(li, k){ li.setAttribute('aria-selected', String(k === ativo)); if (k === ativo) li.scrollIntoView({ block: 'nearest' }); }); }
+    function escolher(r){ inp.value = r.nome + ' – TUSS ' + r.codigo; fechar(); sync(); }
+    function mostrar(rs, q){
+      ul.innerHTML = ''; itens = rs;
+      if (!rs.length) ul.appendChild(h('li', { 'class': 'tuss-vazio' }, 'Nenhum procedimento TUSS encontrado para "' + q + '". O texto digitado fica como está.'));
+      rs.forEach(function(r){ ul.appendChild(h('li', { role: 'option', onmousedown: function(e){ e.preventDefault(); escolher(r); } }, h('b', null, r.codigo), ' ' + r.nome)); });
+      ul.hidden = false; ativo = -1;
+    }
+    inp.addEventListener('input', function(e){
+      sync();
+      if (!e.isTrusted) return;
+      var q = inp.value.trim(); clearTimeout(tmr);
+      if (q.length < 2 || !(window.ACESSO && window.ACESSO.buscarTuss)){ fechar(); return; }
+      tmr = setTimeout(function(){ ult = q; window.ACESSO.buscarTuss(q).then(function(rs){ if (ult === q && document.activeElement === inp) mostrar(rs || [], q); }, fechar); }, 200);
+    });
+    inp.addEventListener('keydown', function(e){
+      if (ul.hidden || !itens.length) return;
+      if (e.key === 'ArrowDown'){ e.preventDefault(); ativo = Math.min(ativo + 1, itens.length - 1); marcar(); }
+      else if (e.key === 'ArrowUp'){ e.preventDefault(); ativo = Math.max(ativo - 1, 0); marcar(); }
+      else if (e.key === 'Enter' && ativo > -1){ e.preventDefault(); escolher(itens[ativo]); }
+      else if (e.key === 'Escape') fechar();
+    });
+    inp.addEventListener('blur', function(){ setTimeout(fechar, 120); });
+    var rm = h('button', { type: 'button', 'class': 'btn small', 'aria-label': 'Remover este procedimento', onclick: function(){ row.remove(); sync(); } }, '✕');
+    var row = h('div', { 'class': 'procx-row' }, h('div', { 'class': 'tuss-box' }, inp, ul), rm);
+    lista.appendChild(row);
+  }
+  lista.__add = addLinha;
+  var btn = h('button', { type: 'button', 'class': 'addrow', onclick: function(){ addLinha(''); } }, '+ Adicionar procedimento');
+  return wrap(f, [labelEl(f), h('div', { 'class': 'procx', style: 'display:flex;flex-direction:column;gap:8px' }, hid, lista, btn), h('span', { 'class': 'tuss-dica' }, 'Use para procedimentos combinados na mesma cirurgia (o principal fica no campo acima).')], 'full');
+}
 function renderYm(f){
   var hid = h('input', { type: 'hidden', id: f.id });
   function sync(){
@@ -1609,9 +1655,18 @@ function syncDatas(){
     t.value = hid.value ? isoBR(hid.value) : ''; t.classList.remove('invalido');
   });
 }
+function syncProcs(){
+  document.querySelectorAll('.procx').forEach(function(b){
+    var hid = b.querySelector('input[type=hidden]'), lista = b.querySelector('.procx-lista');
+    if (!hid || !lista || lista.children.length) return;
+    var arr; try { arr = JSON.parse(hid.value || '[]'); } catch (e){ arr = []; }
+    arr.forEach(function(v){ lista.__add(v); });
+  });
+}
 function syncDmy(){
   syncDatas();
   syncHm();
+  syncProcs();
   document.querySelectorAll('.dmy').forEach(function(b){
     var hid = b.parentNode.querySelector('input[type=hidden]'); if (!hid || !hid.value) return;
     var id = hid.id, p = hid.value.split('-');
@@ -1684,6 +1739,8 @@ function cellEl(c, v){
     return h('div', { 'class': 'cellmulti', role: 'group', 'aria-label': c[0] }, c[3].map(function(o){ return h('label', null, h('input', { type: 'checkbox', value: o, checked: sel.indexOf(o) > -1 ? true : null }), o); }));
   }
   if (c[2] === 'data' || c[2] === 'mesano') return h('input', { type: 'text', 'aria-label': c[0], value: v || null, inputmode: 'numeric', placeholder: c[2] === 'data' ? 'dd/mm/aaaa' : 'mm/aaaa', maxlength: c[2] === 'data' ? 10 : 7, 'data-dmask': c[2] === 'data' ? 'data-txt' : 'mesano', 'data-ano': 'passado' });
+  if (c[2] === 'mes') return h('select', { 'aria-label': c[0] }, h('option', { value: '' }, '—'), ['01 – jan', '02 – fev', '03 – mar', '04 – abr', '05 – mai', '06 – jun', '07 – jul', '08 – ago', '09 – set', '10 – out', '11 – nov', '12 – dez'].map(function(o){ return h('option', { value: o.slice(0, 2), selected: v === o.slice(0, 2) ? true : null }, o); }));
+  if (c[2] === 'ano') return h('input', { type: 'text', 'aria-label': c[0], value: v || null, inputmode: 'numeric', placeholder: 'aaaa', maxlength: 4, 'class': 'numcell', oninput: function(e){ e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); } });
   if (c[2] === 'select') return h('select', { 'aria-label': c[0] }, h('option', { value: '' }, '—'), c[3].map(function(o){ return h('option', { value: o, selected: v === o ? true : null }, o); }));
   return h('input', { type: 'text', 'aria-label': c[0], value: v || null, inputmode: c[2] === 'num' ? 'numeric' : null, 'class': c[2] === 'num' ? 'numcell' : null });
 }
@@ -2573,6 +2630,8 @@ function assinaturaFinal(){
 /* ---------- Leitura de valores ---------- */
 function num(id){ var e = $(id); if (!e) return null; var v = String(e.value || '').trim(); if (/^\d{1,3}(\.\d{3})+$/.test(v)) v = v.replace(/\./g, ''); v = v.replace(/\.(?=.*,)/g, '').replace(',', '.'); var n = parseFloat(v); return isNaN(n) ? null : n; }
 function chip(id){ var c = document.querySelector('input[name="' + id + '"]:checked'); return c ? c.value : ''; }
+function setChip(name, value){ var i = document.querySelector('input[name="' + name + '"][value="' + value + '"]'); if (i) i.checked = true; }
+function marcarCervNormal(){ ['mob_flex', 'mob_ext', 'mob_rot', 'mob_latr'].forEach(function(id){ setChip(id, 'Normal'); }); update(); }
 function multi(id){ return Array.prototype.map.call(document.querySelectorAll('input[name="' + id + '"]:checked'), function(i){ return i.value; }); }
 function ck(id){ var e = $(id); return !!(e && e.checked); }
 function txt(id){ var e = $(id); return e ? String(e.value || '').trim() : ''; }
@@ -2964,6 +3023,7 @@ function linhasSecao(sec, skip){
         case 'hm': v = txt(f.id); if (v) L.push(f.label + ': ' + fmtHm(v)); break;
         case 'ym': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
         case 'cid': case 'tuss': v = txt(f.id); if (v) L.push(f.label + ': ' + v); break;
+        case 'procs': v = (function(){ try { return JSON.parse(txt(f.id) || '[]'); } catch (e){ return []; } })(); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
         case 'multi': v = multi(f.id).map(function(x){ return comTextoOpcao(f, comOutro(f.id, x)); }); if (v.length) L.push(f.label + ': ' + v.join('; ')); break;
         case 'table':
           var rows = tableRows(f.id);
@@ -3876,7 +3936,8 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
     <h2 id="dlg-novo-t">Novo prontuário</h2>
     <label>Instituição onde o paciente será atendido<select id="novo-inst" required></select></label>
     <label>Nome completo do paciente<input id="novo-nome" autocomplete="off"></label>
-    <label>Data de nascimento<input id="novo-dn" type="date"></label>
+    <label>Data de nascimento (opcional)<input id="novo-dn" type="date"></label>
+    <label>CPF (opcional)<input id="novo-cpf" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" data-mask="cpf"></label>
     <label>Número de telefone / WhatsApp<input id="novo-tel" type="tel" inputmode="tel" autocomplete="off" placeholder="(73) 99999-9999"></label>
     <div class="adm-msg" id="dlg-novo-msg" role="alert"></div>
     <div class="dlg-acts"><button class="btn" type="button" id="dlg-novo-cancelar">Cancelar</button><button class="btn primary" type="submit" id="dlg-novo-ok">Criar e abrir</button></div>
@@ -5015,21 +5076,21 @@ $('btn-novo').addEventListener('click', function(){
   if (ok.length !== 1){ var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Selecione…'; s.appendChild(o0); }
   ok.forEach(function(i){ var o = document.createElement('option'); o.value = i.id; o.textContent = i.nome + (i.cidade ? ' – ' + i.cidade : ''); s.appendChild(o); });
   if ($('f-inst').value && ok.some(function(i){ return i.id === $('f-inst').value; })) s.value = $('f-inst').value;
-  $('novo-nome').value = ''; $('novo-dn').value = ''; $('novo-tel').value = ''; msg($('dlg-novo-msg'), '');
+  $('novo-nome').value = ''; $('novo-dn').value = ''; $('novo-cpf').value = ''; $('novo-tel').value = ''; msg($('dlg-novo-msg'), '');
   $('dlg-novo').hidden = false;
   setTimeout(function(){ (s.value ? $('novo-nome') : s).focus(); }, 30);
 });
 $('dlg-novo-cancelar').addEventListener('click', function(){ $('dlg-novo').hidden = true; });
 $('dlg-novo-form').addEventListener('submit', async function(e){
   e.preventDefault();
-  var inst = $('novo-inst').value, nome = $('novo-nome').value.trim(), dn = $('novo-dn').value, tel = $('novo-tel').value.trim(), m = $('dlg-novo-msg');
+  var inst = $('novo-inst').value, nome = $('novo-nome').value.trim(), dn = $('novo-dn').value, cpf = $('novo-cpf').value.trim(), tel = $('novo-tel').value.trim(), m = $('dlg-novo-msg');
   if (!inst) return msg(m, 'Escolha a instituição.', 'err');
   if (nome.length < 3) return msg(m, 'Informe o nome completo do paciente.', 'err');
-  if (!dn) return msg(m, 'Informe a data de nascimento do paciente.', 'err');
   if (tel.replace(/\D/g, '').length < 10) return msg(m, 'Informe o número de telefone/WhatsApp com DDD.', 'err');
+  if (cpf && !cpfValido(cpf)) return msg(m, 'CPF inválido. Confira os números ou deixe em branco.', 'err');
   $('dlg-novo-ok').disabled = true; msg(m, 'Criando…');
   try {
-    var r = await sb.from('avaliacoes').insert({ instituicao_id: inst, paciente_nome: nome, paciente_nascimento: dn, paciente_telefone: tel, criado_por: EU.id }).select('id').single();
+    var r = await sb.from('avaliacoes').insert({ instituicao_id: inst, paciente_nome: nome, paciente_nascimento: dn || null, paciente_cpf: cpf || null, paciente_telefone: tel, criado_por: EU.id }).select('id').single();
     if (r.error || !r.data) throw new Error('Não foi possível criar o prontuário' + (r.error ? ': ' + r.error.message : '.'));
     $('dlg-novo').hidden = true;
     await abrirProntuario(r.data.id, true);
@@ -5051,7 +5112,7 @@ async function abrirProntuario(id, novo){
   ATUAL = r.data;
   (s.data || []).forEach(function(x){ if ((PERM[x.aba_id] || 'oculto') !== 'oculto') window.PRONT.aplicarSecao(x.aba_id, x.dados); });
   // campos do cabeçalho ainda sem aba gravada (ex.: nome digitado ao criar) vêm da lista
-  [['nome', 'paciente_nome'], ['dn', 'paciente_nascimento'], ['telefone', 'paciente_telefone'], ['prontuario', 'registro'], ['cirurgia', 'cirurgia'], ['data_cir', 'data_cirurgia']].forEach(function(c){
+  [['nome', 'paciente_nome'], ['dn', 'paciente_nascimento'], ['documento', 'paciente_cpf'], ['telefone', 'paciente_telefone'], ['prontuario', 'registro'], ['cirurgia', 'cirurgia'], ['data_cir', 'data_cirurgia']].forEach(function(c){
     var e = $(c[0]); if (!e || e.value || !ATUAL[c[1]]) return;
     if ((PERM[e.closest('.sec').id.slice(4)] || 'oculto') === 'oculto') return;
     e.value = ATUAL[c[1]]; window.ACESSO.sujo(e.closest('.sec').id.slice(4));
