@@ -2183,10 +2183,12 @@ function extRefsRender(){
   extMontarRefs();
   var raw = $('exames_ext') ? $('exames_ext').value : '';
   if (raw === EXT_ULT) return; EXT_ULT = raw;
-  var d = extDados(), ref = d.ref || {}, duv = d.duv || [], crit = d.crit || [];
+  var d = extDados(), ref = d.ref || {}, duv = d.duv || [], crit = d.crit || [], datas = d.datas || {};
   EXT_LAB.forEach(function(k){
     var r = $('ref_' + k); if (!r) return;
     r.innerHTML = '';
+    var dt = datas[k] || d.coleta;
+    if (dt) r.appendChild(h('span', null, 'Coleta: ' + dBR(dt)));
     if (ref[k]) r.appendChild(h('span', null, 'Ref. do laudo: ' + ref[k]));
     if (crit.indexOf(k) > -1) r.appendChild(h('span', { 'class': 'tag crit' }, 'valor crítico'));
     if (duv.indexOf(k) > -1) r.appendChild(h('span', { 'class': 'tag duv' }, 'conferido com dúvida'));
@@ -2196,7 +2198,7 @@ function extRefsRender(){
   if (info){
     info.innerHTML = '';
     if (d.em){
-      info.appendChild(h('span', null, h('b', null, 'Preenchido pelo Extrator de exames'), ' em ' + tDate(new Date(d.em)) + (d.por ? ' por ' + d.por : '') + (d.lab ? ' · ' + d.lab : '') + (d.coleta ? ' · coleta ' + dBR(d.coleta) : '') + '. Confira os valores com os laudos.'));
+      info.appendChild(h('span', null, h('b', null, 'Preenchido pelo Extrator de exames'), ' em ' + tDate(new Date(d.em)) + (d.por ? ' por ' + d.por : '') + (d.lab ? ' · ' + d.lab : '') + (d.coleta ? ' · última leitura: coleta de ' + dBR(d.coleta) : '') + '. Cada exame mostra sua própria data de coleta ao lado; os exames não atualizados numa nova leitura mantêm valor e data anteriores. Confira os valores com os laudos.'));
       info.hidden = false;
     } else info.hidden = true;
   }
@@ -2251,11 +2253,16 @@ function extAplicar(P, so_vazios){
     feitos.push(m.k);
   });
   syncDatas();
-  var d = P.d, ant = extDados(), ref = ant.ref || {};
+  var d = P.d, ant = extDados(), ref = ant.ref || {}, datas = ant.datas || {};
   Object.keys(d.referencias || {}).forEach(function(k){ if (feitos.indexOf(k) > -1 || (P.mud.every(function(m){ return m.k !== k; }) && extDefs()[k])) ref[k] = d.referencias[k]; });
-  var info = { em: new Date().toISOString(), por: (window.ACESSO && window.ACESSO.eu && window.ACESSO.eu()) || '', lab: d.laboratorio || '', coleta: d.data_coleta || '', ref: ref,
+  var feitosUnicos = feitos.filter(function(k, i, a){ return a.indexOf(k) === i; });
+  // Cada campo guarda sua própria data de coleta: só os campos atualizados nesta
+  // leitura recebem a nova data; os demais mantêm a data (e o valor) da leitura anterior.
+  feitosUnicos.forEach(function(k){ datas[k] = d.data_coleta || datas[k] || null; });
+  var info = { em: new Date().toISOString(), por: (window.ACESSO && window.ACESSO.eu && window.ACESSO.eu()) || '', lab: d.laboratorio || '', coleta: d.data_coleta || '', ref: ref, datas: datas,
     duv: (d.campos_duvida || []).filter(function(k){ return feitos.indexOf(k) > -1 || (ant.duv || []).indexOf(k) > -1; }),
-    crit: (d.campos_criticos || []).filter(function(k){ return extDefs()[k]; }), arquivos: d.arquivos_origem || [] };
+    crit: (d.campos_criticos || []).filter(function(k){ return extDefs()[k]; }),
+    arquivos: (ant.arquivos || []).concat(d.arquivos_origem || []).filter(function(x, i, a){ return a.indexOf(x) === i; }) };
   $('exames_ext').value = JSON.stringify(info);
   if (window.ACESSO && window.ACESSO.sujo) window.ACESSO.sujo('exames');
   update();
@@ -4033,6 +4040,7 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
       <label id="reuso-op-branco"><input type="radio" name="reuso-modo" value="branco"><span><b>Começar em branco</b><small>Cria uma avaliação nova só com o nome e a data de nascimento.</small></span></label>
     </div>
     <p class="note" style="margin:0">Não são copiados: procedimento proposto, plano anestésico, orientações, TCLE e reavaliação. A avaliação anterior não é alterada.</p>
+    <label class="sa" style="font-size:13.5px;gap:8px"><input type="checkbox" id="reuso-ext-abrir"><span>Já tenho exames novos para importar agora (abre o Extrator de exames depois de criar, na aba 14). Os exames que não forem atualizados continuam com o valor e a data da avaliação anterior.</span></label>
     <div class="adm-msg" id="dlg-reuso-msg" role="alert"></div>
     <div class="dlg-acts"><button class="btn" type="button" id="dlg-reuso-cancelar">Cancelar</button><button class="btn primary" type="submit" id="dlg-reuso-ok">Criar e abrir</button></div>
   </form>
@@ -4750,6 +4758,7 @@ function abrirReuso(itens, destino){
   var si = $('reuso-inst'); si.innerHTML = '';
   INSTS.filter(function(i){ return i.ativa && (!EU.instituicao_id || i.id === EU.instituicao_id); }).forEach(function(i){ var o = document.createElement('option'); o.value = i.id; o.textContent = i.nome + (i.cidade ? ' – ' + i.cidade : ''); si.appendChild(o); });
   $('reuso-inst-l').hidden = !!destino; $('reuso-op-branco').hidden = !!destino;
+  $('reuso-ext-abrir').checked = false;
   msg($('dlg-reuso-msg'), '');
   reusoAtualizarDlg(true);
   $('dlg-reuso').hidden = false;
@@ -4768,6 +4777,7 @@ $('dlg-reuso-cancelar').addEventListener('click', function(){ $('dlg-reuso').hid
 $('dlg-reuso-form').addEventListener('submit', async function(e){
   e.preventDefault();
   var m = $('dlg-reuso-msg'), modo = (document.querySelector('#dlg-reuso input[name="reuso-modo"]:checked') || {}).value, origem = $('reuso-origem').value;
+  var abrirExt = $('reuso-ext-abrir').checked;
   if (!modo) return msg(m, 'Escolha como começar a nova avaliação.', 'err');
   $('dlg-reuso-ok').disabled = true; msg(m, 'Criando…');
   try {
@@ -4785,7 +4795,10 @@ $('dlg-reuso-form').addEventListener('submit', async function(e){
     }
     $('dlg-reuso').hidden = true;
     await abrirProntuario(id, true);
-    if (modo !== 'branco'){ var sa = $('sec-atualizacao'); if (sa && !sa.hidden) sa.scrollIntoView({ block: 'start' }); }
+    if (abrirExt && extPodeUsar()){
+      var se = $('sec-exames'); if (se) se.scrollIntoView({ block: 'start' });
+      extAbrir();
+    } else if (modo !== 'branco'){ var sa = $('sec-atualizacao'); if (sa && !sa.hidden) sa.scrollIntoView({ block: 'start' }); }
   } catch (err){ msg(m, /fetch|network|Failed/i.test(err.message) ? SEM_REDE : err.message, 'err'); }
   finally { $('dlg-reuso-ok').disabled = false; }
 });
