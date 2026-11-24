@@ -1031,7 +1031,7 @@ var SCHEMA = [
     ['II', 'Os incisivos inferiores alcançam o lábio superior, mas não ultrapassam a borda do vermelhão', 'Intermediário'],
     ['III', 'Os incisivos inferiores não alcançam o lábio superior', 'Maior risco de intubação difícil']],
     note: 'Upper Lip Bite Test (Khan, 2003). Classe III tem boa especificidade para laringoscopia difícil.' },
-  { t: 'sub', label: 'Mobilidade cervical', action: { label: 'Marcar normal para todos', fn: marcarCervNormal } },
+  { t: 'sub', label: 'Mobilidade cervical', action: { label: 'Marcar normal para todos', fn: function(){ marcarCervNormal(); } } },
   { t: 'chips', id: 'mob_flex', label: 'Flexão cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
   { t: 'chips', id: 'mob_ext', label: 'Extensão cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
   { t: 'chips', id: 'mob_rot', label: 'Rotação cervical', options: ['Normal', 'Reduzida', 'Muito reduzida'], span: 6 },
@@ -3222,7 +3222,10 @@ function tcleRender(){
     h('p', null, 'Os dados do paciente, o procedimento e a técnica são preenchidos a partir das seções anteriores. Entregue o aparelho ao paciente para ler, marcar as declarações e assinar; depois assine como anestesiologista e baixe o PDF.'),
     h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' },
       h('button', { type: 'button', 'class': 'btn primary', id: 'btn-pm-on' }, 'Entregar ao paciente'),
-      h('button', { type: 'button', 'class': 'btn', id: 'btn-tcle-whats' }, 'Enviar TCLE por WhatsApp (leitura antecipada)', h('span', { 'class': 'qp-badge', id: 'tcle-badge', hidden: true })))));
+      h('button', { type: 'button', 'class': 'btn', id: 'btn-tcle-whats' }, 'Enviar link do TCLE por WhatsApp (leitura antecipada)', h('span', { 'class': 'qp-badge', id: 'tcle-badge', hidden: true })),
+      h('button', { type: 'button', 'class': 'btn', id: 'btn-tcle-pdf-top' }, 'Enviar PDF do TCLE por WhatsApp')),
+    h('p', { 'class': 'legend' }, h('b', null, 'Link: '), 'abre o formulário no celular do paciente, que lê e marca cada item (sem assinar); as respostas aparecem aqui para importar. ', h('b', null, 'PDF: '), 'manda o documento pronto para o paciente só ler — rascunho antes da assinatura, ou o termo já assinado depois (mesmo botão do final da seção).'),
+    h('span', { 'class': 'pdfmsg', id: 'pdfpactopmsg' })));
   root.appendChild(h('div', { 'class': 'tcle-bar pm-only' },
     h('p', null, h('b', null, 'Termo de Consentimento Livre e Esclarecido para Anestesia. '), 'Leia com calma, marque cada declaração e assine no final. Pergunte ao anestesiologista se tiver qualquer dúvida.'),
     h('button', { type: 'button', 'class': 'btn', id: 'btn-pm-off' }, 'Devolver ao médico')));
@@ -3302,8 +3305,8 @@ function tcleRender(){
     h('ul', { 'class': 'checklist', id: 'tcle-check' }),
     h('div', { 'class': 'resumo-actions' }, h('button', { type: 'button', 'class': 'btn primary', id: 'btn-pdf' }, 'Baixar TCLE assinado (PDF)'), h('span', { 'class': 'pdfmsg', id: 'pdfmsg' })),
     h('p', { 'class': 'legend' }, 'O PDF inclui as informações apresentadas ao paciente, as opções marcadas, as assinaturas com data e hora e as referências. Guarde-o no prontuário e entregue uma cópia ao paciente.'),
-    h('div', { 'class': 'resumo-actions doc-only' }, h('button', { type: 'button', 'class': 'btn', id: 'btn-pdf-pac' }, 'Enviar PDF do termo para o paciente'), h('span', { 'class': 'pdfmsg', id: 'pdfpacmsg' })),
-    h('p', { 'class': 'legend doc-only' }, 'Envia o PDF já assinado ao celular do paciente (compartilhamento direto quando o navegador permite, ou download para anexar você mesmo no WhatsApp).')
+    h('div', { 'class': 'resumo-actions doc-only' }, h('button', { type: 'button', 'class': 'btn', id: 'btn-pdf-pac' }, 'Enviar PDF do termo assinado para o paciente'), h('span', { 'class': 'pdfmsg', id: 'pdfpacmsg' })),
+    h('p', { 'class': 'legend doc-only' }, 'Depois de concluídas as assinaturas, envia este PDF (igual ao baixado acima) direto ao celular do paciente — compartilhamento direto quando o navegador permite, ou download para você mesmo anexar no WhatsApp.')
   ]));
 
   root.addEventListener('input', function(e){ var t = e.target; if (t.dataset && t.dataset.auto === 'tcle') t.dataset.manual = '1'; });
@@ -3318,7 +3321,8 @@ function tcleRender(){
     else if (id === 'btn-pm-off') setPatientMode(false);
     else if (id === 'btn-sug-riscos') suggestRisks();
     else if (id === 'btn-pdf') downloadPdf();
-    else if (id === 'btn-pdf-pac') enviarPdfPaciente();
+    else if (id === 'btn-pdf-pac') enviarPdfPaciente('pdfpacmsg');
+    else if (id === 'btn-tcle-pdf-top') enviarPdfPaciente('pdfpactopmsg');
     else if (id === 'btn-minha-assin') usarMinhaAssinatura();
   });
   return root;
@@ -3614,18 +3618,19 @@ function downloadPdf(){
   try { blob = buildPdf().output('blob'); } catch (err){ say('Não foi possível gerar o PDF.', true); return; }
   saveFile(blob, pdfFileName(), say);
 }
-async function enviarPdfPaciente(){
-  var msg = $('pdfpacmsg');
+async function enviarPdfPaciente(msgId){
+  var msg = $(msgId || 'pdfpacmsg'); if (!msg) return;
   function say(t, err){ msg.textContent = t; msg.className = 'pdfmsg' + (err ? ' err' : ''); }
   if (!window.jspdf){ say('Não foi possível carregar o gerador de PDF. Recarregue a página e tente de novo.', true); return; }
   update();
   say('Gerando o PDF…');
   var blob; try { blob = buildPdf().output('blob'); } catch (err){ say('Não foi possível gerar o PDF.', true); return; }
   var name = pdfFileName(), tel = qpDigitos(campo('telefone') || '');
+  var textoWa = (SIG.sig && SIG.med) ? 'Olá! Segue o Termo de Consentimento (TCLE) já assinado, em PDF, para sua referência.' : 'Olá! Segue o Termo de Consentimento (TCLE), em PDF, para você ler com calma antes da consulta. A assinatura será feita presencialmente.';
   var file = null; try { file = new File([blob], name, { type: 'application/pdf' }); } catch (e){}
   if (file && navigator.canShare && navigator.canShare({ files: [file] })){
     try {
-      await navigator.share({ files: [file], title: name, text: 'Termo de consentimento (TCLE)' });
+      await navigator.share({ files: [file], title: name, text: textoWa });
       say('Compartilhado. Escolha o WhatsApp do paciente na lista que abriu.');
       return;
     } catch (err){ if (err && err.name === 'AbortError') return; }
@@ -3633,7 +3638,7 @@ async function enviarPdfPaciente(){
   say('O navegador não consegue enviar o arquivo direto pelo WhatsApp. Baixando o PDF…');
   saveFile(blob, name, function(t, err){
     say(t + (tel ? ' Abra o WhatsApp do paciente e anexe o arquivo baixado.' : ''), err);
-    if (!err && tel){ try { window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent('Olá! Segue o Termo de Consentimento (TCLE), em PDF, para sua referência.'), '_blank'); } catch (e){} }
+    if (!err && tel){ try { window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(textoWa), '_blank'); } catch (e){} }
   });
 }
 function getDL(){
