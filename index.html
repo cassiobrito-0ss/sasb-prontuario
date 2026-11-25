@@ -4181,7 +4181,6 @@ body.auth-ok #btn-exemplo,body.auth-ok #btn-limpar,body.auth-ok #banner,body.aut
   </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>(function(){
 'use strict';
 /* Conexão com o servidor (chave publicável: segura para ficar na página; o acesso aos dados é controlado no servidor) */
@@ -4444,7 +4443,11 @@ $('form-login').addEventListener('submit', async function(e){
   if (!$('gate-troca').hidden) return;
   var u = $('lg-user').value.trim(), p = $('lg-pass').value;
   if (!u || !p){ msg(gMsg, 'Informe login e senha.'); return; }
-  if (!sb){ msg(gMsg, 'Não foi possível carregar o módulo de acesso. Verifique a internet e recarregue a página.'); return; }
+  if (!sb){
+    $('lg-btn').disabled = true; msg(gMsg, 'Carregando o módulo de acesso…', 'ok');
+    await iniciar();
+    if (!sb){ $('lg-btn').disabled = false; msg(gMsg, 'Não foi possível carregar o módulo de acesso. Verifique a internet e recarregue a página.'); return; }
+  }
   $('lg-btn').disabled = true; msg(gMsg, 'Verificando…', 'ok');
   try {
     var r = await sb.auth.signInWithPassword({ email: emailDe(u), password: p });
@@ -5631,12 +5634,33 @@ async function carregarRegistro(){
 
 /* ---------- Início ---------- */
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !$('adm').hidden) $('adm-fechar').click(); });
-function iniciar(){
-  if (!window.supabase || !window.supabase.createClient){ mostrarLogin('Não foi possível carregar o módulo de acesso. Verifique a internet e recarregue a página.'); return; }
-  sb = window.supabase.createClient(CFG.url, CFG.chave, { auth: { storage: store, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
-  sb.auth.onAuthStateChange(function(ev){ if (ev === 'SIGNED_OUT' && EU){ EU = null; PERM = {}; ATUAL = null; SUJO = {}; document.body.classList.remove('com-pront'); if (window.PRONT) window.PRONT.clearAll(); mostrarLogin('Sua sessão terminou. Entre novamente.'); } });
+/* Biblioteca do Supabase: tenta duas CDNs antes de desistir, pois uma CDN
+   fora do ar ou bloqueada (bloqueador de anúncios, rede corporativa) não
+   deve, sozinha, impedir o login. */
+function carregarLibSupabase(){
+  if (window.supabase && window.supabase.createClient) return Promise.resolve(true);
+  var urls = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js', 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'];
+  function tentar(i){
+    if (i >= urls.length) return Promise.resolve(false);
+    return new Promise(function(resolve){
+      var s = document.createElement('script');
+      s.src = urls[i];
+      s.onload = function(){ resolve(!!(window.supabase && window.supabase.createClient)); };
+      s.onerror = function(){ resolve(false); };
+      document.head.appendChild(s);
+    }).then(function(ok){ return ok ? true : tentar(i + 1); });
+  }
+  return tentar(0);
+}
+async function iniciar(){
+  var ok = await carregarLibSupabase();
+  if (!ok) return;
+  if (!sb){
+    sb = window.supabase.createClient(CFG.url, CFG.chave, { auth: { storage: store, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
+    sb.auth.onAuthStateChange(function(ev){ if (ev === 'SIGNED_OUT' && EU){ EU = null; PERM = {}; ATUAL = null; SUJO = {}; document.body.classList.remove('com-pront'); if (window.PRONT) window.PRONT.clearAll(); mostrarLogin('Sua sessão terminou. Entre novamente.'); } });
+  }
   carregarPublicos();
-  iniciarSessao(false).catch(function(){ mostrarLogin(SEM_REDE); });
+  await iniciarSessao(false).catch(function(){ mostrarLogin(SEM_REDE); });
 }
 mostrarLogin();
 iniciar();
