@@ -3629,13 +3629,23 @@ async function enviarPdfPaciente(msgId){
   var textoWa = (SIG.sig && SIG.med) ? 'Olá! Segue o Termo de Consentimento (TCLE) já assinado, em PDF, para sua referência.' : 'Olá! Segue o Termo de Consentimento (TCLE), em PDF, para você ler com calma antes da consulta. A assinatura será feita presencialmente.';
   var file = null; try { file = new File([blob], name, { type: 'application/pdf' }); } catch (e){}
   if (file && navigator.canShare && navigator.canShare({ files: [file] })){
+    say('Abrindo as opções de compartilhamento do aparelho…');
     try {
-      await navigator.share({ files: [file], title: name, text: textoWa });
-      say('Compartilhado. Escolha o WhatsApp do paciente na lista que abriu.');
-      return;
-    } catch (err){ if (err && err.name === 'AbortError') return; }
-  }
-  say('O navegador não consegue enviar o arquivo direto pelo WhatsApp. Baixando o PDF…');
+      // Em alguns navegadores/computadores o compartilhamento nativo não existe de
+      // verdade (canShare() responde 'sim' por engano) e a chamada fica pendurada
+      // para sempre, sem nunca resolver nem falhar — por isso a corrida com um
+      // tempo-limite, para não travar a mensagem indefinidamente nesse caso.
+      var r = await Promise.race([
+        navigator.share({ files: [file], title: name, text: textoWa }).then(function(){ return 'ok'; }),
+        new Promise(function(resolve){ setTimeout(function(){ resolve('tempo'); }, 12000); })
+      ]);
+      if (r === 'ok'){ say('Compartilhado. Escolha o WhatsApp do paciente na lista que abriu.'); return; }
+      say('O compartilhamento não respondeu neste navegador. Baixando o PDF…');
+    } catch (err){
+      if (err && err.name === 'AbortError') return;
+      say('Não foi possível compartilhar direto. Baixando o PDF…');
+    }
+  } else say('Baixando o PDF…');
   saveFile(blob, name, function(t, err){
     say(t + (tel ? ' Abra o WhatsApp do paciente e anexe o arquivo baixado.' : ''), err);
     if (!err && tel){ try { window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(textoWa), '_blank'); } catch (e){} }
